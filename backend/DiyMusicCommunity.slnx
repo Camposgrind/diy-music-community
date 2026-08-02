@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DiyMusicCommunity.Api/DiyMusicCommunity.Api.csproj" />
+    <Project Path="src/DiyMusicCommunity.Application/DiyMusicCommunity.Application.csproj" />
+    <Project Path="src/DiyMusicCommunity.Domain/DiyMusicCommunity.Domain.csproj" />
+    <Project Path="src/DiyMusicCommunity.Infrastructure/DiyMusicCommunity.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DiyMusicCommunity.Api.IntegrationTests/DiyMusicCommunity.Api.IntegrationTests.csproj" />
+    <Project Path="tests/DiyMusicCommunity.Application.Tests/DiyMusicCommunity.Application.Tests.csproj" />
+    <Project Path="tests/DiyMusicCommunity.Domain.Tests/DiyMusicCommunity.Domain.Tests.csproj" />
+  </Folder>
+</Solution>

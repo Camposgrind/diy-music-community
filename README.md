@@ -8,7 +8,7 @@ Powerviolence, D-Beat). Public browsing + community proposals + moderation + ban
 > architecture and [`EXECUTION_STEPS.md`](./EXECUTION_STEPS.md) for the build order.
 
 ## Status
-- [ ] Backend scaffolded
+- [x] Backend scaffolded
 - [ ] Frontend scaffolded
 - [ ] Public browsing
 - [ ] Auth
@@ -16,7 +16,13 @@ Powerviolence, D-Beat). Public browsing + community proposals + moderation + ban
 - [ ] Moderation
 - [ ] Claims
 
+## Maintenance log
+| Date | Change |
+|------|--------|
+| 2025-07-08 | Fixed high-severity transitive vulnerability in `Microsoft.OpenApi` (pinned to 2.7.5) |
+| 2025-07-08 | Removed empty root-level `DiyMusicCommunity.slnx` (real solution lives in `backend/`) |
+
 ## Tech stack
-- Backend: .NET / ASP.NET Core Web API, EF Core, SQL Server
-- Frontend: Angular, TypeScript
+- Backend: .NET 10 / ASP.NET Core Web API, EF Core, SQLite (dev) / Postgres (prod)
+- Frontend: Angular 17+, TypeScript
 - Architecture: Clean Architecture, SOLID, TDD, SDD
