@@ -25,6 +25,8 @@ erDiagram
 		BandStatus Status
 		int FormationYear
 		string Description
+		string LogoImageUrl
+		string BandImageUrl
 		TrustStatus TrustStatus
 		bool IsClaimed
 		datetime CreatedAt

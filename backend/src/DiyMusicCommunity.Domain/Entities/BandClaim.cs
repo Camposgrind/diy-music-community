@@ -21,9 +21,7 @@ public sealed class BandClaim : Entity
         Guid bandId,
         Guid userId,
         ClaimType claimType,
-        DateTime createdAt,
-        string? message = null,
-        string? evidenceUrl = null)
+        DateTime createdAt)
         : base(id)
     {
         if (bandId == Guid.Empty)
@@ -38,11 +36,23 @@ public sealed class BandClaim : Entity
         BandId = bandId;
         UserId = userId;
         ClaimType = claimType;
-        Message = message;
-        EvidenceUrl = evidenceUrl;
         Status = ClaimStatus.Pending;
         CreatedAt = createdAt;
     }
+
+    // --- Optional field setters ---
+
+    public void SetMessage(string? message)
+    {
+        Message = message;
+    }
+
+    public void SetEvidenceUrl(string? evidenceUrl)
+    {
+        EvidenceUrl = evidenceUrl;
+    }
+
+    // --- Review transitions ---
 
     public void Approve(Guid reviewedByUserId, DateTime reviewedAt)
     {

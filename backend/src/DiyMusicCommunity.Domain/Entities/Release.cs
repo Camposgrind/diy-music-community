@@ -13,17 +13,7 @@ public sealed class Release : Entity
     public string? FormatsText { get; private set; }
     public string? CoverImageUrl { get; private set; }
 
-    public Release(
-        Guid id,
-        Guid bandId,
-        string title,
-        ReleaseType releaseType,
-        DateOnly? releaseDate = null,
-        int? year = null,
-        string? labelText = null,
-        string? formatsText = null,
-        string? coverImageUrl = null)
-        : base(id)
+    public Release(Guid id, Guid bandId, string title, ReleaseType releaseType) : base(id)
     {
         if (bandId == Guid.Empty)
         {
@@ -37,8 +27,26 @@ public sealed class Release : Entity
         BandId = bandId;
         Title = title;
         ReleaseType = releaseType;
+    }
+
+    // --- Optional field setters ---
+
+    public void SetReleaseDate(DateOnly? releaseDate)
+    {
         ReleaseDate = releaseDate;
-        Year = year ?? releaseDate?.Year;
+        if (releaseDate.HasValue && !Year.HasValue)
+        {
+            Year = releaseDate.Value.Year;
+        }
+    }
+
+    public void SetYear(int? year)
+    {
+        Year = year;
+    }
+
+    public void SetDetails(string? labelText, string? formatsText, string? coverImageUrl)
+    {
         LabelText = labelText;
         FormatsText = formatsText;
         CoverImageUrl = coverImageUrl;

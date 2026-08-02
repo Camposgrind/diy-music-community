@@ -6,12 +6,21 @@ public class BandMemberEntityTests
 {
     private static readonly Guid BandId = Guid.NewGuid();
 
-    private static BandMember CreateCurrentMember(string name = "Dave Reeves") =>
-        new(Guid.NewGuid(), BandId, name, isCurrent: true, instrument: "Vocals", startYear: 1980);
+    private static BandMember CreateCurrentMember(string name = "Dave Reeves")
+    {
+        var member = new BandMember(Guid.NewGuid(), BandId, name, isCurrent: true);
+        member.SetYears(1980, null);
+        member.SetInstrument("Vocals");
+        return member;
+    }
 
-    private static BandMember CreateMemberWithEndYear(int endYear) =>
-        new(Guid.NewGuid(), BandId, "Dave Reeves", isCurrent: true,
-            instrument: "Vocals", startYear: 1980, endYear: endYear);
+    private static BandMember CreateMemberWithEndYear(int endYear)
+    {
+        var member = new BandMember(Guid.NewGuid(), BandId, "Dave Reeves", isCurrent: true);
+        member.SetInstrument("Vocals");
+        member.SetYears(1980, endYear);
+        return member;
+    }
 
     // --- Construction guards ---
 

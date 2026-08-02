@@ -9,9 +9,10 @@ public class BandProposalEntityTests
     private static readonly Guid ModeratorId = Guid.NewGuid();
     private static readonly DateTime ReviewedAt = DateTime.UtcNow;
 
-    private static BandProposal CreatePendingProposal() =>
-        new(Guid.NewGuid(), "Terrorizer", "US", Guid.NewGuid(), Guid.NewGuid(), DateTime.UtcNow,
-            location: "Los Angeles", formationYear: 1986);
+    private static BandProposal CreatePendingProposal()
+    {
+        return new BandProposal(Guid.NewGuid(), "Terrorizer", "US", Guid.NewGuid(), Guid.NewGuid(), DateTime.UtcNow);
+    }
 
     // --- Construction ---
 

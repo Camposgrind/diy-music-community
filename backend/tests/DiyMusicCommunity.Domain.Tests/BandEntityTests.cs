@@ -9,8 +9,10 @@ public class BandEntityTests
     private static Band CreateBand(
         string name = "Discharge",
         string country = "UK",
-        BandStatus status = BandStatus.Active) =>
-        new(Guid.NewGuid(), name, country, Guid.NewGuid(), status, DateTime.UtcNow);
+        BandStatus status = BandStatus.Active)
+    {
+        return new Band(Guid.NewGuid(), name, country, Guid.NewGuid(), status, DateTime.UtcNow);
+    }
 
     // --- Construction guards ---
 
@@ -46,6 +48,49 @@ public class BandEntityTests
 
         Assert.Equal(TrustStatus.CommunityCreated, band.TrustStatus);
         Assert.False(band.IsClaimed);
+    }
+
+    // --- Optional setters ---
+
+    [Fact]
+    public void SetLocation_Should_UpdateLocation()
+    {
+        var band = CreateBand();
+
+        band.SetLocation("Birmingham");
+
+        Assert.Equal("Birmingham", band.Location);
+    }
+
+    [Fact]
+    public void SetFormationYear_Should_UpdateFormationYear()
+    {
+        var band = CreateBand();
+
+        band.SetFormationYear(1977);
+
+        Assert.Equal(1977, band.FormationYear);
+    }
+
+    [Fact]
+    public void SetDescription_Should_UpdateDescription()
+    {
+        var band = CreateBand();
+
+        band.SetDescription("UK hardcore punk band.");
+
+        Assert.Equal("UK hardcore punk band.", band.Description);
+    }
+
+    [Fact]
+    public void SetImages_Should_UpdateLogoAndBandImageUrl()
+    {
+        var band = CreateBand();
+
+        band.SetImages("https://example.com/logo.png", "https://example.com/band.jpg");
+
+        Assert.Equal("https://example.com/logo.png", band.LogoImageUrl);
+        Assert.Equal("https://example.com/band.jpg", band.BandImageUrl);
     }
 
     // --- MarkClaimPending ---
@@ -122,16 +167,15 @@ public class BandEntityTests
     // --- Update ---
 
     [Fact]
-    public void Update_Should_ChangeNameAndCountry()
+    public void Update_Should_ChangeRequiredFields()
     {
         var band = CreateBand();
         var newGenreId = Guid.NewGuid();
 
-        band.Update("Amebix", "UK", "Bristol", newGenreId, BandStatus.SplitUp, 1978, "Anarcho crust");
+        band.Update("Amebix", "UK", newGenreId, BandStatus.SplitUp);
 
         Assert.Equal("Amebix", band.Name);
         Assert.Equal("UK", band.Country);
-        Assert.Equal("Bristol", band.Location);
         Assert.Equal(newGenreId, band.GenreId);
         Assert.Equal(BandStatus.SplitUp, band.Status);
     }
@@ -144,6 +188,6 @@ public class BandEntityTests
         var band = CreateBand();
 
         Assert.Throws<ArgumentException>(() =>
-            band.Update(name, "UK", null, Guid.NewGuid(), BandStatus.Active, null, null));
+            band.Update(name, "UK", Guid.NewGuid(), BandStatus.Active));
     }
 }

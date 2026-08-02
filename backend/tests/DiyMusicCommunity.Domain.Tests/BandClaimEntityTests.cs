@@ -9,9 +9,13 @@ public class BandClaimEntityTests
     private static readonly Guid ModeratorId = Guid.NewGuid();
     private static readonly DateTime ReviewedAt = DateTime.UtcNow;
 
-    private static BandClaim CreatePendingClaim() =>
-        new(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), ClaimType.CurrentMember, DateTime.UtcNow,
-            message: "I am the drummer.", evidenceUrl: "https://evidence.example.com");
+    private static BandClaim CreatePendingClaim()
+    {
+        var claim = new BandClaim(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), ClaimType.CurrentMember, DateTime.UtcNow);
+        claim.SetMessage("I am the drummer.");
+        claim.SetEvidenceUrl("https://evidence.example.com");
+        return claim;
+    }
 
     // --- Construction ---
 

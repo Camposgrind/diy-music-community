@@ -10,8 +10,15 @@ public class ReleaseEntityTests
     private static Release CreateRelease(
         string title = "World Downfall",
         ReleaseType type = ReleaseType.Album,
-        DateOnly? releaseDate = null) =>
-        new(Guid.NewGuid(), BandId, title, type, releaseDate);
+        DateOnly? releaseDate = null)
+    {
+        var release = new Release(Guid.NewGuid(), BandId, title, type);
+        if (releaseDate.HasValue)
+        {
+            release.SetReleaseDate(releaseDate);
+        }
+        return release;
+    }
 
     // --- Construction guards ---
 
@@ -45,7 +52,8 @@ public class ReleaseEntityTests
     [Fact]
     public void NewRelease_WithExplicitYear_Should_UseExplicitYear()
     {
-        var release = new Release(Guid.NewGuid(), BandId, "World Downfall", ReleaseType.Album, year: 1989);
+        var release = new Release(Guid.NewGuid(), BandId, "World Downfall", ReleaseType.Album);
+        release.SetYear(1989);
 
         Assert.Equal(1989, release.Year);
     }

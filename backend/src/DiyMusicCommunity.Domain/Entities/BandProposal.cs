@@ -25,11 +25,7 @@ public sealed class BandProposal : Entity
         string country,
         Guid genreId,
         Guid submittedByUserId,
-        DateTime createdAt,
-        string? location = null,
-        int? formationYear = null,
-        string? description = null,
-        string? sourceUrl = null)
+        DateTime createdAt)
         : base(id)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -51,15 +47,35 @@ public sealed class BandProposal : Entity
 
         Name = name;
         Country = country;
-        Location = location;
         GenreId = genreId;
-        FormationYear = formationYear;
-        Description = description;
-        SourceUrl = sourceUrl;
         SubmittedByUserId = submittedByUserId;
         ReviewStatus = ProposalStatus.Pending;
         CreatedAt = createdAt;
     }
+
+    // --- Optional field setters ---
+
+    public void SetLocation(string? location)
+    {
+        Location = location;
+    }
+
+    public void SetFormationYear(int? formationYear)
+    {
+        FormationYear = formationYear;
+    }
+
+    public void SetDescription(string? description)
+    {
+        Description = description;
+    }
+
+    public void SetSourceUrl(string? sourceUrl)
+    {
+        SourceUrl = sourceUrl;
+    }
+
+    // --- Review transitions ---
 
     public void Approve(Guid reviewedByUserId, DateTime reviewedAt)
     {
