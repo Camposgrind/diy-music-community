@@ -49,3 +49,29 @@ Result<BandDto>.Failure(Error.NotFound("Band.NotFound", "Band not found"))
 ## Naming
 - Test method names: `Scenario_Should_Result` (e.g. `ApprovePendingProposal_Should_CreateBand`).
 - One class per file; namespace matches folder structure under `DiyMusicCommunity.*`.
+
+## Code style
+- **Always use braces `{ }` for `if` / `else` / `for` / `foreach` / `while` bodies**, even single-line.
+  ```csharp
+  // ✅ correct
+  if (id == Guid.Empty)
+  {
+      throw new ArgumentException("Id cannot be empty.", nameof(id));
+  }
+
+  // ❌ forbidden
+  if (id == Guid.Empty)
+      throw new ArgumentException("Id cannot be empty.", nameof(id));
+  ```
+- **Never use expression-bodied members (`=>`) for methods or constructors.** Use a full block body instead.
+  ```csharp
+  // ✅ correct
+  public void ChangeRole(UserRole newRole)
+  {
+      Role = newRole;
+  }
+
+  // ❌ forbidden
+  public void ChangeRole(UserRole newRole) => Role = newRole;
+  ```
+- LINQ (`Where`, `Select`, `OrderBy`, …) is fine for collection queries; the restriction above applies only to method/constructor bodies.

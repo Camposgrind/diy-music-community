@@ -1,0 +1,93 @@
+using DiyMusicCommunity.Domain.Entities;
+
+namespace DiyMusicCommunity.Domain.Tests;
+
+public class BandMemberEntityTests
+{
+    private static readonly Guid BandId = Guid.NewGuid();
+
+    private static BandMember CreateCurrentMember(string name = "Dave Reeves") =>
+        new(Guid.NewGuid(), BandId, name, isCurrent: true, instrument: "Vocals", startYear: 1980);
+
+    private static BandMember CreateMemberWithEndYear(int endYear) =>
+        new(Guid.NewGuid(), BandId, "Dave Reeves", isCurrent: true,
+            instrument: "Vocals", startYear: 1980, endYear: endYear);
+
+    // --- Construction guards ---
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void NewBandMember_WithEmptyName_Should_ThrowArgumentException(string name)
+    {
+        Assert.Throws<ArgumentException>(() =>
+            new BandMember(Guid.NewGuid(), BandId, name, isCurrent: true));
+    }
+
+    [Fact]
+    public void NewBandMember_WithEmptyBandId_Should_ThrowArgumentException()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            new BandMember(Guid.NewGuid(), Guid.Empty, "Dave", isCurrent: true));
+    }
+
+    // --- EndYear forces IsCurrent = false ---
+
+    [Fact]
+    public void NewBandMember_WithEndYear_Should_ForceIsCurrentToFalse()
+    {
+        var member = CreateMemberWithEndYear(1985);
+
+        Assert.False(member.IsCurrent);
+        Assert.Equal(1985, member.EndYear);
+    }
+
+    [Fact]
+    public void NewBandMember_WithoutEndYear_And_IsCurrentTrue_Should_BeCurrent()
+    {
+        var member = CreateCurrentMember();
+
+        Assert.True(member.IsCurrent);
+        Assert.Null(member.EndYear);
+    }
+
+    // --- SetDeparted ---
+
+    [Fact]
+    public void SetDeparted_Should_SetEndYearAndIsCurrentFalse()
+    {
+        var member = CreateCurrentMember();
+
+        member.SetDeparted(1990);
+
+        Assert.Equal(1990, member.EndYear);
+        Assert.False(member.IsCurrent);
+    }
+
+    [Fact]
+    public void SetDeparted_WithEndYearBeforeStartYear_Should_ThrowArgumentException()
+    {
+        var member = CreateCurrentMember(); // startYear 1980
+
+        Assert.Throws<ArgumentException>(() => member.SetDeparted(1975));
+    }
+
+    // --- Past vs current separation ---
+
+    [Fact]
+    public void Members_WithEndYear_Should_BeDistinguishableFromCurrentMembers()
+    {
+        var members = new[]
+        {
+            CreateCurrentMember("Alice"),
+            CreateMemberWithEndYear(1990),
+            CreateCurrentMember("Bob")
+        };
+
+        var current = members.Where(m => m.IsCurrent).ToList();
+        var past    = members.Where(m => !m.IsCurrent).ToList();
+
+        Assert.Equal(2, current.Count);
+        Assert.Single(past);
+    }
+}
