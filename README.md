@@ -9,7 +9,7 @@ Powerviolence, D-Beat). Public browsing + community proposals + moderation + ban
 
 ## Status
 - [x] Backend scaffolded
-- [ ] Frontend scaffolded
+- [x] Frontend scaffolded
 - [ ] Public browsing
 - [ ] Auth
 - [ ] Proposals
@@ -21,8 +21,9 @@ Powerviolence, D-Beat). Public browsing + community proposals + moderation + ban
 |------|--------|
 | 2025-07-08 | Fixed high-severity transitive vulnerability in `Microsoft.OpenApi` (pinned to 2.7.5) |
 | 2025-07-08 | Removed empty root-level `DiyMusicCommunity.slnx` (real solution lives in `backend/`) |
+| 2025-08-02 | Scaffolded Angular 22 frontend (`dmc-` prefix, SCSS, routing) — `npm run build` green |
 
 ## Tech stack
 - Backend: .NET 10 / ASP.NET Core Web API, EF Core, SQLite (dev) / Postgres (prod)
-- Frontend: Angular 17+, TypeScript
+- Frontend: Angular 22, TypeScript, standalone components
 - Architecture: Clean Architecture, SOLID, TDD, SDD
