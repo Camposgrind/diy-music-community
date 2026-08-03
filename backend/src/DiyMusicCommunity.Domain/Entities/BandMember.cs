@@ -2,13 +2,19 @@ namespace DiyMusicCommunity.Domain.Entities;
 
 public sealed class BandMember : Entity
 {
+    private readonly List<BandMemberOtherBand> _otherBands = new();
+
     public Guid BandId { get; private set; }
     public string Name { get; private set; }
     public string? Instrument { get; private set; }
     public int? StartYear { get; private set; }
     public int? EndYear { get; private set; }
     public bool IsCurrent { get; private set; }
-    public string? AlsoInBandsText { get; private set; }
+
+    public IReadOnlyList<BandMemberOtherBand> OtherBands
+    {
+        get { return _otherBands.AsReadOnly(); }
+    }
 
     public BandMember(Guid id, Guid bandId, string name, bool isCurrent) : base(id)
     {
@@ -43,16 +49,10 @@ public sealed class BandMember : Entity
         StartYear = startYear;
         EndYear = endYear;
 
-        // Rule: if EndYear is set, member is not current
         if (endYear.HasValue)
         {
             IsCurrent = false;
         }
-    }
-
-    public void SetAlsoInBands(string? alsoInBandsText)
-    {
-        AlsoInBandsText = alsoInBandsText;
     }
 
     public void SetDeparted(int endYear)
@@ -65,4 +65,37 @@ public sealed class BandMember : Entity
         EndYear = endYear;
         IsCurrent = false;
     }
+
+    // --- Other bands ---
+
+    public void AddOtherBand(Guid otherBandId)
+    {
+        if (otherBandId == Guid.Empty)
+        {
+            throw new ArgumentException("OtherBandId cannot be empty.", nameof(otherBandId));
+        }
+        if (_otherBands.Any(b => b.OtherBandId == otherBandId))
+        {
+            throw new ArgumentException($"Band '{otherBandId}' is already listed for this member.", nameof(otherBandId));
+        }
+
+        _otherBands.Add(new BandMemberOtherBand(Guid.NewGuid(), Id, otherBandId));
+    }
+
+    public void RemoveOtherBand(Guid otherBandId)
+    {
+        var existing = _otherBands.FirstOrDefault(b => b.OtherBandId == otherBandId);
+        if (existing is null)
+        {
+            throw new ArgumentException($"Band '{otherBandId}' is not listed for this member.", nameof(otherBandId));
+        }
+
+        _otherBands.Remove(existing);
+    }
+
+    public IReadOnlyList<Guid> GetOtherBands()
+    {
+        return _otherBands.Select(b => b.OtherBandId).ToList().AsReadOnly();
+    }
 }
+

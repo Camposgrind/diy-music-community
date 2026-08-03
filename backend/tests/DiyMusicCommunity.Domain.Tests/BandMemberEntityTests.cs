@@ -76,7 +76,7 @@ public class BandMemberEntityTests
     [Fact]
     public void SetDeparted_WithEndYearBeforeStartYear_Should_ThrowArgumentException()
     {
-        var member = CreateCurrentMember(); // startYear 1980
+        var member = CreateCurrentMember();
 
         Assert.Throws<ArgumentException>(() => member.SetDeparted(1975));
     }
@@ -98,5 +98,76 @@ public class BandMemberEntityTests
 
         Assert.Equal(2, current.Count);
         Assert.Single(past);
+    }
+}
+
+public class BandMemberOtherBandTests
+{
+    private static readonly Guid BandId = Guid.NewGuid();
+
+    private static BandMember CreateMember()
+    {
+        var member = new BandMember(Guid.NewGuid(), BandId, "Dave Reeves", isCurrent: true);
+        member.SetYears(1980, null);
+        return member;
+    }
+
+    // --- OtherBands (replaces AlsoInBandsText) ---
+
+    [Fact]
+    public void NewBandMember_Should_HaveNoOtherBands()
+    {
+        var member = CreateMember();
+
+        Assert.Empty(member.GetOtherBands());
+    }
+
+    [Fact]
+    public void AddOtherBand_Should_AppendBandIdToMember()
+    {
+        var member = CreateMember();
+        var otherBandId = Guid.NewGuid();
+
+        member.AddOtherBand(otherBandId);
+
+        Assert.Contains(otherBandId, member.GetOtherBands());
+    }
+
+    [Fact]
+    public void AddOtherBand_Duplicate_Should_ThrowArgumentException()
+    {
+        var member = CreateMember();
+        var otherBandId = Guid.NewGuid();
+        member.AddOtherBand(otherBandId);
+
+        Assert.Throws<ArgumentException>(() => member.AddOtherBand(otherBandId));
+    }
+
+    [Fact]
+    public void AddOtherBand_EmptyGuid_Should_ThrowArgumentException()
+    {
+        var member = CreateMember();
+
+        Assert.Throws<ArgumentException>(() => member.AddOtherBand(Guid.Empty));
+    }
+
+    [Fact]
+    public void RemoveOtherBand_Existing_Should_RemoveFromMember()
+    {
+        var member = CreateMember();
+        var otherBandId = Guid.NewGuid();
+        member.AddOtherBand(otherBandId);
+
+        member.RemoveOtherBand(otherBandId);
+
+        Assert.DoesNotContain(otherBandId, member.GetOtherBands());
+    }
+
+    [Fact]
+    public void RemoveOtherBand_NotPresent_Should_ThrowArgumentException()
+    {
+        var member = CreateMember();
+
+        Assert.Throws<ArgumentException>(() => member.RemoveOtherBand(Guid.NewGuid()));
     }
 }

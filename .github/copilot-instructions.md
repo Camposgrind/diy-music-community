@@ -5,7 +5,7 @@ Web platform to catalog underground/DIY music scenes (Punk, Crust, Grindcore, Po
 Features: public browsing, community proposals, moderation, band claims, trust states.
 
 ## Stack
-- **Backend:** .NET 8, Clean Architecture (Domain / Application / Infrastructure / Api), EF Core (SQLite dev / Postgres prod), FluentValidation, JWT, Result pattern.
+- **Backend:** .NET 10, Clean Architecture (Domain / Application / Infrastructure / Api), EF Core (SQL Server dev / Postgres prod), FluentValidation, JWT, Result pattern.
 - **Frontend:** Angular 17+, standalone components, Reactive Forms, `dmc-` selector prefix.
 - **Tests:** xUnit + Moq (backend), Vitest (frontend). `dotnet test` / `npm test`.
 - **Secrets:** Azure Key Vault (staging/prod) + .NET User Secrets (local dev). Never hardcode secrets.
@@ -48,7 +48,8 @@ Features: public browsing, community proposals, moderation, band claims, trust s
 - Scope: browsing, band detail, proposals, moderation, claims, trust states.
 - JWT only; `sub` + `role` claims.
 - Band claim = resource-based check (`IBandAccessService`), not a global role.
-- Strings for Country / Label / Formats — no extra entities.
+- Strings for Country / Label only. Release formats use `Format` enum + `ReleaseFormat` join entity (see ADR 002). Band member cross-band references use `BandMemberOtherBand` join entity (see ADR 002).
+- **BandMember consistency rules (see ADR 002):** When updating a `BandMember` (name, photo, etc.), the use case MUST propagate changes to all sibling `BandMember` rows linked via `BandMemberOtherBand`. When adding/removing an `OtherBand` link, the use case MUST create/remove reciprocal links on all related members. Both operations MUST be atomic (single `SaveChangesAsync` call).
 - Coverage: ~60% overall, ~85% Domain + Application.
 - Skip E2E if short on time.
 - Secrets: Azure Key Vault in deployed envs; .NET User Secrets locally. See `docs/adr/001-secrets-management.md`.

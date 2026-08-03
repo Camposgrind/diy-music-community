@@ -4,14 +4,20 @@ namespace DiyMusicCommunity.Domain.Entities;
 
 public sealed class Release : Entity
 {
+    private readonly List<ReleaseFormat> _formats = new();
+
     public Guid BandId { get; private set; }
     public string Title { get; private set; }
     public ReleaseType ReleaseType { get; private set; }
     public DateOnly? ReleaseDate { get; private set; }
     public int? Year { get; private set; }
     public string? LabelText { get; private set; }
-    public string? FormatsText { get; private set; }
     public string? CoverImageUrl { get; private set; }
+
+    public IReadOnlyList<ReleaseFormat> Formats
+    {
+        get { return _formats.AsReadOnly(); }
+    }
 
     public Release(Guid id, Guid bandId, string title, ReleaseType releaseType) : base(id)
     {
@@ -45,10 +51,37 @@ public sealed class Release : Entity
         Year = year;
     }
 
-    public void SetDetails(string? labelText, string? formatsText, string? coverImageUrl)
+    public void SetDetails(string? labelText, string? coverImageUrl)
     {
         LabelText = labelText;
-        FormatsText = formatsText;
         CoverImageUrl = coverImageUrl;
+    }
+
+    // --- Formats ---
+
+    public void AddFormat(Format format)
+    {
+        if (_formats.Any(f => f.Format == format))
+        {
+            throw new ArgumentException($"Format '{format}' is already added to this release.", nameof(format));
+        }
+
+        _formats.Add(new ReleaseFormat(Guid.NewGuid(), Id, format));
+    }
+
+    public void RemoveFormat(Format format)
+    {
+        var existing = _formats.FirstOrDefault(f => f.Format == format);
+        if (existing is null)
+        {
+            throw new ArgumentException($"Format '{format}' is not present on this release.", nameof(format));
+        }
+
+        _formats.Remove(existing);
+    }
+
+    public IReadOnlyList<Format> GetFormats()
+    {
+        return _formats.Select(f => f.Format).ToList().AsReadOnly();
     }
 }

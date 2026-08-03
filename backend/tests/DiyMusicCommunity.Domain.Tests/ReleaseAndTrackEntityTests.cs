@@ -3,6 +3,85 @@ using DiyMusicCommunity.Domain.Enums;
 
 namespace DiyMusicCommunity.Domain.Tests;
 
+public class ReleaseFormatTests
+{
+    private static readonly Guid BandId = Guid.NewGuid();
+
+    private static Release CreateRelease()
+    {
+        return new Release(Guid.NewGuid(), BandId, "World Downfall", ReleaseType.Album);
+    }
+
+    // --- AddFormat ---
+
+    [Fact]
+    public void AddFormat_Should_AppendFormatToRelease()
+    {
+        var release = CreateRelease();
+
+        release.AddFormat(Format.Vinyl12);
+
+        Assert.Contains(Format.Vinyl12, release.GetFormats());
+    }
+
+    [Fact]
+    public void AddFormat_Duplicate_Should_ThrowArgumentException()
+    {
+        var release = CreateRelease();
+        release.AddFormat(Format.CD);
+
+        Assert.Throws<ArgumentException>(() => release.AddFormat(Format.CD));
+    }
+
+    [Fact]
+    public void AddFormat_Multiple_Should_StoreAllFormats()
+    {
+        var release = CreateRelease();
+
+        release.AddFormat(Format.Vinyl12);
+        release.AddFormat(Format.CD);
+        release.AddFormat(Format.Digital);
+
+        var formats = release.GetFormats();
+        Assert.Equal(3, formats.Count);
+        Assert.Contains(Format.Vinyl12, formats);
+        Assert.Contains(Format.CD, formats);
+        Assert.Contains(Format.Digital, formats);
+    }
+
+    // --- RemoveFormat ---
+
+    [Fact]
+    public void RemoveFormat_Existing_Should_RemoveFromRelease()
+    {
+        var release = CreateRelease();
+        release.AddFormat(Format.Cassette);
+
+        release.RemoveFormat(Format.Cassette);
+
+        Assert.DoesNotContain(Format.Cassette, release.GetFormats());
+    }
+
+    [Fact]
+    public void RemoveFormat_NotPresent_Should_ThrowArgumentException()
+    {
+        var release = CreateRelease();
+
+        Assert.Throws<ArgumentException>(() => release.RemoveFormat(Format.DVD));
+    }
+
+    // --- FormatsText is gone ---
+
+    [Fact]
+    public void NewRelease_Should_HaveNoFormats()
+    {
+        var release = CreateRelease();
+
+        Assert.Empty(release.GetFormats());
+    }
+}
+
+
 public class ReleaseEntityTests
 {
     private static readonly Guid BandId = Guid.NewGuid();

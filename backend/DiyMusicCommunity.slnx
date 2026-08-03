@@ -1,4 +1,10 @@
 <Solution>
+  <Folder Name="/frontend/">
+    <Project Path="../frontend/DiyMusicCommunity.Frontend.esproj">
+      <Build />
+      <Deploy />
+    </Project>
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/DiyMusicCommunity.Api/DiyMusicCommunity.Api.csproj" />
     <Project Path="src/DiyMusicCommunity.Application/DiyMusicCommunity.Application.csproj" />

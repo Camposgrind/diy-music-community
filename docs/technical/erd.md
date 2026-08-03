@@ -41,8 +41,13 @@ erDiagram
 		date ReleaseDate
 		int Year
 		string LabelText
-		string FormatsText
 		string CoverImageUrl
+	}
+
+	ReleaseFormat {
+		Guid Id PK
+		Guid ReleaseId FK
+		Format Format
 	}
 
 	Track {
@@ -60,7 +65,12 @@ erDiagram
 		int StartYear
 		int EndYear
 		bool IsCurrent
-		string AlsoInBandsText
+	}
+
+	BandMemberOtherBand {
+		Guid Id PK
+		Guid BandMemberId FK
+		Guid OtherBandId FK
 	}
 
 	BandProposal {
@@ -111,6 +121,10 @@ erDiagram
 	Band ||--o{ BandClaim : "subject of"
 
 	Release ||--o{ Track : "contains"
+	Release ||--o{ ReleaseFormat : "released as"
+
+	BandMember ||--o{ BandMemberOtherBand : "also in"
+	Band ||--o{ BandMemberOtherBand : "referenced by"
 
 	User ||--o{ BandProposal : "submits"
 	User ||--o{ BandClaim : "submits"
