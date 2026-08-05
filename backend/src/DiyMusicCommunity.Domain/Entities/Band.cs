@@ -14,6 +14,7 @@ public sealed class Band : Entity
     public string? Description { get; private set; }
     public string? LogoImageUrl { get; private set; }
     public string? BandImageUrl { get; private set; }
+    public string? MusicUrlPortal { get; private set; }
     public TrustStatus TrustStatus { get; private set; }
     public bool IsClaimed { get; private set; }
     public DateTime CreatedAt { get; private set; }
@@ -75,6 +76,12 @@ public sealed class Band : Entity
     {
         LogoImageUrl = logoImageUrl;
         BandImageUrl = bandImageUrl;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void SetMusicUrlPortal(string? musicUrlPortal)
+    {
+        MusicUrlPortal = musicUrlPortal;
         UpdatedAt = DateTime.UtcNow;
     }
 

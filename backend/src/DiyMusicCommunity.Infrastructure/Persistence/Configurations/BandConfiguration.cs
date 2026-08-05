@@ -31,6 +31,9 @@ public sealed class BandConfiguration : IEntityTypeConfiguration<Band>
         builder.Property(b => b.BandImageUrl)
             .HasMaxLength(500);
 
+        builder.Property(b => b.MusicUrlPortal)
+            .HasColumnType("nvarchar(max)");
+
         builder.Property(b => b.Status)
             .HasConversion<string>()
             .HasMaxLength(50);

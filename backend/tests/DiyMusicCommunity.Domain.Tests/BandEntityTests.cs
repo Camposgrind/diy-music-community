@@ -93,6 +93,40 @@ public class BandEntityTests
         Assert.Equal("https://example.com/band.jpg", band.BandImageUrl);
     }
 
+    // --- SetMusicUrl ---
+
+    [Fact]
+    public void SetMusicUrlPortal_Should_UpdateMusicUrlPortal()
+    {
+        var band = CreateBand();
+
+        band.SetMusicUrlPortal("https://bandcamp.com/discharge");
+
+        Assert.Equal("https://bandcamp.com/discharge", band.MusicUrlPortal);
+    }
+
+    [Fact]
+    public void SetMusicUrlPortal_WithNull_Should_ClearMusicUrlPortal()
+    {
+        var band = CreateBand();
+        band.SetMusicUrlPortal("https://bandcamp.com/discharge");
+
+        band.SetMusicUrlPortal(null);
+
+        Assert.Null(band.MusicUrlPortal);
+    }
+
+    [Fact]
+    public void SetMusicUrlPortal_Should_UpdateUpdatedAt()
+    {
+        var band = CreateBand();
+        var before = band.UpdatedAt;
+
+        band.SetMusicUrlPortal("https://bandcamp.com/discharge");
+
+        Assert.True(band.UpdatedAt >= before);
+    }
+
     // --- MarkClaimPending ---
 
     [Fact]

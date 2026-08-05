@@ -27,6 +27,7 @@ erDiagram
 		string Description
 		string LogoImageUrl
 		string BandImageUrl
+		string MusicUrlPortal
 		TrustStatus TrustStatus
 		bool IsClaimed
 		datetime CreatedAt
