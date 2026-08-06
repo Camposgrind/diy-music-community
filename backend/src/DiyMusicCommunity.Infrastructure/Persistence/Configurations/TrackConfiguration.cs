@@ -36,7 +36,7 @@ public sealed class TrackConfiguration : IEntityTypeConfiguration<Track>
             new { Id = new Guid("c0de0000-cafe-beef-dead-000000000017"), ReleaseId = new Guid("a1b2cafe-dead-beef-f00d-c0de00000001"), Title = "Viejos Riders Nunca Mueren",TrackNumber = 17 },
             new { Id = new Guid("c0de0000-cafe-beef-dead-000000000018"), ReleaseId = new Guid("a1b2cafe-dead-beef-f00d-c0de00000001"), Title = "Sombra Eterna",             TrackNumber = 18 },
             new { Id = new Guid("c0de0000-cafe-beef-dead-000000000019"), ReleaseId = new Guid("a1b2cafe-dead-beef-f00d-c0de00000001"), Title = "Nunca Ganas",               TrackNumber = 19 },
-            new { Id = new Guid("c0de0000-cafe-beef-dead-000000000020"), ReleaseId = new Guid("a1b2cafe-dead-beef-f00d-c0de00000001"), Title = "",                          TrackNumber = 20 },
+            new { Id = new Guid("c0de0000-cafe-beef-dead-000000000020"), ReleaseId = new Guid("a1b2cafe-dead-beef-f00d-c0de00000001"), Title = "Vacío",                    TrackNumber = 20 },
             new { Id = new Guid("c0de0000-cafe-beef-dead-000000000021"), ReleaseId = new Guid("a1b2cafe-dead-beef-f00d-c0de00000001"), Title = "Sin Libertad",              TrackNumber = 21 },
             new { Id = new Guid("c0de0000-cafe-beef-dead-000000000022"), ReleaseId = new Guid("a1b2cafe-dead-beef-f00d-c0de00000001"), Title = "Fronteras",                 TrackNumber = 22 },
             new { Id = new Guid("c0de0000-cafe-beef-dead-000000000023"), ReleaseId = new Guid("a1b2cafe-dead-beef-f00d-c0de00000001"), Title = "Freya",                    TrackNumber = 23 });

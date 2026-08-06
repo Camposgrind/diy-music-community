@@ -34,6 +34,9 @@ public sealed class BandConfiguration : IEntityTypeConfiguration<Band>
         builder.Property(b => b.MusicUrlPortal)
             .HasColumnType("nvarchar(max)");
 
+        builder.Property(b => b.BandContact)
+            .HasColumnType("nvarchar(max)");
+
         builder.Property(b => b.Status)
             .HasConversion<string>()
             .HasMaxLength(50);
@@ -44,6 +47,11 @@ public sealed class BandConfiguration : IEntityTypeConfiguration<Band>
 
         builder.HasIndex(b => b.Name);
         builder.HasIndex(b => b.Status);
+
+        builder.HasOne(b => b.Genre)
+            .WithMany()
+            .HasForeignKey(b => b.GenreId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasData(
             new

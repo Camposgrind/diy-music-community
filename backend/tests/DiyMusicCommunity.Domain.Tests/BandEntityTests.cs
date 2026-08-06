@@ -127,6 +127,40 @@ public class BandEntityTests
         Assert.True(band.UpdatedAt >= before);
     }
 
+    // --- SetBandContact ---
+
+    [Fact]
+    public void SetBandContact_Should_UpdateBandContact()
+    {
+        var band = CreateBand();
+
+        band.SetBandContact("contact@discharge.com");
+
+        Assert.Equal("contact@discharge.com", band.BandContact);
+    }
+
+    [Fact]
+    public void SetBandContact_WithNull_Should_ClearBandContact()
+    {
+        var band = CreateBand();
+        band.SetBandContact("contact@discharge.com");
+
+        band.SetBandContact(null);
+
+        Assert.Null(band.BandContact);
+    }
+
+    [Fact]
+    public void SetBandContact_Should_UpdateUpdatedAt()
+    {
+        var band = CreateBand();
+        var before = band.UpdatedAt;
+
+        band.SetBandContact("contact@discharge.com");
+
+        Assert.True(band.UpdatedAt >= before);
+    }
+
     // --- MarkClaimPending ---
 
     [Fact]

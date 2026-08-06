@@ -15,10 +15,14 @@ public sealed class Band : Entity
     public string? LogoImageUrl { get; private set; }
     public string? BandImageUrl { get; private set; }
     public string? MusicUrlPortal { get; private set; }
+    public string? BandContact { get; private set; }
     public TrustStatus TrustStatus { get; private set; }
     public bool IsClaimed { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
+
+    // Navigation property — populated by EF Core when explicitly included
+    public Genre? Genre { get; private set; }
 
     public Band(
         Guid id,
@@ -82,6 +86,12 @@ public sealed class Band : Entity
     public void SetMusicUrlPortal(string? musicUrlPortal)
     {
         MusicUrlPortal = musicUrlPortal;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void SetBandContact(string? bandContact)
+    {
+        BandContact = bandContact;
         UpdatedAt = DateTime.UtcNow;
     }
 

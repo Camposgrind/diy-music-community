@@ -1,5 +1,6 @@
 using DiyMusicCommunity.Domain.Abstractions;
 using DiyMusicCommunity.Domain.Entities;
+using DiyMusicCommunity.Domain.Enums;
 using DiyMusicCommunity.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +23,46 @@ public sealed class BandRepository : IBandRepository
     public async Task<IReadOnlyList<Band>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Bands.ToListAsync(cancellationToken);
+    }
+
+    public async Task<(IReadOnlyList<Band> Items, int TotalCount)> SearchAsync(
+        BandSearchFilter filter,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _context.Bands
+            .Include(b => b.Genre)
+            .Where(b => b.TrustStatus != TrustStatus.Blocked)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(filter.Name))
+        {
+            query = query.Where(b => b.Name.Contains(filter.Name));
+        }
+
+        if (!string.IsNullOrWhiteSpace(filter.Country))
+        {
+            query = query.Where(b => b.Country.ToLower() == filter.Country.ToLower());
+        }
+
+        if (filter.GenreId.HasValue)
+        {
+            query = query.Where(b => b.GenreId == filter.GenreId.Value);
+        }
+
+        if (filter.Status.HasValue)
+        {
+            query = query.Where(b => b.Status == filter.Status.Value);
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .OrderBy(b => b.Name)
+            .Skip((filter.Page - 1) * filter.PageSize)
+            .Take(filter.PageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
     }
 
     public async Task AddAsync(Band band, CancellationToken cancellationToken = default)

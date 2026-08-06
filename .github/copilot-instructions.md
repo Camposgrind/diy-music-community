@@ -31,6 +31,7 @@ Features: public browsing, community proposals, moderation, band claims, trust s
 - Backend test names: `Scenario_Should_Result`
 - Frontend test names: `it('should ...')`
 - Angular selectors: `dmc-` prefix; files: `kebab-case.type.ts`
+- **Response model classes** (the types returned inside `IActionResult` / `Ok()` from controllers) MUST be named with the `Model` suffix — e.g. `BandListItemModel`, `BandDetailModel`. Never use `Dto` as the suffix for classes that are directly returned by a controller action.
 
 ## Must NOT do
 - Delete tests or lower coverage thresholds to pass CI.
@@ -43,6 +44,7 @@ Features: public browsing, community proposals, moderation, band claims, trust s
 - **Hardcode any secret, password, connection string, or API key in any file.**
 - Commit `appsettings.Local.json`, `.env`, or any file containing real secret values.
 - Put secrets in `environment.ts` or any frontend file.
+- **Hardcode magic strings (error codes, route segments, message text, enum-like string values) directly in production code.** Extract them to `const` fields (inside the class that owns them) or to a dedicated static class (e.g. `BandErrors.Codes`). Seed data, EF configurations, and migrations are exempt.
 
 ## Key decisions (do not revisit)
 - Scope: browsing, band detail, proposals, moderation, claims, trust states.
