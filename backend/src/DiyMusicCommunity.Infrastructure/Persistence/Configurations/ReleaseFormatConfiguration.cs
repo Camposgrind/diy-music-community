@@ -16,5 +16,10 @@ public sealed class ReleaseFormatConfiguration : IEntityTypeConfiguration<Releas
             .HasMaxLength(50);
 
         builder.HasIndex(rf => new { rf.ReleaseId, rf.Format }).IsUnique();
+
+        builder.HasData(
+            new { Id = new Guid("f04f0000-cafe-beef-dead-000000000001"), ReleaseId = new Guid("a1b2cafe-dead-beef-f00d-c0de00000001"), Format = Domain.Enums.Format.Vinyl12 },
+            new { Id = new Guid("f04f0000-cafe-beef-dead-000000000002"), ReleaseId = new Guid("a1b2cafe-dead-beef-f00d-c0de00000001"), Format = Domain.Enums.Format.CD },
+            new { Id = new Guid("f04f0000-cafe-beef-dead-000000000003"), ReleaseId = new Guid("a1b2cafe-dead-beef-f00d-c0de00000001"), Format = Domain.Enums.Format.Cassette });
     }
 }

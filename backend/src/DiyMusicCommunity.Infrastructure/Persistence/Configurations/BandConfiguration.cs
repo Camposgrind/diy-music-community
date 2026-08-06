@@ -44,5 +44,22 @@ public sealed class BandConfiguration : IEntityTypeConfiguration<Band>
 
         builder.HasIndex(b => b.Name);
         builder.HasIndex(b => b.Status);
+
+        builder.HasData(
+            new
+            {
+                Id = new Guid("ba4dc0de-beef-cafe-f00d-b00000000001"),
+                Name = "Convulsions",
+                Country = "Spain",
+                Location = "El Ejido",
+                GenreId = new Guid("a1b2c3d4-e5f6-7890-abcd-ef1234567890"),
+                Status = Domain.Enums.BandStatus.Active,
+                FormationYear = 2016,
+                IsClaimed = true,
+                MusicUrlPortal = "https://convulsionsgrindcore.bandcamp.com",
+                TrustStatus = Domain.Enums.TrustStatus.Claimed,
+                CreatedAt = new DateTime(2026, 8, 5, 0, 0, 0, DateTimeKind.Utc),
+                UpdatedAt = new DateTime(2026, 8, 5, 0, 0, 0, DateTimeKind.Utc)
+            });
     }
 }

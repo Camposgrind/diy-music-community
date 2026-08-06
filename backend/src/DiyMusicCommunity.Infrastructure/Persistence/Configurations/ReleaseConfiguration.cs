@@ -31,5 +31,18 @@ public sealed class ReleaseConfiguration : IEntityTypeConfiguration<Release>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(r => r.BandId);
+
+        builder.HasData(
+            new
+            {
+                Id = new Guid("a1b2cafe-dead-beef-f00d-c0de00000001"),
+                BandId = new Guid("ba4dc0de-beef-cafe-f00d-b00000000001"),
+                Title = "Grindcore Not War",
+                LabelText = "Hecatombe Records, Regurgitated Semen Records",
+                ReleaseType = Domain.Enums.ReleaseType.Album,
+                ReleaseDate = new DateOnly(2023, 3, 10),
+                Year = (int?)2023,
+                CoverImageUrl = (string?)null
+            });
     }
 }

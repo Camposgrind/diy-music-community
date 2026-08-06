@@ -23,5 +23,11 @@ public sealed class BandMemberConfiguration : IEntityTypeConfiguration<BandMembe
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(m => m.BandId);
+
+        builder.HasData(
+            new { Id = new Guid("de4db33f-cafe-f00d-a1b2-c3d4e5f00001"), BandId = new Guid("ba4dc0de-beef-cafe-f00d-b00000000001"), Name = "Sergio Campos",   Instrument = "Vocals", IsCurrent = true, StartYear = (int?)2016, EndYear = (int?)null },
+            new { Id = new Guid("de4db33f-cafe-f00d-a1b2-c3d4e5f00002"), BandId = new Guid("ba4dc0de-beef-cafe-f00d-b00000000001"), Name = "Hector Gonzalez", Instrument = "Guitar", IsCurrent = true, StartYear = (int?)2016, EndYear = (int?)null },
+            new { Id = new Guid("de4db33f-cafe-f00d-a1b2-c3d4e5f00003"), BandId = new Guid("ba4dc0de-beef-cafe-f00d-b00000000001"), Name = "Binky",           Instrument = "Bass",  IsCurrent = true, StartYear = (int?)2016, EndYear = (int?)null },
+            new { Id = new Guid("de4db33f-cafe-f00d-a1b2-c3d4e5f00004"), BandId = new Guid("ba4dc0de-beef-cafe-f00d-b00000000001"), Name = "Samuel Fernandez",Instrument = "Drums", IsCurrent = true, StartYear = (int?)2016, EndYear = (int?)null });
     }
 }
