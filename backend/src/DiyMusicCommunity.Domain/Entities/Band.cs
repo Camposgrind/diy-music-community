@@ -24,6 +24,13 @@ public sealed class Band : Entity
     // Navigation property — populated by EF Core when explicitly included
     public Genre? Genre { get; private set; }
 
+    // Navigation properties — populated by EF Core when explicitly included
+    private readonly List<Release> _releases = new();
+    private readonly List<BandMember> _members = new();
+
+    public IReadOnlyList<Release> Releases => _releases.AsReadOnly();
+    public IReadOnlyList<BandMember> Members => _members.AsReadOnly();
+
     public Band(
         Guid id,
         string name,

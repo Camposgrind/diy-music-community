@@ -1,6 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using DiyMusicCommunity.Application.Bands;
+using DiyMusicCommunity.Application.Bands.GetBandDetail;
 using DiyMusicCommunity.Application.Bands.GetBands; // BandListItemModel
 using DiyMusicCommunity.Application.Common;
 using DiyMusicCommunity.Domain.Entities;
@@ -13,6 +16,13 @@ namespace DiyMusicCommunity.Api.IntegrationTests;
 // Each test gets its own factory → fresh in-memory SQLite database
 public sealed class BandsControllerTests
 {
+    // Matches the JsonStringEnumConverter configured in Program.cs
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter() }
+    };
+
     // -----------------------------------------------------------------------
     // Seeding helpers
     // -----------------------------------------------------------------------
@@ -254,5 +264,99 @@ public sealed class BandsControllerTests
         body!.Items.Should().BeEmpty();
         body.TotalCount.Should().Be(1);
         body.Page.Should().Be(99);
+    }
+
+    // -----------------------------------------------------------------------
+    // GET /api/bands/{id}
+    // -----------------------------------------------------------------------
+
+    [Fact]
+    public async Task GET_BandDetail_ExistingId_Should_Return200WithBandDetailModel()
+    {
+        var bandId = Guid.NewGuid();
+        var (factory, client) = CreateClient(db =>
+        {
+            // GrindcoreGenreId is already seeded via HasData in GenreConfiguration
+            var band = new Band(bandId, "Terrorizer", "USA", GrindcoreGenreId, BandStatus.SplitUp, DateTime.UtcNow);
+            band.SetFormationYear(1986);
+            band.SetLocation("Los Angeles");
+            db.Bands.Add(band);
+        });
+        using var _ = factory;
+
+        var response = await client.GetAsync($"/api/bands/{bandId}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var body = await response.Content.ReadFromJsonAsync<BandDetailModel>(JsonOptions);
+        body.Should().NotBeNull();
+        body!.Id.Should().Be(bandId);
+        body.Name.Should().Be("Terrorizer");
+        body.Country.Should().Be("USA");
+        body.Location.Should().Be("Los Angeles");
+        body.FormationYear.Should().Be(1986);
+        body.Status.Should().Be(BandStatus.SplitUp);
+    }
+
+    [Fact]
+    public async Task GET_BandDetail_UnknownId_Should_Return404WithNotFoundError()
+    {
+        var (factory, client) = CreateClient();
+        using var _ = factory;
+
+        var unknownId = Guid.NewGuid();
+        var response = await client.GetAsync($"/api/bands/{unknownId}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        var error = await response.Content.ReadFromJsonAsync<Error>();
+        error!.Code.Should().Be(BandErrors.Codes.NotFound);
+    }
+
+    [Fact]
+    public async Task GET_BandDetail_InvalidGuid_Should_Return400()
+    {
+        var (factory, client) = CreateClient();
+        using var _ = factory;
+
+        var response = await client.GetAsync("/api/bands/not-a-guid");
+
+        // The {id:guid} route constraint does not match a non-GUID segment;
+        // ASP.NET Core returns 404 (no route match) rather than 400.
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task GET_BandDetail_BandWithNoReleases_Should_Return200WithEmptyReleases()
+    {
+        var bandId = Guid.NewGuid();
+        var (factory, client) = CreateClient(db =>
+        {
+            db.Bands.Add(new Band(bandId, "NoReleaseBand", "UK", GrindcoreGenreId, BandStatus.Active, DateTime.UtcNow));
+        });
+        using var _ = factory;
+
+        var response = await client.GetAsync($"/api/bands/{bandId}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var body = await response.Content.ReadFromJsonAsync<BandDetailModel>(JsonOptions);
+        body!.Releases.Should().NotBeNull();
+        body.Releases.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task GET_BandDetail_BandWithNoMembers_Should_Return200WithEmptyMembers()
+    {
+        var bandId = Guid.NewGuid();
+        var (factory, client) = CreateClient(db =>
+        {
+            db.Bands.Add(new Band(bandId, "NoMemberBand", "DE", GrindcoreGenreId, BandStatus.Active, DateTime.UtcNow));
+        });
+        using var _ = factory;
+
+        var response = await client.GetAsync($"/api/bands/{bandId}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var body = await response.Content.ReadFromJsonAsync<BandDetailModel>(JsonOptions);
+        body!.Members.Should().NotBeNull();
+        body.Members.Should().BeEmpty();
     }
 }

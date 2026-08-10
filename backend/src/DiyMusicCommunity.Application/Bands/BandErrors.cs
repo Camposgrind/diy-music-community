@@ -13,6 +13,7 @@ public static class BandErrors
     {
         public const string InvalidFilter = "Band.InvalidFilter";
         public const string TooManyResults = "Band.TooManyResults";
+        public const string NotFound = "Band.NotFound";
     }
 
     public static Error InvalidFilter(string message)
@@ -22,4 +23,7 @@ public static class BandErrors
         => Error.UnprocessableEntity(
             Codes.TooManyResults,
             $"Your search returned more than {cap} bands. Please refine your filters to narrow the results.");
+
+    public static Error NotFound(Guid id)
+        => Error.NotFound(Codes.NotFound, $"No band with id '{id}' was found.");
 }

@@ -1,3 +1,4 @@
+using DiyMusicCommunity.Application.Bands.GetBandDetail;
 using DiyMusicCommunity.Application.Bands.GetBands;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,7 @@ public static class DependencyInjection
     {
         services.AddValidatorsFromAssemblyContaining<GetBandsQueryValidator>();
         services.AddScoped<GetBandsUseCase>();
+        services.AddScoped<GetBandDetailUseCase>();
 
         return services;
     }

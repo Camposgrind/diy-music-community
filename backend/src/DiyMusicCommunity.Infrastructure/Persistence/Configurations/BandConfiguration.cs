@@ -53,6 +53,19 @@ public sealed class BandConfiguration : IEntityTypeConfiguration<Band>
             .HasForeignKey(b => b.GenreId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasMany(b => b.Releases)
+            .WithOne()
+            .HasForeignKey(r => r.BandId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(b => b.Members)
+            .WithOne()
+            .HasForeignKey(m => m.BandId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Navigation(b => b.Releases).HasField("_releases");
+        builder.Navigation(b => b.Members).HasField("_members");
+
         builder.HasData(
             new
             {
@@ -65,6 +78,7 @@ public sealed class BandConfiguration : IEntityTypeConfiguration<Band>
                 FormationYear = 2016,
                 IsClaimed = true,
                 MusicUrlPortal = "https://convulsionsgrindcore.bandcamp.com",
+                BandContact = "convulsionsgrindcore@gmail.com",
                 TrustStatus = Domain.Enums.TrustStatus.Claimed,
                 CreatedAt = new DateTime(2026, 8, 5, 0, 0, 0, DateTimeKind.Utc),
                 UpdatedAt = new DateTime(2026, 8, 5, 0, 0, 0, DateTimeKind.Utc)

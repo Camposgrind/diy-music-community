@@ -10,6 +10,11 @@ public sealed class BandMemberOtherBandConfiguration : IEntityTypeConfiguration<
     {
         builder.HasKey(b => b.Id);
 
+        builder.HasOne(b => b.OtherBand)
+            .WithMany()
+            .HasForeignKey(b => b.OtherBandId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasIndex(b => new { b.BandMemberId, b.OtherBandId }).IsUnique();
         builder.HasIndex(b => b.OtherBandId);
     }

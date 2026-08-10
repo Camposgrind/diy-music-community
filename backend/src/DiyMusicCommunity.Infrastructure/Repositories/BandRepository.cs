@@ -20,6 +20,17 @@ public sealed class BandRepository : IBandRepository
         return await _context.Bands.FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
     }
 
+    public async Task<Band?> GetDetailAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _context.Bands
+            .Include(b => b.Genre)
+            .Include(b => b.Releases)
+            .Include(b => b.Members)
+                .ThenInclude(m => m.OtherBands)
+                    .ThenInclude(ob => ob.OtherBand)
+            .FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
+    }
+
     public async Task<IReadOnlyList<Band>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Bands.ToListAsync(cancellationToken);
