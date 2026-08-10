@@ -30,6 +30,13 @@ public sealed class ReleaseConfiguration : IEntityTypeConfiguration<Release>
             .HasForeignKey(rf => rf.ReleaseId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasMany(r => r.Tracks)
+            .WithOne()
+            .HasForeignKey(t => t.ReleaseId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Navigation(r => r.Tracks).HasField("_tracks");
+
         builder.HasIndex(r => r.BandId);
 
         builder.HasData(

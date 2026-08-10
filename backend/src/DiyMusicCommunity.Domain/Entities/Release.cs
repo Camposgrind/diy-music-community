@@ -5,8 +5,10 @@ namespace DiyMusicCommunity.Domain.Entities;
 public sealed class Release : Entity
 {
     private readonly List<ReleaseFormat> _formats = new();
+    private readonly List<Track> _tracks = new();
 
     public Guid BandId { get; private set; }
+    public Band? Band { get; private set; }
     public string Title { get; private set; }
     public ReleaseType ReleaseType { get; private set; }
     public DateOnly? ReleaseDate { get; private set; }
@@ -18,6 +20,8 @@ public sealed class Release : Entity
     {
         get { return _formats.AsReadOnly(); }
     }
+
+    public IReadOnlyList<Track> Tracks => _tracks.AsReadOnly();
 
     public Release(Guid id, Guid bandId, string title, ReleaseType releaseType) : base(id)
     {

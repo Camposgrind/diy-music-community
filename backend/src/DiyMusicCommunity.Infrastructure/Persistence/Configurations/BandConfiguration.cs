@@ -54,7 +54,7 @@ public sealed class BandConfiguration : IEntityTypeConfiguration<Band>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(b => b.Releases)
-            .WithOne()
+            .WithOne(r => r.Band)
             .HasForeignKey(r => r.BandId)
             .OnDelete(DeleteBehavior.Cascade);
 
