@@ -1,5 +1,6 @@
 using DiyMusicCommunity.Application.Bands.GetBandDetail;
 using DiyMusicCommunity.Application.Bands.GetBands;
+using DiyMusicCommunity.Application.Genres.GetGenres;
 using DiyMusicCommunity.Application.Releases.GetReleaseDetail;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,7 @@ public static class DependencyInjection
         services.AddScoped<GetBandsUseCase>();
         services.AddScoped<GetBandDetailUseCase>();
         services.AddScoped<GetReleaseDetailUseCase>();
+        services.AddScoped<GetGenresUseCase>();
 
         return services;
     }
