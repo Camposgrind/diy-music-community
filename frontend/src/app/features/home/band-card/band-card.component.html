@@ -1,23 +1,35 @@
-<div class="band-card">
-  <div class="band-card__header">
-    <h3 class="band-card__name">{{ band().name }}</h3>
-    <span class="band-card__status" [class.band-card__status--active]="band().status === 'Active'">
-      {{ band().status }}
-    </span>
-  </div>
-  <div class="band-card__details">
-    <div class="band-card__info">
-      <span class="band-card__label">Country</span>
-      <span class="band-card__value">{{ band().country }}</span>
+<article class="band-card">
+  <div class="band-card__accent"></div>
+  <div class="band-card__body">
+    <div class="band-card__top">
+      <h3 class="band-card__name">{{ band().name }}</h3>
+      <span
+        class="band-card__status"
+        [class.band-card__status--active]="band().status === 'Active'"
+        [class.band-card__status--splitup]="band().status === 'SplitUp'"
+        [class.band-card__status--onhold]="band().status === 'OnHold'">
+        {{ band().status === 'SplitUp' ? 'Split Up' : band().status === 'OnHold' ? 'On Hold' : band().status }}
+      </span>
     </div>
-    @if (band().formationYear) {
-      <div class="band-card__info">
-        <span class="band-card__label">Formed</span>
-        <span class="band-card__value">{{ band().formationYear }}</span>
-      </div>
-    }
+    <div class="band-card__meta">
+      <span class="band-card__meta-item">
+        @if (band().country | countryFlag; as flagCode) {
+          <span class="fi" [ngClass]="'fi-' + flagCode"></span>
+        } @else {
+          <span class="band-card__meta-icon">🌐</span>
+        }
+        {{ band().country }}
+      </span>
+      @if (band().formationYear) {
+        <span class="band-card__meta-sep">·</span>
+        <span class="band-card__meta-item">
+          <span class="band-card__meta-icon">&#9776;</span>
+          Est. {{ band().formationYear }}
+        </span>
+      }
+    </div>
+    <div class="band-card__footer">
+      <span class="band-card__genre-badge">{{ band().genre }}</span>
+    </div>
   </div>
-  <div class="band-card__genre">
-    <span class="band-card__genre-badge">{{ band().genre }}</span>
-  </div>
-</div>
+</article>

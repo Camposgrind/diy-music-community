@@ -1,85 +1,159 @@
 .band-card {
-  background: #1e1e1e;
+  display: flex;
+  flex-direction: row;
+  background: #1a1a1a;
   border: 1px solid #2a2a2a;
-  border-radius: 6px;
-  padding: 1.25rem;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.5),
+    0 8px 24px rgba(0, 0, 0, 0.4);
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+  cursor: default;
 
   &:hover {
+    transform: translateY(-4px) scale(1.01);
     border-color: #8b0000;
-    transform: translateY(-2px);
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.6),
+      0 16px 40px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(139, 0, 0, 0.25),
+      0 8px 32px rgba(139, 0, 0, 0.12);
   }
 
-  &__header {
+  // Left red accent bar
+  &__accent {
+    width: 4px;
+    flex-shrink: 0;
+    background: linear-gradient(180deg, #8b0000 0%, #4a0000 100%);
+    opacity: 0.85;
+    transition: opacity 0.22s ease;
+  }
+
+  &:hover &__accent {
+    opacity: 1;
+  }
+
+  &__body {
+    flex: 1;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    padding: 1.125rem 1.25rem;
+    gap: 0.625rem;
+    min-width: 0;
+  }
+
+  // --- Top row: name + status pill ---
+  &__top {
+    display: flex;
     align-items: flex-start;
-    margin-bottom: 0.75rem;
-    gap: 0.5rem;
+    justify-content: space-between;
+    gap: 0.75rem;
   }
 
   &__name {
     font-family: 'Oswald', sans-serif;
-    font-size: 1.125rem;
+    font-size: 1.1rem;
     font-weight: 600;
-    color: #fff;
+    color: #ffffff;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.75px;
     margin: 0;
+    line-height: 1.25;
+    // Clamp long names gracefully
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &__status {
-    font-size: 0.7rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 3px;
-    background: #333;
-    color: #999;
+    flex-shrink: 0;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    background: #2a2a2a;
+    color: #777;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
+    letter-spacing: 0.75px;
+    border: 1px solid #333;
+    line-height: 1.4;
 
     &--active {
-      background: rgba(139, 0, 0, 0.2);
-      color: #cd5c5c;
+      background: rgba(34, 100, 34, 0.2);
+      color: #6fcf6f;
+      border-color: rgba(34, 100, 34, 0.45);
+    }
+
+    &--splitup {
+      background: rgba(139, 0, 0, 0.18);
+      color: #e06060;
+      border-color: rgba(139, 0, 0, 0.4);
+    }
+
+    &--onhold {
+      background: rgba(160, 110, 0, 0.18);
+      color: #d4a843;
+      border-color: rgba(160, 110, 0, 0.4);
     }
   }
 
-  &__details {
+  // --- Meta row: country · year ---
+  &__meta {
     display: flex;
-    gap: 1.5rem;
-    margin-bottom: 0.75rem;
-  }
-
-  &__info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
-  }
-
-  &__label {
-    font-size: 0.7rem;
-    color: #666;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  &__value {
-    font-size: 0.875rem;
-    color: #ccc;
-  }
-
-  &__genre {
-    display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     gap: 0.375rem;
+    flex-wrap: wrap;
+  }
+
+  &__meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.8125rem;
+    color: #aaa;
+  }
+
+  &__meta-icon {
+    font-size: 0.75rem;
+    opacity: 0.6;
+  }
+
+  .fi {
+    font-size: 0.9rem;
+    line-height: 1;
+    border-radius: 2px;
+  }
+
+  &__meta-sep {
+    color: #444;
+    font-size: 0.875rem;
+    line-height: 1;
+  }
+
+  // --- Footer: genre badge ---
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    flex-wrap: wrap;
+    margin-top: auto;
+    padding-top: 0.25rem;
   }
 
   &__genre-badge {
-    font-size: 0.75rem;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.75px;
+    text-transform: uppercase;
     padding: 0.2rem 0.625rem;
-    border-radius: 3px;
-    background: rgba(139, 0, 0, 0.15);
-    color: #cd5c5c;
-    border: 1px solid rgba(139, 0, 0, 0.3);
+    border-radius: 4px;
+    background: rgba(139, 0, 0, 0.12);
+    color: #c05050;
+    border: 1px solid rgba(139, 0, 0, 0.28);
   }
 }

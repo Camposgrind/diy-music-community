@@ -1,13 +1,15 @@
 <div class="search-form">
-  <h2 class="search-form__title">Search Bands</h2>
-  <form [formGroup]="form" (ngSubmit)="onSearch()" class="search-form__fields">
+  <div class="search-form__accent"></div>
+  <div class="search-form__inner">
+    <h2 class="search-form__title">Search Bands</h2>
+    <form [formGroup]="form" (ngSubmit)="onSearch()" class="search-form__fields">
     <div class="search-form__field">
       <label class="search-form__label" for="bandName">Band Name</label>
       <input
         id="bandName"
         type="text"
         formControlName="name"
-        placeholder="e.g. Discharge, Napalm Death..."
+        placeholder="Type the name of a band..."
         autocomplete="off" />
     </div>
     <div class="search-form__field">
@@ -36,5 +38,6 @@
       <button type="submit" class="search-form__btn search-form__btn--search">Search</button>
       <button type="button" class="search-form__btn search-form__btn--reset" (click)="onReset()">Reset</button>
     </div>
-  </form>
+    </form>
+  </div>
 </div>
