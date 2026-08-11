@@ -1,0 +1,23 @@
+<div class="band-card">
+  <div class="band-card__header">
+    <h3 class="band-card__name">{{ band().name }}</h3>
+    <span class="band-card__status" [class.band-card__status--active]="band().status === 'Active'">
+      {{ band().status }}
+    </span>
+  </div>
+  <div class="band-card__details">
+    <div class="band-card__info">
+      <span class="band-card__label">Country</span>
+      <span class="band-card__value">{{ band().country }}</span>
+    </div>
+    @if (band().formationYear) {
+      <div class="band-card__info">
+        <span class="band-card__label">Formed</span>
+        <span class="band-card__value">{{ band().formationYear }}</span>
+      </div>
+    }
+  </div>
+  <div class="band-card__genre">
+    <span class="band-card__genre-badge">{{ band().genre }}</span>
+  </div>
+</div>

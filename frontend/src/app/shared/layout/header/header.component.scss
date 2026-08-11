@@ -1,0 +1,75 @@
+:host {
+  display: block;
+}
+
+.header {
+  background-color: #0d0d0d;
+  border-bottom: 1px solid #222;
+  padding: 0.75rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    text-decoration: none;
+
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  &__logo {
+    font-size: 1.5rem;
+    color: #8b0000;
+  }
+
+  &__title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #fff;
+  }
+
+  &__nav {
+    display: flex;
+    gap: 1.5rem;
+
+    a {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #999;
+      transition: color 0.2s ease;
+
+      &:hover,
+      &.active {
+        color: #8b0000;
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .header__inner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .header__nav {
+    gap: 1rem;
+  }
+}

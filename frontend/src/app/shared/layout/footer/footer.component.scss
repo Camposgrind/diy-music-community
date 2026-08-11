@@ -1,0 +1,31 @@
+:host {
+  display: block;
+}
+
+.footer {
+  background-color: #0d0d0d;
+  border-top: 1px solid #222;
+  padding: 2rem 0;
+  margin-top: auto;
+  text-align: center;
+
+  &__brand {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #8b0000;
+    margin-bottom: 0.25rem;
+  }
+
+  &__tagline {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 0.75rem;
+  }
+
+  &__copy {
+    font-size: 0.75rem;
+    color: #555;
+  }
+}

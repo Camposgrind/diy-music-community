@@ -1,1 +1,149 @@
-/* You can add global styles to this file, and also import other style files */
+// === Variables ===
+$bg-primary: #111111;
+$bg-secondary: #161616;
+$bg-card: #1e1e1e;
+$bg-input: #222222;
+$accent: #8b0000;
+$accent-hover: #a00000;
+$text-primary: #e0e0e0;
+$text-secondary: #999999;
+$text-heading: #ffffff;
+$border-color: #333333;
+$font-heading: 'Oswald', sans-serif;
+$font-body: 'Inter', sans-serif;
+$radius: 6px;
+$transition: 0.2s ease;
+
+// === Reset & Base ===
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: $font-body;
+  background-color: $bg-primary;
+  color: $text-primary;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-heading;
+  color: $text-heading;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+a {
+  color: $text-primary;
+  text-decoration: none;
+  transition: color $transition;
+
+  &:hover {
+    color: $accent;
+  }
+}
+
+button {
+  font-family: $font-body;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+input,
+select {
+  font-family: $font-body;
+  background-color: $bg-input;
+  color: $text-primary;
+  border: 1px solid $border-color;
+  border-radius: $radius;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  transition: border-color $transition;
+  width: 100%;
+
+  &:focus {
+    border-color: $accent;
+    outline: none;
+  }
+
+  &::placeholder {
+    color: $text-secondary;
+  }
+}
+
+// === Utility ===
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+// === Scrollbar ===
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $bg-secondary;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $border-color;
+  border-radius: 4px;
+
+  &:hover {
+    background: $text-secondary;
+  }
+}
+
+// === Toast ===
+.toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toast {
+  background: $bg-card;
+  border: 1px solid $border-color;
+  border-left: 4px solid $accent;
+  padding: 0.875rem 1.25rem;
+  border-radius: $radius;
+  color: $text-primary;
+  font-size: 0.875rem;
+  max-width: 400px;
+  animation: toast-in 0.3s ease;
+
+  &--error {
+    border-left-color: $accent;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+

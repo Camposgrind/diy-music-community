@@ -9,11 +9,24 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        // FormatJsonConverter must be registered first so it takes priority over the
-        // global JsonStringEnumConverter for the Format enum specifically.
         options.JsonSerializerOptions.Converters.Add(new FormatJsonConverter());
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>() ?? [];
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddSwaggerDocumentation();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -21,6 +34,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 var app = builder.Build();
 
 app.UseSwaggerDocumentation();
+app.UseCors();
 app.UseHttpsRedirection();
 app.MapControllers();
 

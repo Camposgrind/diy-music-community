@@ -1,0 +1,51 @@
+@if (loading()) {
+  <div class="results__loading">
+    <div class="results__spinner"></div>
+    <p>Searching the underground...</p>
+  </div>
+} @else if (error()) {
+  <div class="results__error">
+    <p>{{ error() }}</p>
+  </div>
+} @else if (results(); as r) {
+  <div class="results">
+    <div class="results__header">
+      <span class="results__count">{{ r.totalCount }} band{{ r.totalCount !== 1 ? 's' : '' }} found</span>
+    </div>
+    @if (r.items.length === 0) {
+      <div class="results__empty">
+        <p>No bands match your search. Try different filters.</p>
+      </div>
+    } @else {
+      <div class="results__grid">
+        @for (band of r.items; track band.id) {
+          <dmc-band-card [band]="band" />
+        }
+      </div>
+      @if (totalPages > 1) {
+        <div class="results__pagination">
+          <button
+            class="results__page-btn"
+            [disabled]="r.page <= 1"
+            (click)="onPageChange(r.page - 1)">
+            &laquo; Prev
+          </button>
+          @for (p of pages; track p) {
+            <button
+              class="results__page-btn"
+              [class.results__page-btn--active]="p === r.page"
+              (click)="onPageChange(p)">
+              {{ p }}
+            </button>
+          }
+          <button
+            class="results__page-btn"
+            [disabled]="r.page >= totalPages"
+            (click)="onPageChange(r.page + 1)">
+            Next &raquo;
+          </button>
+        </div>
+      }
+    }
+  </div>
+}

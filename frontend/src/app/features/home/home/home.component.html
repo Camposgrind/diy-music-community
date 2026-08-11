@@ -1,0 +1,31 @@
+<section class="hero">
+  <div class="hero__inner container">
+    <h1 class="hero__title">Discover the Underground</h1>
+    <p class="hero__subtitle">Community Driven Underground Music Database</p>
+  </div>
+</section>
+
+<section class="search-section container">
+  <dmc-bands-search-form
+    [countries]="countries()"
+    [genres]="genres()"
+    [genresError]="genresError()"
+    (search)="onSearch($event)"
+    (reset)="onReset()" />
+</section>
+
+<section class="results-section container">
+  <dmc-bands-results
+    [results]="results()"
+    [loading]="loading()"
+    [error]="error()"
+    (pageChange)="onPageChange($event)" />
+</section>
+
+@if (toastMessage(); as msg) {
+  <div class="toast-container">
+    <div class="toast toast--error" (click)="dismissToast()">
+      {{ msg }}
+    </div>
+  </div>
+}
