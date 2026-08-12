@@ -11,6 +11,7 @@ import {
   GetBandsQuery,
   GenreModel,
 } from '../../../infrastructure/api';
+import { SearchStateService } from '../search-state.service';
 
 @Component({
   selector: 'dmc-home',
@@ -23,6 +24,7 @@ export class HomeComponent implements OnInit {
   private readonly bandsApi = inject(BandsApiService);
   private readonly countriesService = inject(CountriesService);
   private readonly genresApi = inject(GenresApiService);
+  private readonly searchState = inject(SearchStateService);
 
   readonly countries = signal<string[]>([]);
   readonly genres = signal<GenreModel[]>([]);
@@ -31,6 +33,7 @@ export class HomeComponent implements OnInit {
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly toastMessage = signal<string | null>(null);
+  readonly savedFilters = signal<BandSearchFilters | null>(null);
 
   private currentFilters: BandSearchFilters = { name: '', country: '', genreId: '' };
   private currentPage = 1;
@@ -48,9 +51,21 @@ export class HomeComponent implements OnInit {
       next: (data) => this.genres.set(data),
       error: (err: unknown) => {
         console.error('Failed to load genres:', err);
-        this.genresError.set('Could not load genres — is the backend running?');
+        this.genresError.set('Could not load genres \u2014 is the backend running?');
       },
     });
+
+    const saved = this.searchState.state();
+    if (saved) {
+      this.currentPage = saved.page;
+      this.currentFilters = {
+        name: saved.query.name ?? '',
+        country: saved.query.country ?? '',
+        genreId: saved.query.genreId ?? '',
+      };
+      this.savedFilters.set(this.currentFilters);
+      this.fetchBands();
+    }
   }
 
   onSearch(filters: BandSearchFilters): void {
@@ -65,6 +80,8 @@ export class HomeComponent implements OnInit {
     this.results.set(null);
     this.error.set(null);
     this.toastMessage.set(null);
+    this.savedFilters.set(null);
+    this.searchState.clear();
   }
 
   onPageChange(page: number): void {
@@ -95,6 +112,8 @@ export class HomeComponent implements OnInit {
     if (this.currentFilters.genreId) {
       query.genreId = this.currentFilters.genreId;
     }
+
+    this.searchState.save({ query, page: this.currentPage });
 
     this.bandsApi.getBands(query).subscribe({
       next: (result) => {

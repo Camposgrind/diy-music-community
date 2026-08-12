@@ -1,11 +1,11 @@
 <header class="header">
   <div class="header__inner container">
-    <a routerLink="/" class="header__brand">
+    <a class="header__brand" (click)="clearAndGoHome()" style="cursor:pointer">
       <img src="images/grindLogo.jpg" alt="DIY Music Community" class="header__logo-img" />
       <span class="header__title">DIY Music Community</span>
     </a>
     <nav class="header__nav">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+      <a (click)="clearAndGoHome()" style="cursor:pointer">Home</a>
     </nav>
   </div>
 </header>

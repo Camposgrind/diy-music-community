@@ -1,4 +1,4 @@
-.results {
+﻿.results {
   &__header {
     margin-bottom: 1rem;
   }
@@ -109,4 +109,11 @@
   .results__grid {
     grid-template-columns: 1fr;
   }
+}
+
+
+.results__card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
 }

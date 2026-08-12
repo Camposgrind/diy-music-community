@@ -1,0 +1,171 @@
+.members {
+  padding: 2rem 0;
+  border-bottom: 1px solid #2a2a2a;
+
+  &__title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #cc2222;
+    margin: 0 0 1.5rem;
+    padding-bottom: 0.625rem;
+    border-bottom: 1px solid #2a2a2a;
+    text-shadow: 0 0 18px rgba(139, 0, 0, 0.45);
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 48px;
+      height: 2px;
+      background: linear-gradient(90deg, #8b0000, transparent);
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 1rem;
+  }
+
+  // ── Card: 3D box-shadow + left accent bar ──────────
+  &__card {
+    display: flex;
+    flex-direction: row;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow:
+      0 2px 6px rgba(0, 0, 0, 0.5),
+      0 8px 24px rgba(0, 0, 0, 0.4);
+    transition:
+      transform 0.22s ease,
+      box-shadow 0.22s ease,
+      border-color 0.22s ease;
+
+    &:hover {
+      transform: translateY(-4px) scale(1.01);
+      border-color: #8b0000;
+      box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.6),
+        0 16px 40px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(139, 0, 0, 0.25),
+        0 8px 32px rgba(139, 0, 0, 0.12);
+    }
+  }
+
+  &__card-accent {
+    width: 4px;
+    flex-shrink: 0;
+    background: linear-gradient(180deg, #8b0000 0%, #4a0000 100%);
+    opacity: 0.85;
+    transition: opacity 0.22s ease;
+  }
+
+  &__card:hover &__card-accent {
+    opacity: 1;
+  }
+
+  &__card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 1rem 1.125rem;
+    min-width: 0;
+  }
+
+  // ── Top: name + Present badge ──────────────────────
+  &__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-height: 2.3rem; // reserves two lines of name text so all cards align
+  }
+
+  &__name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+    color: #fff;
+    line-height: 1.25;
+  }
+
+  &__present-badge {
+    flex-shrink: 0;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    background: rgba(34, 100, 34, 0.22);
+    color: #6fcf6f;
+    border: 1px solid rgba(34, 100, 34, 0.45);
+    line-height: 1.4;
+  }
+
+  // ── Instrument ────────────────────────────────────
+  &__instrument {
+    font-size: 0.8rem;
+    color: #aaa;
+  }
+
+  // ── Years ─────────────────────────────────────────
+  &__years {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    margin-top: 0.1rem;
+  }
+
+  &__year-val {
+    color: #999;
+  }
+
+  &__year-sep {
+    color: #666;
+  }
+
+  &__year-present {
+    color: #6fcf6f;
+    font-weight: 600;
+  }
+
+  // ── Other bands ───────────────────────────────────
+  &__other-bands {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.4rem;
+    padding-top: 0.4rem;
+    border-top: 1px solid #222;
+  }
+
+  &__other-label {
+    font-size: 0.65rem;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  &__other-band {
+    font-size: 0.68rem;
+    color: #c05050;
+    background: rgba(139, 0, 0, 0.1);
+    border: 1px solid rgba(139, 0, 0, 0.22);
+    border-radius: 3px;
+    padding: 0.1rem 0.4rem;
+  }
+}

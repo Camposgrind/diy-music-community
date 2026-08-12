@@ -1,11 +1,12 @@
-import { Component, input, output } from '@angular/core';
+﻿import { Component, input, output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { BandListItemModel, PagedResult } from '../../../infrastructure/api/models';
 import { BandCardComponent } from '../band-card/band-card.component';
 
 @Component({
   selector: 'dmc-bands-results',
   standalone: true,
-  imports: [BandCardComponent],
+  imports: [BandCardComponent, RouterLink],
   templateUrl: './bands-results.component.html',
   styleUrl: './bands-results.component.scss',
 })

@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, effect } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { GenreModel } from '../../../infrastructure/api/models';
 
@@ -19,6 +19,7 @@ export class BandsSearchFormComponent {
   readonly countries = input<string[]>([]);
   readonly genres = input<GenreModel[]>([]);
   readonly genresError = input<string | null>(null);
+  readonly initialFilters = input<BandSearchFilters | null>(null);
 
   readonly search = output<BandSearchFilters>();
   readonly reset = output<void>();
@@ -28,6 +29,18 @@ export class BandsSearchFormComponent {
     country: new FormControl(''),
     genreId: new FormControl(''),
   });
+
+  constructor() {
+    effect(() => {
+      const filters = this.initialFilters();
+      if (filters) {
+        this.form.patchValue(
+          { name: filters.name, country: filters.country, genreId: filters.genreId },
+          { emitEvent: false }
+        );
+      }
+    });
+  }
 
   onSearch(): void {
     const value = this.form.getRawValue();

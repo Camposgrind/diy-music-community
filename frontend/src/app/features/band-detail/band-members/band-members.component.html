@@ -1,0 +1,49 @@
+<section class="members">
+  <h2 class="members__title">{{ title() }}</h2>
+  <div class="members__grid">
+    @for (member of members(); track member.id) {
+      <div class="members__card">
+        <div class="members__card-accent"></div>
+        <div class="members__card-body">
+
+          <div class="members__top">
+            <div class="members__name">{{ member.name }}</div>
+            @if (member.isCurrent) {
+              <span class="members__present-badge">Present</span>
+            }
+          </div>
+
+          @if (member.instrument) {
+            <div class="members__instrument">{{ member.instrument }}</div>
+          }
+
+          <div class="members__years">
+            @if (member.startYear) {
+              <span class="members__year-val">{{ member.startYear }}</span>
+              <span class="members__year-sep">&ndash;</span>
+              @if (member.endYear) {
+                <span class="members__year-val">{{ member.endYear }}</span>
+              } @else if (member.isCurrent) {
+                <span class="members__year-present">Present</span>
+              } @else {
+                <span class="members__year-val">?</span>
+              }
+            }
+          </div>
+
+          @if (member.otherBands.length > 0) {
+            <div class="members__other-bands">
+              <span class="members__other-label">Also in:</span>
+              @for (band of member.otherBands; track band.bandId) {
+                @if (band.bandName) {
+                  <span class="members__other-band">{{ band.bandName }}</span>
+                }
+              }
+            </div>
+          }
+
+        </div>
+      </div>
+    }
+  </div>
+</section>

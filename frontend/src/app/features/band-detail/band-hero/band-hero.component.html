@@ -1,0 +1,108 @@
+<!-- ── Logo header banner ─────────────────────────────────────── -->
+@if (isCustomImage(band().logoImageUrl)) {
+  <div class="band-hero__logo-header">
+    <img
+      class="band-hero__logo-header-img"
+      [src]="band().logoImageUrl!"
+      [alt]="band().name + ' logo'"
+      (error)="onImgError($event)"
+      (click)="openLightbox(band().logoImageUrl)" />
+  </div>
+}
+
+<!-- ── Main hero row ──────────────────────────────────────────── -->
+<section class="band-hero">
+
+  <!-- Left: large band photo -->
+  <div
+    class="band-hero__photo-wrap"
+    [class.band-hero__photo-wrap--clickable]="isCustomImage(band().bandImageUrl)"
+    (click)="openLightbox(band().bandImageUrl)">
+    <img
+      class="band-hero__photo"
+      [src]="band().bandImageUrl || fallback"
+      [alt]="band().name"
+      (error)="onImgError($event)" />
+    @if (isCustomImage(band().bandImageUrl)) {
+      <div class="band-hero__photo-zoom">&#9654; View</div>
+    }
+  </div>
+
+  <!-- Right: info panel -->
+  <div class="band-hero__info">
+
+    <!-- Band name (no logo thumbnail here — logo is in the header above) -->
+    <h1 class="band-hero__name">{{ band().name }}</h1>
+
+    <!-- Status + genre badges -->
+    <div class="band-hero__meta">
+      <dmc-status-badge [status]="band().status" />
+
+      @if (band().genre) {
+        <span class="band-hero__genre">{{ band().genre }}</span>
+      }
+    </div>
+
+    <!-- Labelled info rows -->
+    <dl class="band-hero__info-grid">
+      <div class="band-hero__info-row">
+        <dt class="band-hero__info-label">Country</dt>
+        <dd class="band-hero__info-value">{{ band().country }}</dd>
+      </div>
+
+      @if (band().location) {
+        <div class="band-hero__info-row">
+          <dt class="band-hero__info-label">Location</dt>
+          <dd class="band-hero__info-value">{{ band().location }}</dd>
+        </div>
+      }
+
+      @if (band().formationYear) {
+        <div class="band-hero__info-row">
+          <dt class="band-hero__info-label">Formed</dt>
+          <dd class="band-hero__info-value">{{ band().formationYear }}</dd>
+        </div>
+      }
+
+      @if (band().genre) {
+        <div class="band-hero__info-row">
+          <dt class="band-hero__info-label">Genre</dt>
+          <dd class="band-hero__info-value">{{ band().genre }}</dd>
+        </div>
+      }
+
+      @if (band().musicUrlPortal) {
+        <div class="band-hero__info-row">
+          <dt class="band-hero__info-label">Portal</dt>
+          <dd class="band-hero__info-value">
+            <a class="band-hero__link" [href]="band().musicUrlPortal" target="_blank" rel="noopener noreferrer">
+              Music Portal
+            </a>
+          </dd>
+        </div>
+      }
+
+      @if (band().bandContact) {
+        <div class="band-hero__info-row">
+          <dt class="band-hero__info-label">Contact</dt>
+          <dd class="band-hero__info-value band-hero__contact">{{ band().bandContact }}</dd>
+        </div>
+      }
+    </dl>
+
+    @if (band().description) {
+      <p class="band-hero__description">{{ band().description }}</p>
+    }
+  </div>
+</section>
+
+<!-- ── Lightbox overlay ───────────────────────────────────────── -->
+@if (lightboxUrl()) {
+  <div class="lightbox" (click)="closeLightbox()">
+    <div class="lightbox__backdrop"></div>
+    <div class="lightbox__content" (click)="$event.stopPropagation()">
+      <button class="lightbox__close" (click)="closeLightbox()" aria-label="Close">&times;</button>
+      <img class="lightbox__img" [src]="lightboxUrl()!" [alt]="band().name" />
+    </div>
+  </div>
+}

@@ -1,0 +1,31 @@
+<section class="discography">
+  <h2 class="discography__title">Discography</h2>
+
+  <!-- Column headers -->
+  <div class="discography__header">
+    <span class="discography__header-type">Type</span>
+    <span class="discography__header-name">Release</span>
+    <span class="discography__header-year">Year</span>
+  </div>
+
+  <div class="discography__list">
+    @for (release of releases(); track release.id) {
+      <div class="discography__item">
+        <div class="discography__item-accent" [ngClass]="accentClass(release.releaseType)"></div>
+        <div class="discography__item-content">
+          <div class="discography__item-type" [ngClass]="typeClass(release.releaseType)">
+            {{ release.releaseType }}
+          </div>
+          <div
+            class="discography__item-title"
+            [class.discography__item-title--album]="release.releaseType === 'Album'">
+            {{ release.title }}
+          </div>
+          <div class="discography__item-year">
+            @if (release.year) { {{ release.year }} }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</section>

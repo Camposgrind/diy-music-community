@@ -60,12 +60,12 @@
       font-size: 0.875rem;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #999;
+      color: #fff;
       transition: color 0.2s ease;
 
       &:hover,
       &.active {
-        color: #8b0000;
+        color: #fff;
       }
     }
   }

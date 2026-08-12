@@ -3,3 +3,7 @@ export type { BandListItemModel } from './band-list-item.model';
 export type { PagedResult } from './paged-result.model';
 export type { GetBandsQuery } from './get-bands-query.model';
 export type { ApiError } from './api-error.model';
+export type { BandDetailModel } from './band-detail.model';
+export type { BandMemberModel } from './band-member.model';
+export type { BandMemberOtherBandModel } from './band-member-other-band.model';
+export type { BandReleaseModel } from './band-release.model';

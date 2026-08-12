@@ -1,0 +1,34 @@
+﻿<div class="band-detail container">
+  <dmc-back-to-results />
+
+  @if (loading()) {
+    <div class="band-detail__loading">
+      <img src="images/Play GIF Image.png" alt="Loading..." class="band-detail__loading-gif" />
+      <p>Loading band details...</p>
+    </div>
+  } @else if (error()) {
+    <div class="band-detail__error">
+      <p class="band-detail__error-msg">{{ error() }}</p>
+      <div class="band-detail__error-actions">
+        <button class="band-detail__action-btn band-detail__action-btn--primary" (click)="retry()">
+          Try Again
+        </button>
+        <a class="band-detail__action-btn" routerLink="/">Browse Bands</a>
+      </div>
+    </div>
+  } @else if (band(); as b) {
+    <dmc-band-hero [band]="b" />
+
+    @if (hasReleases()) {
+      <dmc-band-discography [releases]="b.releases" />
+    }
+
+    @if (hasCurrentMembers()) {
+      <dmc-band-members [members]="currentMembers()" title="Current Members" />
+    }
+
+    @if (hasPastMembers()) {
+      <dmc-band-members [members]="pastMembers()" title="Past Members" />
+    }
+  }
+</div>

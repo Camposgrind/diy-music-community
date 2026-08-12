@@ -1,8 +1,8 @@
-import { Injectable, inject } from '@angular/core';
+﻿import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { BandListItemModel, GetBandsQuery, PagedResult } from './models';
+import { BandDetailModel, BandListItemModel, GetBandsQuery, PagedResult } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class BandsApiService {
@@ -28,5 +28,9 @@ export class BandsApiService {
     }
 
     return this.http.get<PagedResult<BandListItemModel>>(this.baseUrl, { params });
+  }
+
+  getBandDetail(id: string): Observable<BandDetailModel> {
+    return this.http.get<BandDetailModel>(`${this.baseUrl}/${id}`);
   }
 }
