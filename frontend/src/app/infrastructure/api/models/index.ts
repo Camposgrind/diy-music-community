@@ -7,3 +7,6 @@ export type { BandDetailModel } from './band-detail.model';
 export type { BandMemberModel } from './band-member.model';
 export type { BandMemberOtherBandModel } from './band-member-other-band.model';
 export type { BandReleaseModel } from './band-release.model';
+export type { ReleaseDetailModel } from './release-detail.model';
+export type { ReleaseBandModel } from './release-band.model';
+export type { ReleaseTrackModel } from './release-track.model';

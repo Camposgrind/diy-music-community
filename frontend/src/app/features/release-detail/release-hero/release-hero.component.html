@@ -1,0 +1,81 @@
+<!-- ── Main hero row ──────────────────────────────────────────── -->
+<section class="release-hero">
+
+  <!-- Left: cover art -->
+  <div
+    class="release-hero__cover-wrap"
+    [class.release-hero__cover-wrap--clickable]="isCustomImage(release().coverImageUrl)"
+    (click)="openLightbox(release().coverImageUrl)">
+    <img
+      class="release-hero__cover"
+      [src]="release().coverImageUrl || fallback"
+      [alt]="release().title"
+      (error)="onImgError($event)" />
+    @if (isCustomImage(release().coverImageUrl)) {
+      <div class="release-hero__cover-zoom">&#9654; View</div>
+    }
+  </div>
+
+  <!-- Right: info panel -->
+  <div class="release-hero__info">
+
+    <!-- Band name -->
+    @if (release().band) {
+      <p class="release-hero__band-name">{{ release().band!.name }}</p>
+    }
+
+    <!-- Release title -->
+    <h1 class="release-hero__title">{{ release().title }}</h1>
+
+    <!-- Release type badge -->
+    <div class="release-hero__meta">
+      <span class="release-hero__type-badge" [class]="typeClass(release().releaseType)">
+        {{ release().releaseType }}
+      </span>
+    </div>
+
+    <!-- Labelled info rows -->
+    <dl class="release-hero__info-grid">
+
+      @if (release().year) {
+        <div class="release-hero__info-row">
+          <dt class="release-hero__info-label">Year</dt>
+          <dd class="release-hero__info-value">{{ release().year }}</dd>
+        </div>
+      }
+
+      @if (release().releaseDate) {
+        <div class="release-hero__info-row">
+          <dt class="release-hero__info-label">Released</dt>
+          <dd class="release-hero__info-value">{{ release().releaseDate }}</dd>
+        </div>
+      }
+
+      @if (release().labelText) {
+        <div class="release-hero__info-row">
+          <dt class="release-hero__info-label">{{ release().labelText!.includes(',') ? 'Labels' : 'Label' }}</dt>
+          <dd class="release-hero__info-value">{{ release().labelText }}</dd>
+        </div>
+      }
+
+      @if (release().formats.length > 0) {
+        <div class="release-hero__info-row">
+          <dt class="release-hero__info-label">{{ release().formats.length > 1 ? 'Formats' : 'Format' }}</dt>
+          <dd class="release-hero__info-value">{{ release().formats.join(' / ') }}</dd>
+        </div>
+      }
+
+    </dl>
+  </div>
+</section>
+
+<!-- ── Lightbox ───────────────────────────────────────────────── -->
+@if (lightboxUrl()) {
+  <div class="lightbox" (click)="closeLightbox()">
+    <div class="lightbox__backdrop"></div>
+    <div class="lightbox__content" (click)="$event.stopPropagation()">
+      <button class="lightbox__close" (click)="closeLightbox()" aria-label="Close">&times;</button>
+      <img class="lightbox__img" [src]="lightboxUrl()!" [alt]="release().title" />
+    </div>
+  </div>
+}

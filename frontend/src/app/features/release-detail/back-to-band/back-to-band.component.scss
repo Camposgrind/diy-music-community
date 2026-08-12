@@ -1,0 +1,30 @@
+.back-nav {
+  padding: 1.25rem 0 0;
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: 1px solid #333;
+    color: #aaa;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+
+    &:hover {
+      color: #fff;
+      border-color: #8b0000;
+    }
+  }
+
+  &__arrow {
+    font-size: 1rem;
+    line-height: 1;
+  }
+}

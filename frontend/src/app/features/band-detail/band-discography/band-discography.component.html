@@ -10,7 +10,7 @@
 
   <div class="discography__list">
     @for (release of releases(); track release.id) {
-      <div class="discography__item">
+      <div class="discography__item discography__item--clickable" (click)="navigateToRelease(release.id)">
         <div class="discography__item-accent" [ngClass]="accentClass(release.releaseType)"></div>
         <div class="discography__item-content">
           <div class="discography__item-type" [ngClass]="typeClass(release.releaseType)">

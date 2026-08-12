@@ -1,0 +1,26 @@
+<div class="release-detail container">
+  <dmc-back-to-band />
+
+  @if (loading()) {
+    <div class="release-detail__loading">
+      <img src="images/Play GIF Image.png" alt="Loading..." class="release-detail__loading-gif" />
+      <p>Loading release details...</p>
+    </div>
+  } @else if (error()) {
+    <div class="release-detail__error">
+      <p class="release-detail__error-msg">{{ error() }}</p>
+      <div class="release-detail__error-actions">
+        <button class="release-detail__action-btn release-detail__action-btn--primary" (click)="retry()">
+          Try Again
+        </button>
+        <a class="release-detail__action-btn" routerLink="/">Browse Bands</a>
+      </div>
+    </div>
+  } @else if (release(); as r) {
+    <dmc-release-hero [release]="r" />
+
+    @if (hasTracks()) {
+      <dmc-release-tracks [tracks]="r.tracks" />
+    }
+  }
+</div>

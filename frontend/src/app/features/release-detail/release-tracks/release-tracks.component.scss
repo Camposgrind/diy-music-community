@@ -1,0 +1,98 @@
+.tracks {
+  padding: 2rem 0;
+  border-bottom: 1px solid #2a2a2a;
+
+  // ── Section title — matches Discography / Current Members style
+  &__title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #cc2222;
+    margin: 0 0 1.5rem;
+    padding-bottom: 0.625rem;
+    border-bottom: 1px solid #2a2a2a;
+    text-shadow: 0 0 18px rgba(139, 0, 0, 0.45);
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 48px;
+      height: 2px;
+      background: linear-gradient(90deg, #8b0000, transparent);
+    }
+  }
+
+  // ── Column header row ────────────────────────────────────────
+  &__header {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    gap: 1rem;
+    padding: 0 1.125rem 0.6rem 1.125rem;
+    margin-bottom: 0.4rem;
+    border-bottom: 1px solid #2a2a2a;
+  }
+
+  &__header-num,
+  &__header-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #cc2222;
+  }
+
+  // ── Track list ───────────────────────────────────────────────
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  // ── Track row: 3D card style matching discography rows ───────
+  &__item {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    gap: 1rem;
+    align-items: center;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 0.7rem 1.125rem;
+    box-shadow:
+      0 2px 6px rgba(0, 0, 0, 0.5),
+      0 8px 24px rgba(0, 0, 0, 0.4);
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      border-color: #8b0000;
+      box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.6),
+        0 12px 32px rgba(0, 0, 0, 0.45),
+        0 0 0 1px rgba(139, 0, 0, 0.2);
+    }
+  }
+
+  &__item-num {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #555;
+    text-align: center;
+  }
+
+  &__item-title {
+    font-size: 0.9rem;
+    color: #ddd;
+    font-weight: 500;
+  }
+}

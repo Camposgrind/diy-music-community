@@ -1,6 +1,8 @@
-import { Component, input } from '@angular/core';
+import { Component, input, inject } from '@angular/core';
 import { NgClass } from '@angular/common';
+import { Router } from '@angular/router';
 import { BandReleaseModel } from '../../../infrastructure/api/models';
+import { ReleaseStateService } from '../../release-detail/release-state.service';
 
 @Component({
   selector: 'dmc-band-discography',
@@ -10,7 +12,16 @@ import { BandReleaseModel } from '../../../infrastructure/api/models';
   styleUrl: './band-discography.component.scss',
 })
 export class BandDiscographyComponent {
+  private readonly router = inject(Router);
+  private readonly releaseState = inject(ReleaseStateService);
+
   readonly releases = input.required<BandReleaseModel[]>();
+  readonly bandId = input.required<string>();
+
+  navigateToRelease(releaseId: string): void {
+    this.releaseState.saveBandId(this.bandId());
+    this.router.navigate(['/releases', releaseId]);
+  }
 
   typeClass(releaseType: string): string {
     switch (releaseType) {

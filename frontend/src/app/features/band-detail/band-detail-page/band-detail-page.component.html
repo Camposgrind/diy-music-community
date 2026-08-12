@@ -1,4 +1,4 @@
-﻿<div class="band-detail container">
+<div class="band-detail container">
   <dmc-back-to-results />
 
   @if (loading()) {
@@ -20,7 +20,7 @@
     <dmc-band-hero [band]="b" />
 
     @if (hasReleases()) {
-      <dmc-band-discography [releases]="b.releases" />
+      <dmc-band-discography [releases]="b.releases" [bandId]="b.id" />
     }
 
     @if (hasCurrentMembers()) {

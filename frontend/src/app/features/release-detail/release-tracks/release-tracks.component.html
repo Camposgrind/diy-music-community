@@ -1,0 +1,18 @@
+<section class="tracks">
+  <h2 class="tracks__title">Track List</h2>
+
+  <!-- Column headers -->
+  <div class="tracks__header">
+    <span class="tracks__header-num">#</span>
+    <span class="tracks__header-title">Title</span>
+  </div>
+
+  <div class="tracks__list">
+    @for (track of sortedTracks(); track track.trackNumber) {
+      <div class="tracks__item">
+        <span class="tracks__item-num">{{ track.trackNumber }}</span>
+        <span class="tracks__item-title">{{ track.title }}</span>
+      </div>
+    }
+  </div>
+</section>
