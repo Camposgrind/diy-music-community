@@ -1,4 +1,6 @@
+using DiyMusicCommunity.Application.Abstractions;
 using DiyMusicCommunity.Domain.Abstractions;
+using DiyMusicCommunity.Infrastructure.Auth;
 using DiyMusicCommunity.Infrastructure.Persistence;
 using DiyMusicCommunity.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -25,10 +27,14 @@ public static class DependencyInjection
         services.AddScoped<IBandRepository, BandRepository>();
         services.AddScoped<IReleaseRepository, ReleaseRepository>();
         services.AddScoped<IGenreRepository, GenreRepository>();
-        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IProposalRepository, ProposalRepository>();
         services.AddScoped<IClaimRepository, ClaimRepository>();
+
+        services.AddScoped<IIdentityService, IdentityService>();
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
 
         return services;
     }
 }
+
+

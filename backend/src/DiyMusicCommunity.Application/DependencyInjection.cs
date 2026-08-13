@@ -1,3 +1,5 @@
+using DiyMusicCommunity.Application.Auth.Login;
+using DiyMusicCommunity.Application.Auth.Register;
 using DiyMusicCommunity.Application.Bands.GetBandDetail;
 using DiyMusicCommunity.Application.Bands.GetBands;
 using DiyMusicCommunity.Application.Genres.GetGenres;
@@ -16,7 +18,10 @@ public static class DependencyInjection
         services.AddScoped<GetBandDetailUseCase>();
         services.AddScoped<GetReleaseDetailUseCase>();
         services.AddScoped<GetGenresUseCase>();
+        services.AddScoped<RegisterUseCase>();
+        services.AddScoped<LoginUseCase>();
 
         return services;
     }
 }
+

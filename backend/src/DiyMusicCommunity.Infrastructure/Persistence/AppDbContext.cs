@@ -1,10 +1,13 @@
 using DiyMusicCommunity.Domain.Abstractions;
 using DiyMusicCommunity.Domain.Entities;
+using DiyMusicCommunity.Infrastructure.Auth;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace DiyMusicCommunity.Infrastructure.Persistence;
 
-public sealed class AppDbContext : DbContext, IUnitOfWork
+public sealed class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>, IUnitOfWork
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -18,7 +21,6 @@ public sealed class AppDbContext : DbContext, IUnitOfWork
     public DbSet<Release> Releases => Set<Release>();
     public DbSet<ReleaseFormat> ReleaseFormats => Set<ReleaseFormat>();
     public DbSet<Track> Tracks => Set<Track>();
-    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
