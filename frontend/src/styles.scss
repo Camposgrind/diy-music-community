@@ -147,3 +147,130 @@ select {
   }
 }
 
+// === Auth Pages ===
+.auth-page {
+  min-height: calc(100vh - 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.auth-card {
+  background-color: $bg-card;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 440px;
+  overflow: hidden;
+
+  &__accent {
+    height: 4px;
+    background: linear-gradient(90deg, $accent, #cc0000);
+  }
+
+  &__body {
+    padding: 2.5rem 2rem;
+  }
+
+  &__title {
+    font-family: $font-heading;
+    font-size: 1.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: $text-heading;
+    margin-bottom: 0.25rem;
+  }
+
+  &__subtitle {
+    font-size: 0.875rem;
+    color: $text-secondary;
+    margin-bottom: 2rem;
+  }
+
+  &__footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: $text-secondary;
+  }
+
+  &__link {
+    color: #cc3333;
+    font-weight: 600;
+    transition: color $transition;
+
+    &:hover { color: $text-heading; }
+  }
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  &__label {
+    font-family: $font-heading;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: $text-secondary;
+  }
+
+  &__input-wrapper {
+    position: relative;
+
+    input { padding-right: 3rem; }
+  }
+
+  &__toggle-pwd {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0;
+    line-height: 1;
+    color: $text-secondary;
+  }
+
+  &__input--error {
+    border-color: $accent !important;
+  }
+
+  &__error {
+    font-size: 0.78rem;
+    color: #cc3333;
+  }
+
+  &__submit {
+    margin-top: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: $accent;
+    color: $text-heading;
+    font-family: $font-heading;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border: none;
+    border-radius: $radius;
+    cursor: pointer;
+    transition: background-color $transition;
+    width: 100%;
+
+    &:hover:not(:disabled) { background-color: $accent-hover; }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+  }
+}

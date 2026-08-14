@@ -8,6 +8,7 @@ describe('CountriesService', () => {
   let httpMock: HttpTestingController;
 
   beforeEach(() => {
+    TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting()],
     });
@@ -22,7 +23,7 @@ describe('CountriesService', () => {
   it('should call GET data/countries.json', () => {
     service.getCountries().subscribe();
 
-    const req = httpMock.expectOne('data/countries.json');
+    const req = httpMock.expectOne((r) => r.url.endsWith('data/countries.json'));
     expect(req.request.method).toBe('GET');
     req.flush(['Spain', 'Japan']);
   });
@@ -31,7 +32,7 @@ describe('CountriesService', () => {
     let result: string[] | undefined;
     service.getCountries().subscribe((r) => (result = r));
 
-    const req = httpMock.expectOne('data/countries.json');
+    const req = httpMock.expectOne((r) => r.url.endsWith('data/countries.json'));
     req.flush(['Spain', 'Japan', 'Brazil']);
 
     expect(result).toEqual(['Spain', 'Japan', 'Brazil']);
@@ -41,7 +42,7 @@ describe('CountriesService', () => {
     service.getCountries().subscribe();
     service.getCountries().subscribe();
 
-    const requests = httpMock.match('data/countries.json');
+    const requests = httpMock.match((r) => r.url.endsWith('data/countries.json'));
     expect(requests.length).toBe(1);
     requests[0].flush(['Spain']);
   });

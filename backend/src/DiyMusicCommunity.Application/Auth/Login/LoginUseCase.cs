@@ -28,7 +28,7 @@ public sealed class LoginUseCase
             return Result<LoginResponse>.Failure(Error.Validation(AuthErrors.Codes.InvalidCredentials, message));
         }
 
-        var (succeeded, userId, email, roles) = await _identityService.LoginAsync(
+        var (succeeded, userId, username, email, roles) = await _identityService.LoginAsync(
             request.Email,
             request.Username,
             request.Password,
@@ -39,7 +39,7 @@ public sealed class LoginUseCase
             return Result<LoginResponse>.Failure(AuthErrors.InvalidCredentials());
         }
 
-        var (token, expiresAt) = _jwtTokenService.GenerateToken(userId, email, roles);
+        var (token, expiresAt) = _jwtTokenService.GenerateToken(userId, username, email, roles);
 
         return Result<LoginResponse>.Success(new LoginResponse
         {

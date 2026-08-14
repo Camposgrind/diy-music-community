@@ -16,6 +16,7 @@ describe('BandsSearchFormComponent', () => {
   ];
 
   beforeEach(async () => {
+    TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [BandsSearchFormComponent],
     }).compileComponents();

@@ -1,0 +1,123 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="auth-card__accent"></div>
+
+    <div class="auth-card__body">
+      <h1 class="auth-card__title">Join DIY Music Community</h1>
+      <p class="auth-card__subtitle">Create your own account</p>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form" novalidate>
+
+        <!-- Username -->
+        <div class="auth-form__field">
+          <label class="auth-form__label" for="username">Username</label>
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            placeholder="your_username"
+            autocomplete="username"
+            [class.auth-form__input--error]="username.invalid && username.touched" />
+          @if (username.hasError('required') && username.touched) {
+            <span class="auth-form__error">Username is required.</span>
+          }
+          @if (username.hasError('minlength') && username.touched) {
+            <span class="auth-form__error">Username must be at least 3 characters.</span>
+          }
+          @if (username.hasError('maxlength') && username.touched) {
+            <span class="auth-form__error">Username must not exceed 50 characters.</span>
+          }
+          @if (username.hasError('pattern') && username.touched) {
+            <span class="auth-form__error">Only letters, numbers, underscores and hyphens allowed.</span>
+          }
+        </div>
+
+        <!-- Email -->
+        <div class="auth-form__field">
+          <label class="auth-form__label" for="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="your@email.com"
+            autocomplete="email"
+            [class.auth-form__input--error]="email.invalid && email.touched" />
+          @if (email.hasError('required') && email.touched) {
+            <span class="auth-form__error">Email is required.</span>
+          }
+          @if (email.hasError('email') && email.touched) {
+            <span class="auth-form__error">Enter a valid email address.</span>
+          }
+          @if (email.hasError('maxlength') && email.touched) {
+            <span class="auth-form__error">Email must not exceed 256 characters.</span>
+          }
+        </div>
+
+        <!-- Password -->
+        <div class="auth-form__field">
+          <label class="auth-form__label" for="password">Password</label>
+          <div class="auth-form__input-wrapper">
+            <input
+              id="password"
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="••••••••"
+              autocomplete="new-password"
+              [class.auth-form__input--error]="password.invalid && password.touched" />
+            <button type="button" class="auth-form__toggle-pwd" (click)="togglePassword()"
+              [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
+              {{ showPassword() ? '🙈' : '👁' }}
+            </button>
+          </div>
+          @if (password.hasError('required') && password.touched) {
+            <span class="auth-form__error">Password is required.</span>
+          }
+          @if (password.hasError('minlength') && password.touched) {
+            <span class="auth-form__error">Password must be at least 8 characters.</span>
+          }
+          @if (password.hasError('pattern') && password.touched) {
+            <span class="auth-form__error">
+              Must contain uppercase, lowercase, number, and special character.
+            </span>
+          }
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="auth-form__field">
+          <label class="auth-form__label" for="confirmPassword">Confirm Password</label>
+          <div class="auth-form__input-wrapper">
+            <input
+              id="confirmPassword"
+              [type]="showConfirm() ? 'text' : 'password'"
+              formControlName="confirmPassword"
+              placeholder="••••••••"
+              autocomplete="new-password"
+              [class.auth-form__input--error]="
+                (confirmPassword.invalid && confirmPassword.touched) ||
+                (form.hasError('passwordMismatch') && confirmPassword.touched)" />
+            <button type="button" class="auth-form__toggle-pwd" (click)="toggleConfirm()"
+              [attr.aria-label]="showConfirm() ? 'Hide password' : 'Show password'">
+              {{ showConfirm() ? '🙈' : '👁' }}
+            </button>
+          </div>
+          @if (confirmPassword.hasError('required') && confirmPassword.touched) {
+            <span class="auth-form__error">Please confirm your password.</span>
+          }
+          @if (form.hasError('passwordMismatch') && confirmPassword.touched) {
+            <span class="auth-form__error">Passwords do not match.</span>
+          }
+        </div>
+
+        <button type="submit" class="auth-form__submit" [disabled]="loading()">
+          @if (loading()) { Creating account… } @else { Create Account }
+        </button>
+
+      </form>
+
+      <p class="auth-card__footer">
+        Already have an account?
+        <a routerLink="/login" class="auth-card__link">Sign in</a>
+      </p>
+    </div>
+  </div>
+</section>

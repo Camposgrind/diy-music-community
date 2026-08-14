@@ -1,0 +1,6 @@
+// Reuses all styles from login — shared via global auth-card + auth-form classes
+// Component-specific overrides only
+
+.auth-card__title {
+  font-size: 1.6rem;
+}

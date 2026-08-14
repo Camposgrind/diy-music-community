@@ -34,11 +34,12 @@ public sealed class JwtTokenService : IJwtTokenService
             : DefaultExpiryMinutes;
     }
 
-    public (string Token, DateTime ExpiresAt) GenerateToken(Guid userId, string email, IEnumerable<string> roles)
+    public (string Token, DateTime ExpiresAt) GenerateToken(Guid userId, string username, string email, IEnumerable<string> roles)
     {
         var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
+            new Claim(JwtRegisteredClaimNames.UniqueName, username),
             new Claim(JwtRegisteredClaimNames.Email, email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };

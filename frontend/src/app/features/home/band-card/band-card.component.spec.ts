@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ComponentRef } from '@angular/core';
+import { provideRouter } from '@angular/router';
 import { BandCardComponent } from './band-card.component';
 import { BandListItemModel } from '../../../infrastructure/api/models';
 
@@ -18,8 +19,10 @@ describe('BandCardComponent', () => {
   };
 
   beforeEach(async () => {
+    TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [BandCardComponent],
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(BandCardComponent);

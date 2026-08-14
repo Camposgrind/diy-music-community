@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ComponentRef } from '@angular/core';
+import { provideRouter } from '@angular/router';
 import { BandsResultsComponent } from './bands-results.component';
 import { BandListItemModel, PagedResult } from '../../../infrastructure/api/models';
 
@@ -18,8 +19,10 @@ describe('BandsResultsComponent', () => {
   };
 
   beforeEach(async () => {
+    TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [BandsResultsComponent],
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(BandsResultsComponent);
@@ -35,7 +38,7 @@ describe('BandsResultsComponent', () => {
   it('should show loading spinner when loading is true', () => {
     componentRef.setInput('loading', true);
     fixture.detectChanges();
-    expect(el.querySelector('.results__spinner')).toBeTruthy();
+    expect(el.querySelector('.results__loading')).toBeTruthy();
     expect(el.textContent).toContain('Searching the underground');
   });
 

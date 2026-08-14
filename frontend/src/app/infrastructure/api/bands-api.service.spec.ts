@@ -9,6 +9,7 @@ describe('BandsApiService', () => {
   let httpMock: HttpTestingController;
 
   beforeEach(() => {
+    TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting()],
     });
@@ -24,7 +25,7 @@ describe('BandsApiService', () => {
     const query: GetBandsQuery = { page: 2, pageSize: 10 };
     service.getBands(query).subscribe();
 
-    const req = httpMock.expectOne((r) => r.url === '/api/bands');
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/bands'));
     expect(req.request.params.get('page')).toBe('2');
     expect(req.request.params.get('pageSize')).toBe('10');
     expect(req.request.params.has('name')).toBe(false);
@@ -37,7 +38,7 @@ describe('BandsApiService', () => {
     const query: GetBandsQuery = { page: 1, pageSize: 20, name: 'Napalm' };
     service.getBands(query).subscribe();
 
-    const req = httpMock.expectOne((r) => r.url === '/api/bands');
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/bands'));
     expect(req.request.params.get('name')).toBe('Napalm');
     req.flush({ items: [], page: 1, pageSize: 20, totalCount: 0 });
   });
@@ -46,7 +47,7 @@ describe('BandsApiService', () => {
     const query: GetBandsQuery = { page: 1, pageSize: 20, country: 'United Kingdom' };
     service.getBands(query).subscribe();
 
-    const req = httpMock.expectOne((r) => r.url === '/api/bands');
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/bands'));
     expect(req.request.params.get('country')).toBe('United Kingdom');
     req.flush({ items: [], page: 1, pageSize: 20, totalCount: 0 });
   });
@@ -55,7 +56,7 @@ describe('BandsApiService', () => {
     const query: GetBandsQuery = { page: 1, pageSize: 20, genreId: 'abc-123' };
     service.getBands(query).subscribe();
 
-    const req = httpMock.expectOne((r) => r.url === '/api/bands');
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/bands'));
     expect(req.request.params.get('genreId')).toBe('abc-123');
     req.flush({ items: [], page: 1, pageSize: 20, totalCount: 0 });
   });
@@ -64,7 +65,7 @@ describe('BandsApiService', () => {
     const query: GetBandsQuery = { page: 1, pageSize: 20, status: 'Active' };
     service.getBands(query).subscribe();
 
-    const req = httpMock.expectOne((r) => r.url === '/api/bands');
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/bands'));
     expect(req.request.params.get('status')).toBe('Active');
     req.flush({ items: [], page: 1, pageSize: 20, totalCount: 0 });
   });
@@ -81,7 +82,7 @@ describe('BandsApiService', () => {
     let result: PagedResult<BandListItemModel> | undefined;
     service.getBands(query).subscribe((r) => (result = r));
 
-    const req = httpMock.expectOne((r) => r.url === '/api/bands');
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/bands'));
     req.flush(mockResult);
 
     expect(result).toEqual(mockResult);

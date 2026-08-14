@@ -5,5 +5,5 @@ namespace DiyMusicCommunity.Application.Abstractions;
 /// </summary>
 public interface IJwtTokenService
 {
-    (string Token, DateTime ExpiresAt) GenerateToken(Guid userId, string email, IEnumerable<string> roles);
+    (string Token, DateTime ExpiresAt) GenerateToken(Guid userId, string username, string email, IEnumerable<string> roles);
 }

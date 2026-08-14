@@ -9,6 +9,7 @@ describe('GenresApiService', () => {
   let httpMock: HttpTestingController;
 
   beforeEach(() => {
+    TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting()],
     });
@@ -23,7 +24,7 @@ describe('GenresApiService', () => {
   it('should call GET /api/genres', () => {
     service.getGenres().subscribe();
 
-    const req = httpMock.expectOne('/api/genres');
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/genres'));
     expect(req.request.method).toBe('GET');
     req.flush([]);
   });
@@ -37,7 +38,7 @@ describe('GenresApiService', () => {
     let result: GenreModel[] | undefined;
     service.getGenres().subscribe((r) => (result = r));
 
-    const req = httpMock.expectOne('/api/genres');
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/genres'));
     req.flush(mockGenres);
 
     expect(result).toEqual(mockGenres);

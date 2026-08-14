@@ -10,3 +10,4 @@ export type { BandReleaseModel } from './band-release.model';
 export type { ReleaseDetailModel } from './release-detail.model';
 export type { ReleaseBandModel } from './release-band.model';
 export type { ReleaseTrackModel } from './release-track.model';
+export type { LoginRequest, RegisterRequest, LoginResponse, AuthUser } from './auth.models';

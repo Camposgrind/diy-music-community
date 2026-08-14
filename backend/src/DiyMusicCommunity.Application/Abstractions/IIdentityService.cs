@@ -11,7 +11,7 @@ public interface IIdentityService
         string password,
         CancellationToken cancellationToken = default);
 
-    Task<(bool Succeeded, Guid UserId, string Email, IEnumerable<string> Roles)> LoginAsync(
+    Task<(bool Succeeded, Guid UserId, string Username, string Email, IEnumerable<string> Roles)> LoginAsync(
         string? email,
         string? username,
         string password,

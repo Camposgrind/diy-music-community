@@ -41,7 +41,7 @@ public sealed class IdentityService : IIdentityService
         return (true, []);
     }
 
-    public async Task<(bool Succeeded, Guid UserId, string Email, IEnumerable<string> Roles)> LoginAsync(
+    public async Task<(bool Succeeded, Guid UserId, string Username, string Email, IEnumerable<string> Roles)> LoginAsync(
         string? email,
         string? username,
         string password,
@@ -61,18 +61,18 @@ public sealed class IdentityService : IIdentityService
 
         if (user is null)
         {
-            return (false, Guid.Empty, string.Empty, []);
+            return (false, Guid.Empty, string.Empty, string.Empty, []);
         }
 
         var passwordValid = await _userManager.CheckPasswordAsync(user, password);
         if (!passwordValid)
         {
-            return (false, Guid.Empty, string.Empty, []);
+            return (false, Guid.Empty, string.Empty, string.Empty, []);
         }
 
         var roles = await _userManager.GetRolesAsync(user);
 
-        return (true, user.Id, user.Email!, roles);
+        return (true, user.Id, user.UserName!, user.Email!, roles);
     }
 
     public async Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default)

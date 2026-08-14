@@ -19,6 +19,7 @@ describe('HomeComponent', () => {
   };
 
   beforeEach(async () => {
+    TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [HomeComponent],
       providers: [provideHttpClient(), provideHttpClientTesting()],
@@ -34,9 +35,9 @@ describe('HomeComponent', () => {
   });
 
   function flushInitialRequests(): void {
-    const countriesReq = httpMock.expectOne('data/countries.json');
+    const countriesReq = httpMock.expectOne((r) => r.url.endsWith('data/countries.json'));
     countriesReq.flush(['Spain', 'Japan']);
-    const genresReq = httpMock.expectOne('/api/genres');
+    const genresReq = httpMock.expectOne((r) => r.url.endsWith('/api/genres'));
     genresReq.flush([{ id: 'g1', name: 'Grindcore' }]);
   }
 
@@ -65,7 +66,7 @@ describe('HomeComponent', () => {
     component.onSearch({ name: 'Discharge', country: '', genreId: '' });
     expect(component.loading()).toBe(true);
 
-    const req = httpMock.expectOne((r) => r.url === '/api/bands');
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/bands'));
     req.flush({ items: [mockBand], page: 1, pageSize: 20, totalCount: 1 });
   });
 
@@ -75,7 +76,7 @@ describe('HomeComponent', () => {
 
     component.onSearch({ name: '', country: '', genreId: '' });
 
-    const req = httpMock.expectOne((r) => r.url === '/api/bands');
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/bands'));
     const mockResult: PagedResult<BandListItemModel> = {
       items: [mockBand],
       page: 1,
@@ -94,7 +95,7 @@ describe('HomeComponent', () => {
 
     component.onSearch({ name: '', country: '', genreId: '' });
 
-    const req = httpMock.expectOne((r) => r.url === '/api/bands');
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/bands'));
     req.flush(
       { code: 'Band.InvalidFilter', message: 'Invalid filter' },
       { status: 400, statusText: 'Bad Request' },
@@ -110,7 +111,7 @@ describe('HomeComponent', () => {
 
     component.onSearch({ name: '', country: '', genreId: '' });
 
-    const req = httpMock.expectOne((r) => r.url === '/api/bands');
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/bands'));
     req.flush(
       { code: 'Band.TooManyResults', message: 'Too many results, refine filters' },
       { status: 422, statusText: 'Unprocessable Entity' },
@@ -126,7 +127,7 @@ describe('HomeComponent', () => {
     flushInitialRequests();
 
     component.onSearch({ name: 'test', country: '', genreId: '' });
-    const req = httpMock.expectOne((r) => r.url === '/api/bands');
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/bands'));
     req.flush({ items: [mockBand], page: 1, pageSize: 20, totalCount: 1 });
 
     component.onReset();
@@ -141,11 +142,11 @@ describe('HomeComponent', () => {
     flushInitialRequests();
 
     component.onSearch({ name: '', country: '', genreId: '' });
-    const req1 = httpMock.expectOne((r) => r.url === '/api/bands');
+    const req1 = httpMock.expectOne((r) => r.url.endsWith('/api/bands'));
     req1.flush({ items: [mockBand], page: 1, pageSize: 20, totalCount: 40 });
 
     component.onPageChange(2);
-    const req2 = httpMock.expectOne((r) => r.url === '/api/bands');
+    const req2 = httpMock.expectOne((r) => r.url.endsWith('/api/bands'));
     expect(req2.request.params.get('page')).toBe('2');
     req2.flush({ items: [mockBand], page: 2, pageSize: 20, totalCount: 40 });
 
@@ -155,9 +156,9 @@ describe('HomeComponent', () => {
   it('should set genresError when genres API fails', () => {
     fixture.detectChanges();
 
-    const countriesReq = httpMock.expectOne('data/countries.json');
+    const countriesReq = httpMock.expectOne((r) => r.url.endsWith('data/countries.json'));
     countriesReq.flush(['Spain']);
-    const genresReq = httpMock.expectOne('/api/genres');
+    const genresReq = httpMock.expectOne((r) => r.url.endsWith('/api/genres'));
     genresReq.flush('error', { status: 500, statusText: 'Server Error' });
 
     expect(component.genresError()).toContain('Could not load genres');
@@ -166,9 +167,9 @@ describe('HomeComponent', () => {
   it('should keep genres empty array when API fails', () => {
     fixture.detectChanges();
 
-    const countriesReq = httpMock.expectOne('data/countries.json');
+    const countriesReq = httpMock.expectOne((r) => r.url.endsWith('data/countries.json'));
     countriesReq.flush([]);
-    const genresReq = httpMock.expectOne('/api/genres');
+    const genresReq = httpMock.expectOne((r) => r.url.endsWith('/api/genres'));
     genresReq.flush('error', { status: 500, statusText: 'Server Error' });
 
     expect(component.genres()).toEqual([]);
@@ -179,7 +180,7 @@ describe('HomeComponent', () => {
     flushInitialRequests();
 
     component.onSearch({ name: '', country: '', genreId: '' });
-    const req = httpMock.expectOne((r) => r.url === '/api/bands');
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/bands'));
     req.flush(
       { code: 'Band.TooManyResults', message: 'Too many' },
       { status: 422, statusText: 'Unprocessable Entity' },
@@ -194,7 +195,7 @@ describe('HomeComponent', () => {
     flushInitialRequests();
 
     component.onSearch({ name: 'Napalm', country: '', genreId: '' });
-    const req = httpMock.expectOne((r) => r.url === '/api/bands');
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/bands'));
     expect(req.request.params.get('name')).toBe('Napalm');
     expect(req.request.params.has('country')).toBe(false);
     expect(req.request.params.has('genreId')).toBe(false);
@@ -206,7 +207,7 @@ describe('HomeComponent', () => {
     flushInitialRequests();
 
     component.onSearch({ name: '', country: 'Japan', genreId: 'g1' });
-    const req = httpMock.expectOne((r) => r.url === '/api/bands');
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/bands'));
     expect(req.request.params.get('country')).toBe('Japan');
     expect(req.request.params.get('genreId')).toBe('g1');
     req.flush({ items: [], page: 1, pageSize: 20, totalCount: 0 });

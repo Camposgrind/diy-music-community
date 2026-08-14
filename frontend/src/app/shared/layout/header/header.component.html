@@ -4,8 +4,22 @@
       <img src="images/grindLogo.jpg" alt="DIY Music Community" class="header__logo-img" />
       <span class="header__title">DIY Music Community</span>
     </a>
+
     <nav class="header__nav">
-      <a (click)="clearAndGoHome()" style="cursor:pointer">Home</a>
+      <a (click)="clearAndGoHome()" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" routerLink="/" style="cursor:pointer">Home</a>
+
+      @if (auth.isAuthenticated()) {
+        <span class="header__user">
+          <span class="header__user-icon">♪</span>
+          {{ auth.currentUser()?.username }}
+        </span>
+        <button class="header__logout" (click)="logout()">
+          <span class="header__logout-icon">⏻</span>
+          Log Out
+        </button>
+      } @else {
+        <a routerLink="/login" routerLinkActive="active">Login</a>
+      }
     </nav>
   </div>
 </header>
