@@ -28,7 +28,7 @@ src/app/
 
 ## Auth state
 - `AuthService` exposes current-user via a signal or `BehaviorSubject`.
-- Guards: `auth.guard.ts` (authenticated?), `role.guard.ts` (role check), `claim.guard.ts` (band claim check).
+- Guards: `auth.guard.ts` (authenticated?) and `role.guard.ts` (role check). Administrator catalog-management routes require `Admin`.
 
 ## Testing
 - Test runner: **Vitest**. Config in `frontend/vitest.config.ts`. Do not use Karma or Jasmine.

@@ -20,7 +20,7 @@ const mockBand: BandDetailModel = {
   musicUrlPortal: null,
   bandContact: null,
   releases: [
-    { id: 'r1', title: 'Scum', releaseType: 'Album', year: 1987, coverImageUrl: null },
+    { id: 'r1', title: 'Scum', releaseType: 'Album', year: 1987 },
   ],
   members: [
     { id: 'm1', name: 'Barney Greenway', instrument: 'Vocals', startYear: 1989, endYear: null, isCurrent: true, otherBands: [] },

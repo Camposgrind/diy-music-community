@@ -15,9 +15,9 @@ applyTo: "**/*.spec.ts,**/*Tests.cs"
 `Scenario_Should_Result`
 ```csharp
 // Good
-ApprovePendingProposal_Should_CreatePublishedBand()
-RejectProposalWithoutReason_Should_ReturnFailure()
-SubmitDuplicateClaim_Should_ReturnConflictError()
+AdminCreatesBand_Should_ReturnBand()
+AdminUpdatesBand_Should_ReturnUpdatedBand()
+NonAdminCreatesBand_Should_ReturnForbidden()
 ```
 
 ### Layer targets
@@ -28,11 +28,10 @@ SubmitDuplicateClaim_Should_ReturnConflictError()
 | Api | Integration | Nothing — `WebApplicationFactory` + SQLite in-memory |
 
 ### Must-have scenarios
-- Proposal approval → Band created with `CommunityCreated` trust status.
-- Claim approval → Band `TrustStatus = Claimed`, `IsClaimed = true`.
-- Role access → 403 for unauthorized roles.
-- Duplicate pending claim → conflict error.
-- Public band list filtering → blocked bands excluded.
+- Admin creates and updates bands successfully.
+- Role access → 403 for non-Admin callers on catalog writes.
+- Unauthenticated catalog writes return 401.
+- Public band list results are paginated and filter correctly.
 
 ### Coverage targets
 - Domain + Application: ~85%.
@@ -54,7 +53,7 @@ it('should redirect to login when unauthenticated')
 
 ### What to test
 - Component logic (state changes, method calls).
-- Guards (`auth.guard`, `role.guard`, `claim.guard`).
+- Guards (`auth.guard`, `role.guard`), including Admin-only catalog routes.
 - Form validation rules.
 - HTTP services via `HttpTestingController` (Angular's test utilities work normally with Vitest).
 

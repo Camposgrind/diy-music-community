@@ -60,7 +60,7 @@ Because the same person exists as separate `BandMember` rows (one per band), the
 cases** must enforce two consistency rules:
 
 ### 1. Name/photo propagation
-When a moderator or claim-holder updates a member's name (or future profile image), the use case
+When an administrator updates a member's name (or future profile image), the use case
 must find all `BandMember` rows with the same name across the linked bands and propagate the change.
 
 **Use case responsibility (`Application` layer):**

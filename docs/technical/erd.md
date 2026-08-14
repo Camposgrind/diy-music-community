@@ -29,8 +29,6 @@ erDiagram
 		string BandImageUrl
 		string MusicUrlPortal
 		string BandContact
-		TrustStatus TrustStatus
-		bool IsClaimed
 		datetime CreatedAt
 		datetime UpdatedAt
 	}
@@ -75,52 +73,10 @@ erDiagram
 		Guid OtherBandId FK
 	}
 
-	BandProposal {
-		Guid Id PK
-		string Name
-		string Country
-		string Location
-		Guid GenreId FK
-		int FormationYear
-		string Description
-		string SourceUrl
-		Guid SubmittedByUserId FK
-		ProposalStatus ReviewStatus
-		datetime CreatedAt
-		datetime ReviewedAt
-		Guid ReviewedByUserId FK
-		string RejectionReason
-	}
-
-	BandClaim {
-		Guid Id PK
-		Guid BandId FK
-		Guid UserId FK
-		ClaimType ClaimType
-		string Message
-		string EvidenceUrl
-		ClaimStatus Status
-		datetime CreatedAt
-		datetime ReviewedAt
-		Guid ReviewedByUserId FK
-		string RejectionReason
-	}
-
-	ModerationAction {
-		Guid Id PK
-		Guid ModeratorId FK
-		string ActionType
-		Guid TargetId
-		string Reason
-		datetime CreatedAt
-	}
-
 	Genre ||--o{ Band : "classifies"
-	Genre ||--o{ BandProposal : "suggested for"
 
 	Band ||--o{ Release : "has"
 	Band ||--o{ BandMember : "has"
-	Band ||--o{ BandClaim : "subject of"
 
 	Release ||--o{ Track : "contains"
 	Release ||--o{ ReleaseFormat : "released as"
@@ -128,7 +84,5 @@ erDiagram
 	BandMember ||--o{ BandMemberOtherBand : "also in"
 	Band ||--o{ BandMemberOtherBand : "referenced by"
 
-	User ||--o{ BandProposal : "submits"
-	User ||--o{ BandClaim : "submits"
-	User ||--o{ ModerationAction : "performs"
+```
 ```

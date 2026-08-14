@@ -50,7 +50,7 @@ What are the trade-offs and implications?
 ## Spec acceptance criteria format
 ```markdown
 ## Acceptance criteria
-- [x] Given a pending proposal, when a moderator approves it, then a published Band is created.
-- [ ] Given an approved proposal, when a moderator tries to approve it again, then a 409 is returned.
+- [x] Given an Admin submits valid band data, when the request is processed, then a Band is created.
+- [ ] Given a non-Admin submits band data, when the request is processed, then a 403 is returned.
 ```
 Use `[x]` when the scenario is implemented and tested; `[ ]` when pending.

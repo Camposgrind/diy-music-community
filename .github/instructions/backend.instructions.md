@@ -14,12 +14,12 @@ applyTo: "backend/**/*.cs"
 
 ## Domain
 - Entities in `Domain/Entities/`, enums in `Domain/Enums/`, value objects in `Domain/ValueObjects/`.
-- Repository *interfaces* in `Domain/Abstractions/` (`IBandRepository`, `IProposalRepository`, `IClaimRepository`, `IUnitOfWork`).
-- Domain exceptions in `Domain/Exceptions/` (`DomainException`, `InvalidProposalTransitionException`).
+- Repository *interfaces* in `Domain/Abstractions/` (`IBandRepository`, `IUnitOfWork`).
+- Domain exceptions in `Domain/Exceptions/` (`DomainException`).
 - No EF Core attributes on domain entities.
 
 ## Application
-- One folder per feature: `Bands/`, `Proposals/`, `Claims/`, `Auth/`, `Common/`.
+- One folder per feature: `Bands/`, `Auth/`, `Common/`.
 - Use plain use-case classes with a `Handle(request)` method — no MediatR.
 - Use FluentValidation for all input validation.
 - Return `Result<T>` for expected failures; never throw for business rule violations.
@@ -28,15 +28,14 @@ applyTo: "backend/**/*.cs"
 ## Infrastructure
 - One `IEntityTypeConfiguration<T>` per entity.
 - Migrations in `Infrastructure/Persistence/Migrations/`.
-- Seed data: idempotent, Development environment only (12 bands, admin + moderator users).
+- Seed data: idempotent, Development environment only (12 bands and an admin user).
 - `LocalFileStorageService` implements `IFileStorageService` — no Azure for MVP.
 - JWT implementation in `Infrastructure/Auth/JwtTokenService.cs`.
 
 ## Api
 - Thin controllers: call use case → return HTTP result.
 - `ExceptionHandlingMiddleware` catches unhandled exceptions → structured error response.
-- Auth: `[Authorize(Roles = "Moderator,Admin")]` for moderation endpoints.
-- Band claim access: resource-based check via `IBandAccessService.CanEditBand(userId, bandId)`.
+- Auth: `[Authorize(Roles = "Admin")]` for band creation and update endpoints.
 - Error envelope: `{ "error": { "code": "...", "message": "..." } }`.
 
 ## Result pattern
@@ -47,7 +46,7 @@ Result<BandDto>.Failure(Error.NotFound("Band.NotFound", "Band not found"))
 ```
 
 ## Naming
-- Test method names: `Scenario_Should_Result` (e.g. `ApprovePendingProposal_Should_CreateBand`).
+- Test method names: `Scenario_Should_Result` (e.g. `AdminCreatesBand_Should_ReturnBand`).
 - One class per file; namespace matches folder structure under `DiyMusicCommunity.*`.
 
 ## Code style

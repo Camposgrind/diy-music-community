@@ -27,11 +27,9 @@ tests/
 ### Naming convention
 `Scenario_Should_Result`
 ```csharp
-ApprovePendingProposal_Should_CreatePublishedBand()
-RejectProposalWithoutReason_Should_ReturnFailure()
-SubmitDuplicateClaim_Should_ReturnConflictError()
-GetBands_Should_ExcludeBlockedBands()
-ModerationEndpoint_Should_Return403_ForUserRole()
+AdminCreatesBand_Should_ReturnBand()
+NonAdminCreatesBand_Should_Return403()
+GetBands_Should_ReturnMatchingPage()
 ```
 
 ### Layer guidance
@@ -42,14 +40,11 @@ ModerationEndpoint_Should_Return403_ForUserRole()
 | Api | Integration | xUnit + `WebApplicationFactory` + SQLite in-memory | Nothing |
 
 ### Must-have test scenarios
-1. Approve pending proposal → Band created, `TrustStatus = CommunityCreated`.
-2. Re-approve already-approved proposal → `409 Conflict`.
-3. Reject proposal without reason → failure result.
-4. Submit duplicate pending claim → conflict error.
-5. Approve claim → `Band.TrustStatus = Claimed`, `Band.IsClaimed = true`.
-6. Moderation endpoint called with `User` role → `403 Forbidden`.
-7. Protected endpoint called without token → `401 Unauthorized`.
-8. Public band list → blocked bands excluded.
+1. Admin creates a band → the band is persisted and returned.
+2. Admin updates a band → the amended catalog data is persisted and returned.
+3. Band creation or update called with a non-Admin role → `403 Forbidden`.
+4. Protected catalog-management endpoint called without a token → `401 Unauthorized`.
+5. Public band list → matching results are paginated.
 
 ### Run command
 ```bash
@@ -84,7 +79,7 @@ it('should disable submit button while request is pending')
 
 ### What to test
 - Component logic: state transitions, method calls, template bindings.
-- Guards: `auth.guard`, `role.guard`, `claim.guard`.
+- Guards: `auth.guard`, `role.guard` (including rejection of non-Admin users from catalog-management routes).
 - Form validation rules (required, minLength, pattern).
 - HTTP services via `HttpTestingController`.
 

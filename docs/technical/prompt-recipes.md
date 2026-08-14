@@ -72,20 +72,19 @@ Add a Reactive Form for <feature> following these rules:
 5. Write tests that verify each validation rule triggers the correct error message.
 ```
 
-## Moderation workflow (backend + frontend)
+## Administrator catalog workflow (backend + frontend)
 ```
-Using the spec at docs/specs/NNN-<name>.md, implement the full moderation workflow for <ProposalOrClaim>:
+Using the spec at docs/specs/NNN-<name>.md, implement administrator-only create/update management for bands:
 
 Backend:
-- Approve use case: transitions status, creates side effects (band creation or trust update), records ModerationAction.
-- Reject use case: requires reason, transitions status, records ModerationAction.
-- Controller endpoints: POST .../approve and POST .../reject with Moderator/Admin role guard.
-- Integration tests for happy paths + role guard (403) + already-processed conflict (409).
+- Create and update use cases validate the request and persist the band.
+- Controller endpoints use an `Admin` role guard.
+- Integration tests cover the happy paths, 401 without a token, and 403 for a non-Admin role.
 
 Frontend:
-- Moderation dashboard page that lists pending items.
-- Approve / Reject actions with confirmation + optional reason input.
-- Reflect updated status in the list after action.
+- Administrator-only create and edit pages.
+- Forms show validation feedback and redirect or refresh after a successful save.
+- Do not expose contribution, claim, or moderation screens.
 ```
 
 ## Update spec after behavior change

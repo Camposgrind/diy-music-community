@@ -20,6 +20,7 @@
     "strictInputAccessModifiers": true
   },
   "files": [],
+  "exclude": ["vitest.config.ts"],
   "references": [
     {
       "path": "./tsconfig.app.json"

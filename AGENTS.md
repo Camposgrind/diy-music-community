@@ -4,8 +4,8 @@
 
 ## Product context
 Web platform to catalog underground music (Punk, Crust, Grindcore, Powerviolence, D-Beat).
-Public browsing + community proposals + moderation + band claims + trust states.
-Full scope: `docs/functional/overview.md`.
+Public browsing with an administrator-maintained band catalog. Only administrators may create or update bands.
+Functional scope: `docs/functional/overview.md`.
 
 ## Tech stack
 - Backend: .NET / ASP.NET Core Web API, EF Core, SQL Server, JWT, Clean Architecture.
@@ -21,7 +21,7 @@ Full scope: `docs/functional/overview.md`.
 5. Do not overengineer. This is a solo MVP with a hard deadline.
 
 ## Architecture rules
-- Layers & responsibilities: `docs/technical/architecture.md`.
+- Data model: `docs/technical/erd.md`.
 - Domain: entities/enums/rules only, no EF/HTTP.
 - Application: use cases/DTOs/validators + interfaces.
 - Infrastructure: EF, repos, storage, JWT.

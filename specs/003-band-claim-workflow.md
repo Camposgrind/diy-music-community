@@ -1,4 +1,6 @@
-# Feature: Band Claim Workflow
+# Retired: Band Claim Workflow
+
+> **Status:** Superseded by [ADR 003](../docs/adr/003-admin-only-band-catalog.md). Band claims are no longer part of the product. Retained only as historical context; do not implement this workflow.
 
 ## User story
 As a registered user, I want to claim a band to prove my relationship to it.

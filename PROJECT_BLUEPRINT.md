@@ -4,8 +4,7 @@ A pragmatic, MVP-focused Clean Architecture + SOLID + TDD + SDD blueprint for a 
 developer working with AI agents under a tight deadline (Aug 2 → Aug 23).
 
 **Product:** A web platform to catalog underground/DIY music scenes (Punk, Crust,
-Grindcore, Powerviolence, D-Beat). Public browsing + community proposals + moderation
-+ band claims + trust states.
+Grindcore, Powerviolence, D-Beat). Public browsing with an administrator-maintained catalog.
 
 ---
 
@@ -120,11 +119,11 @@ DiyMusicCommunity.Api             ← depends on Application (+ Infrastructure v
 
 ```text
 Domain/
-├── Entities/     Band, Release, Track, BandMember, BandProposal, BandClaim, ModerationAction, User
-├── Enums/        BandStatus, TrustStatus, ProposalStatus, ClaimStatus, ClaimType, UserRole
-├── ValueObjects/ (optional) SourceUrl, EvidenceUrl
-├── Exceptions/   DomainException, InvalidProposalTransitionException
-└── Abstractions/ IBandRepository, IProposalRepository, IClaimRepository, IUnitOfWork
+├── Entities/     Band, Release, Track, BandMember, User
+├── Enums/        BandStatus, ReleaseType, Format, UserRole
+├── ValueObjects/ (optional) SourceUrl
+├── Exceptions/   DomainException
+└── Abstractions/ IBandRepository, IUnitOfWork
 ```
 
 ### Application
@@ -134,9 +133,7 @@ Domain/
 
 ```text
 Application/
-├── Bands/      GetBandsQuery, GetBandByIdQuery, dtos, validators
-├── Proposals/  CreateProposalCommand, ApproveProposalCommand, RejectProposalCommand
-├── Claims/     SubmitClaimCommand, ApproveClaimCommand, RejectClaimCommand
+├── Bands/      GetBandsQuery, GetBandByIdQuery, CreateBandCommand, UpdateBandCommand, dtos, validators
 ├── Auth/       RegisterCommand, LoginCommand
 ├── Common/     Result<T>, Error, pagination
 └── Abstractions/ IFileStorageService, IJwtTokenService, ICurrentUser
@@ -152,7 +149,7 @@ Application/
 ```text
 Infrastructure/
 ├── Persistence/  AppDbContext, Configurations/, Migrations/, Seed/
-├── Repositories/ BandRepository, ProposalRepository, ClaimRepository
+├── Repositories/ BandRepository
 ├── Storage/      LocalFileStorageService  (AzureBlobStorageService later)
 ├── Auth/         JwtTokenService, PasswordHasher
 └── DependencyInjection.cs
@@ -165,7 +162,7 @@ Infrastructure/
 
 ```text
 Api/
-├── Controllers/  Auth, Bands, Releases, BandProposals, BandClaims, Moderation
+├── Controllers/  Auth, Bands, Releases
 ├── Middleware/   ExceptionHandlingMiddleware
 ├── Program.cs
 └── appsettings.json
@@ -174,10 +171,9 @@ Api/
 ### Pragmatic recommendations
 - **Result pattern** (`Result<T>` + `Error`) for expected failures; exceptions only for exceptional cases.
 - **JWT**: contains `sub` (userId) + `role`. No refresh tokens for MVP.
-- **Role auth**: `[Authorize(Roles = "Moderator,Admin")]`.
-- **Band claim auth**: NOT a role — resource-based check (see §6).
+- **Role auth**: `[Authorize(Roles = "Admin")]` for catalog-management endpoints.
 - **EF Core**: code-first, one `IEntityTypeConfiguration` per entity.
-- **Seed**: idempotent, Development only (12 bands, admin + moderator users).
+- **Seed**: idempotent, Development only (12 bands and an admin user).
 - **Storage**: `IFileStorageService` now (`LocalFileStorageService`); Azure Blob later. Do not build Azure for the MVP.
 
 ---
@@ -189,9 +185,9 @@ Angular selector prefix: `dmc-`.
 ```text
 src/app/
 ├── core/
-│   ├── auth/     auth.service.ts, auth.guard.ts, role.guard.ts, claim.guard.ts
+│   ├── auth/     auth.service.ts, auth.guard.ts, role.guard.ts
 │   ├── http/     auth.interceptor.ts, error.interceptor.ts
-│   ├── models/   band.model.ts, proposal.model.ts, claim.model.ts, user.model.ts
+│   ├── models/   band.model.ts, user.model.ts
 │   └── services/ api base, notification service
 │
 ├── shared/
@@ -204,9 +200,7 @@ src/app/
     ├── bands/       band-list (page), band-detail (page), band-card (presentational)
     ├── releases/    release-detail (page), tracklist (presentational)
     ├── auth/        login (page), register (page)
-    ├── proposals/   propose-band (page), my-proposals (page)
-    ├── moderation/  moderation-dashboard, proposal-review, claim-review
-    └── claims/      claim-band (page/dialog)
+    └── bands-admin/ create-band, edit-band
 ```
 
 | Folder | Purpose |
@@ -231,44 +225,30 @@ Country/label/formats are strings for the MVP.
 
 ### User
 - Auth identity + role.
-- `Id, Email, PasswordHash, DisplayName, Role (User|Moderator|Admin), CreatedAt`.
-- 1→N Proposals, 1→N Claims. Email unique; default role `User`.
+- `Id, Email, PasswordHash, DisplayName, Role (User|Admin), CreatedAt`.
+- Email unique; default role `User`.
 - Tests: duplicate email rejected; new user gets `User`.
 
 ### Band
 - Core catalog entity.
-- `Id, Name, Country, Location, GenreId, Status (Active|SplitUp|OnHold), FormationYear, Description, TrustStatus (CommunityCreated|ClaimPending|Claimed|Blocked), IsClaimed, CreatedAt, UpdatedAt`.
-- N→1 Genre, 1→N Releases, 1→N BandMembers, 1→N Claims.
-- Rules: `IsClaimed` true only on approved claim; trust transitions constrained.
-- Tests: approving claim → Claimed + IsClaimed; blocked excluded from list.
+- `Id, Name, Country, Location, GenreId, Status (Active|SplitUp|OnHold), FormationYear, Description, CreatedAt, UpdatedAt`.
+- N→1 Genre, 1→N Releases, 1→N BandMembers.
+- Rules: only an administrator can create or update catalog data.
+- Tests: admin can create/update; non-admin receives 403.
 
 ### Genre
 - `Id, Name`. One primary genre per band for MVP.
 
 ### Release
-- `Id, BandId, Title, ReleaseType (Demo|EP|Album|Split|Compilation), ReleaseDate, Year, LabelText, FormatsText, CoverImageUrl`.
-- N→1 Band, 1→N Tracks. Tests: belongs to band; tracklist ordered.
+- `Id, BandId, Title, ReleaseType (Demo|EP|Album|Split|Compilation), ReleaseDate, Year, LabelText, CoverImageUrl`.
+- N→1 Band, 1→N Tracks, 1→N ReleaseFormats. Tests: belongs to band; tracklist ordered.
 
 ### Track
 - `Id, ReleaseId, Title, TrackNumber`. `TrackNumber` unique per release.
 
 ### BandMember
-- `Id, BandId, Name, Instrument, StartYear, EndYear, IsCurrent, AlsoInBandsText`.
+- `Id, BandId, Name, Instrument, StartYear, EndYear, IsCurrent`.
 - Rule: `EndYear` set → `IsCurrent=false`. Tests: current vs past separated.
-
-### BandProposal
-- `Id, Name, Country, Location, GenreId, Status, FormationYear, Description, SourceUrl, SubmittedByUserId, ReviewStatus (Pending|Approved|Rejected), CreatedAt, ReviewedAt, ReviewedByUserId, RejectionReason`.
-- Rules: only Pending can transition; approval creates published Band (CommunityCreated); rejection needs reason.
-- Tests: approve pending → creates band; re-approve → error; reject w/o reason → error.
-
-### BandClaim
-- `Id, BandId, UserId, ClaimType (CurrentMember|PastMember|Representative|Label|Other), Message, EvidenceUrl, Status (Pending|Approved|Rejected), CreatedAt, ReviewedAt, ReviewedByUserId, RejectionReason`.
-- Rules: submit → band ClaimPending; approve → Claimed + IsClaimed; no two pending claims per (user, band).
-- Tests: duplicate pending rejected; approval updates band.
-
-### ModerationAction
-- `Id, ModeratorId, ActionType, TargetId, Reason, CreatedAt`.
-- Rule: created on every decision. Tests: one action per approve/reject.
 
 ---
 
@@ -288,33 +268,14 @@ Status: 400 validation, 401 unauthenticated, 403 forbidden, 404 not found, 409 c
 |---|---|---|---|---|
 | GET | `/api/bands` (name,genreId,country,status,page) | `PagedResult<BandListItemDto>` | Anon | 400 |
 | GET | `/api/bands/{id}` | `BandDetailDto` | Anon | 404 |
+| POST | `/api/bands` | `CreateBandDto` | `BandDetailDto` | Admin | 400,401,403 |
+| PUT | `/api/bands/{id}` | `UpdateBandDto` | `BandDetailDto` | Admin | 400,401,403,404 |
 
 ### Releases / Genres
 | Method | Route | Response | Role | Errors |
 |---|---|---|---|---|
 | GET | `/api/releases/{id}` | `ReleaseDetailDto` | Anon | 404 |
 | GET | `/api/genres` | `GenreDto[]` | Anon | – |
-
-### BandProposals
-| Method | Route | Request | Response | Role | Errors |
-|---|---|---|---|---|---|
-| POST | `/api/band-proposals` | `CreateProposalDto` | `ProposalDto` | User | 400,401 |
-| GET | `/api/me/band-proposals` | – | `ProposalDto[]` | User | 401 |
-
-### BandClaims
-| Method | Route | Request | Response | Role | Errors |
-|---|---|---|---|---|---|
-| POST | `/api/bands/{bandId}/claims` | `CreateClaimDto` | `ClaimDto` | User | 400,401,404,409 |
-
-### Moderation
-| Method | Route | Request | Response | Role | Errors |
-|---|---|---|---|---|---|
-| GET | `/api/moderation/band-proposals` | – | `ProposalDto[]` | Mod/Admin | 401,403 |
-| POST | `/api/moderation/band-proposals/{id}/approve` | – | `BandDto` | Mod/Admin | 403,404,409 |
-| POST | `/api/moderation/band-proposals/{id}/reject` | `RejectDto` | `ProposalDto` | Mod/Admin | 400,403,404 |
-| GET | `/api/moderation/claims` | – | `ClaimDto[]` | Mod/Admin | 401,403 |
-| POST | `/api/moderation/claims/{id}/approve` | – | `ClaimDto` | Mod/Admin | 403,404,409 |
-| POST | `/api/moderation/claims/{id}/reject` | `RejectDto` | `ClaimDto` | Mod/Admin | 400,403,404 |
 
 Every endpoint has a corresponding happy-path + auth/role test.
 
@@ -325,15 +286,10 @@ Every endpoint has a corresponding happy-path + auth/role test.
 | Actor | Can do |
 |---|---|
 | Anonymous | Browse, list/filter, view band/release detail, members. |
-| Registered user | + login, propose band, view own proposals, submit claim. |
-| Moderator | + view/approve/reject proposals and claims. |
-| Admin | + full access during demo. |
-| User with approved claim | Registered user + (future) edit their band. |
+| Registered user | + login; no band catalog write access. |
+| Admin | + create and update band catalog content. |
 
-**Approved claim without a global role:** ownership is per-band, not global.
-Use a resource-based check — "does an `Approved` BandClaim exist for `(userId, bandId)`?" —
-via `IBandAccessService.CanEditBand(userId, bandId)` or an `IAuthorizationHandler`.
-JWT holds only `User/Moderator/Admin`.
+JWT holds only `User/Admin`; catalog writes use the `Admin` role guard.
 
 ---
 
@@ -348,8 +304,8 @@ JWT holds only `User/Moderator/Admin`.
 | Frontend service | HTTP services (HttpTestingController) | Should |
 | E2E | Full demo flow | Optional — skip if short on time |
 
-**Must test:** proposal approval → band creation; claim approval → trust change;
-role access (403); duplicate claim prevention; public filtering.
+**Must test:** administrator create/update; non-admin access rejected (403); unauthenticated access
+rejected (401); public filtering.
 **Naming:** backend `Scenario_Should_Result`; frontend `it('should ...')`.
 **Commands:** `dotnet test` / `npm test`.
 **Coverage:** ~60% overall, ~85% Domain + Application. Don't chase 100%.
@@ -379,8 +335,8 @@ Specs live in `docs/specs/NNN-feature-name.md` — the source of truth.
 ## Out of scope
 ```
 
-Full example specs for **public band browsing**, **band proposal workflow**, and
-**band claim workflow** are in `docs/specs/001–003`.
+Example specs for **public band browsing** and **administrator band management** are in
+`docs/specs/`.
 
 ---
 
@@ -428,7 +384,7 @@ referenced from `AGENTS.md`.
 # 12. Prompt Recipes
 
 Stored in `docs/technical/prompt-recipes.md`: backend entity (TDD), application service (TDD),
-API endpoint (TDD), Angular feature page, Angular service, Reactive Form, moderation workflow,
+API endpoint (TDD), Angular feature page, Angular service, Reactive Form, administrator catalog workflow,
 update spec, refactor without behavior change, add tests, review vs Clean Architecture / SOLID / SDD.
 
 ---
@@ -444,9 +400,7 @@ update spec, refactor without behavior change, add tests, review vs Clean Archit
 | 4 – Public API | Read endpoints | Aug 5 | Swagger works, tests green |
 | 5 – Angular public | Public UI | Aug 6–9 | Anonymous flow end-to-end |
 | 6 – Auth | Login/roles | Aug 10–12 | Protected routes enforced |
-| 7 – Proposals | Contribution | Aug 13–15 | Propose + my-proposals works |
-| 8 – Moderation | Curation | Aug 16 | Approved proposal appears public |
-| 9 – Claims | Verification | Aug 17–20 | Approved claim shows "Claimed" |
+| 7 – Admin catalog | Curation | Aug 13–17 | Admin can create and update bands |
 | 10 – Polish | Ship | Aug 21–23 | Demo script runs clean |
 
 If you slip, cut in this order: reports → images → history → advanced editing → real Blob Storage.
@@ -462,12 +416,12 @@ original blueprint). Never "build everything at once".
 
 # Recommended Key Decisions (do not change)
 
-1. Scope freeze: browsing, band detail, proposals, moderation, claims, trust states.
+1. Scope freeze: browsing, band detail, and administrator-managed catalog content.
 2. Clean Architecture, 4 layers, no MediatR/AutoMapper.
 3. Result pattern over exceptions for expected failures.
 4. JWT only — no refresh tokens / email verification / password reset.
-5. Band claim = resource-based check, not a global role.
-6. Strings for Country/Label/Formats; no Person/Label/Format entities yet.
+5. Only Admin may create or update bands; community proposals, claims, and moderation are out of scope.
+6. Strings for Country/Label; release formats and member cross-band references use the ADR 002 join models.
 7. Local file storage only; Azure Blob documented as future.
 8. SDD + TDD mandatory, enforced by AGENTS.md.
 9. Coverage ~60% overall, ~85% Domain/Application.

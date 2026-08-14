@@ -55,14 +55,14 @@ return Result<BandDto>.Success(dto);
 
 // Failure
 return Result<BandDto>.Failure(Error.NotFound("Band.NotFound", "Band not found."));
-return Result<BandDto>.Failure(Error.Conflict("Claim.Duplicate", "A pending claim already exists."));
+return Result<BandDto>.Failure(Error.Conflict("Band.Duplicate", "A band with the same identity already exists."));
 
 // Controller mapping
 if (result.IsFailure)
     return result.Error.Code switch
     {
         "Band.NotFound" => NotFound(result.Error),
-        "Claim.Duplicate" => Conflict(result.Error),
+        "Band.Duplicate" => Conflict(result.Error),
         _ => BadRequest(result.Error)
     };
 return Ok(result.Value);

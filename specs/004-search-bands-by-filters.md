@@ -4,7 +4,7 @@
 Allow any visitor (anonymous or authenticated) to search and filter the public band catalog by name,
 country, and genre, receiving a paginated list of results suitable for display in a table.
 Results are capped at 100 matching bands (pre-pagination); queries that exceed that cap are rejected
-so the user is forced to narrow their filters. Blocked bands are always excluded from public results.
+so the user is forced to narrow their filters.
 
 ## User story
 As a visitor, I want to search bands by name, country, and/or genre with pagination,
@@ -12,12 +12,11 @@ so that I can quickly discover underground/DIY bands relevant to what I am looki
 without being overwhelmed by unfiltered results.
 
 ## Acceptance criteria
-- [ ] Given bands exist, when I GET /api/bands with no filters, then I receive a paginated list of non-Blocked bands (page 1, default pageSize 20).
+- [ ] Given bands exist, when I GET /api/bands with no filters, then I receive a paginated list of bands (page 1, default pageSize 20).
 - [ ] Given `?name=discharge`, when I GET /api/bands, then only bands whose name contains "discharge" (case-insensitive) are returned.
 - [ ] Given `?country=UK`, when I GET /api/bands, then only bands from country "UK" are returned.
 - [ ] Given `?genreId=<guid>`, when I GET /api/bands, then only bands belonging to that genre are returned.
 - [ ] Given multiple filters are combined, when I GET /api/bands, then all filters are applied with AND logic.
-- [ ] Given a band has `TrustStatus = Blocked`, when I GET /api/bands, then that band is never included regardless of other filters.
 - [ ] Given filters produce more than 100 matching bands, when I GET /api/bands, then the API returns 422 with error code `Band.TooManyResults`.
 - [ ] Given `?page=2&pageSize=20`, when I GET /api/bands, then the correct page of results is returned.
 - [ ] Given `?pageSize=51`, when I GET /api/bands, then the API returns 400 (pageSize max is 50).
@@ -65,7 +64,6 @@ GET /api/bands?name={string}&country={string}&genreId={guid}&status={BandStatus}
 | 422  | `Band.TooManyResults` | Filtered result set exceeds 100 bands before pagination  |
 
 ## Domain rules
-- `TrustStatus = Blocked` bands are **never** returned in public listings.
 - `name`: case-insensitive partial match (contains).
 - `country`: case-insensitive exact match.
 - `genreId`: exact match on `Band.GenreId`.
@@ -85,18 +83,16 @@ GET /api/bands?name={string}&country={string}&genreId={guid}&status={BandStatus}
 
 ## Test scenarios
 - Unit (Application):
-  - `GetBands_WithNoFilters_Should_ReturnPagedListExcludingBlocked`
+  - `GetBands_WithNoFilters_Should_ReturnPagedList`
   - `GetBands_WithNameFilter_Should_ReturnOnlyMatchingBands`
   - `GetBands_WithCountryFilter_Should_ReturnOnlyMatchingBands`
   - `GetBands_WithGenreFilter_Should_ReturnOnlyMatchingBands`
   - `GetBands_WithCombinedFilters_Should_ApplyAllFilters`
   - `GetBands_WhenResultsExceed100_Should_ReturnTooManyResultsFailure`
-  - `GetBands_WithBlockedBands_Should_ExcludeBlockedFromCount`
   - `GetBands_WithValidPagination_Should_ReturnCorrectPage`
 - Integration (Api):
   - `GET_Bands_NoFilters_Should_Return200WithPagedResult`
   - `GET_Bands_WithNameFilter_Should_Return200WithFilteredBands`
-  - `GET_Bands_BlockedBand_Should_NotAppearInResponse`
   - `GET_Bands_ResultsOver100_Should_Return422WithTooManyResultsError`
   - `GET_Bands_InvalidPageSize_Should_Return400`
   - `GET_Bands_InvalidPage_Should_Return400`
@@ -105,6 +101,5 @@ GET /api/bands?name={string}&country={string}&genreId={guid}&status={BandStatus}
 - Full-text / fuzzy search.
 - Sorting by popularity, member count, or release count.
 - Filtering by formation year range.
-- Authenticated-only views showing Blocked bands (separate moderation feature).
 - Cursor-based / keyset pagination.
 - Caching / ETags.

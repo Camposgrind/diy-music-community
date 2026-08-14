@@ -1,4 +1,6 @@
-# Feature: Band Proposal Workflow
+# Retired: Band Proposal Workflow
+
+> **Status:** Superseded by [ADR 003](../docs/adr/003-admin-only-band-catalog.md). Community proposals are no longer part of the product. Retained only as historical context; do not implement this workflow.
 
 ## User story
 As a registered user, I want to propose a new band so the community can grow the catalog.

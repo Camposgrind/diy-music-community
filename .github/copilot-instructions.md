@@ -2,7 +2,7 @@
 
 ## Product
 Web platform to catalog underground/DIY music scenes (Punk, Crust, Grindcore, Powerviolence, D-Beat).
-Features: public browsing, community proposals, moderation, band claims, trust states.
+Features: public browsing and administrator-managed bands.
 
 ## Stack
 - **Backend:** .NET 10, Clean Architecture (Domain / Application / Infrastructure / Api), EF Core (SQL Server dev / Postgres prod), FluentValidation, JWT, Result pattern.
@@ -47,9 +47,9 @@ Features: public browsing, community proposals, moderation, band claims, trust s
 - **Hardcode magic strings (error codes, route segments, message text, enum-like string values) directly in production code.** Extract them to `const` fields (inside the class that owns them) or to a dedicated static class (e.g. `BandErrors.Codes`). Seed data, EF configurations, and migrations are exempt.
 
 ## Key decisions (do not revisit)
-- Scope: browsing, band detail, proposals, moderation, claims, trust states.
+- Scope: browsing, band detail, and administrator-managed catalog content.
 - JWT only; `sub` + `role` claims.
-- Band claim = resource-based check (`IBandAccessService`), not a global role.
+- Only the `Admin` role may create or update band catalog content. Do not add proposal, claim, or moderation workflows.
 - Strings for Country / Label only. Release formats use `Format` enum + `ReleaseFormat` join entity (see ADR 002). Band member cross-band references use `BandMemberOtherBand` join entity (see ADR 002).
 - **BandMember consistency rules (see ADR 002):** When updating a `BandMember` (name, photo, etc.), the use case MUST propagate changes to all sibling `BandMember` rows linked via `BandMemberOtherBand`. When adding/removing an `OtherBand` link, the use case MUST create/remove reciprocal links on all related members. Both operations MUST be atomic (single `SaveChangesAsync` call).
 - Coverage: ~60% overall, ~85% Domain + Application.
