@@ -14,6 +14,8 @@ public static class BandErrors
         public const string InvalidFilter = "Band.InvalidFilter";
         public const string TooManyResults = "Band.TooManyResults";
         public const string NotFound = "Band.NotFound";
+        public const string Duplicate = "Catalog.Duplicate";
+        public const string InvalidRequest = "Catalog.InvalidRequest";
     }
 
     public static Error InvalidFilter(string message)
@@ -26,4 +28,10 @@ public static class BandErrors
 
     public static Error NotFound(Guid id)
         => Error.NotFound(Codes.NotFound, $"No band with id '{id}' was found.");
+
+    public static Error Duplicate(string resource)
+        => Error.Conflict(Codes.Duplicate, $"A {resource} with the same identity already exists.");
+
+    public static Error InvalidRequest(string message)
+        => Error.Validation(Codes.InvalidRequest, message);
 }

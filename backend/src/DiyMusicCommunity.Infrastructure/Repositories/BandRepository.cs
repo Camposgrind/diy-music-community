@@ -25,10 +25,21 @@ public sealed class BandRepository : IBandRepository
         return await _context.Bands
             .Include(b => b.Genre)
             .Include(b => b.Releases)
+                .ThenInclude(release => release.Tracks)
             .Include(b => b.Members)
                 .ThenInclude(m => m.OtherBands)
                     .ThenInclude(ob => ob.OtherBand)
             .FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
+    }
+
+    public async Task<Band?> FindByNameAndCountryAsync(string name, string country, CancellationToken cancellationToken = default)
+    {
+        var normalizedName = name.Trim().ToUpper();
+        var normalizedCountry = country.Trim().ToUpper();
+
+        return await _context.Bands.FirstOrDefaultAsync(
+            band => band.Name.Trim().ToUpper() == normalizedName && band.Country.Trim().ToUpper() == normalizedCountry,
+            cancellationToken);
     }
 
     public async Task<IReadOnlyList<Band>> GetAllAsync(CancellationToken cancellationToken = default)

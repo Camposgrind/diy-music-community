@@ -61,6 +61,38 @@ public sealed class Release : Entity
         CoverImageUrl = coverImageUrl;
     }
 
+    public void Update(string title, ReleaseType releaseType, DateOnly? releaseDate, int? year, string? labelText, string? coverImageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            throw new ArgumentException("Release title cannot be empty.", nameof(title));
+        }
+
+        Title = title;
+        ReleaseType = releaseType;
+        ReleaseDate = releaseDate;
+        Year = releaseDate?.Year ?? year;
+        LabelText = labelText;
+        CoverImageUrl = coverImageUrl;
+    }
+
+    public void ReplaceTracks(IReadOnlyList<(string Title, int TrackNumber)> tracks)
+    {
+        if (tracks.GroupBy(track => track.TrackNumber).Any(group => group.Count() > 1))
+        {
+            throw new ArgumentException("Track numbers must be unique within a release.", nameof(tracks));
+        }
+
+        var newTracks = new List<Track>();
+        foreach (var track in tracks)
+        {
+            newTracks.Add(new Track(Guid.NewGuid(), Id, track.Title, track.TrackNumber));
+        }
+
+        _tracks.Clear();
+        _tracks.AddRange(newTracks);
+    }
+
     // --- Formats ---
 
     public void AddFormat(Format format)

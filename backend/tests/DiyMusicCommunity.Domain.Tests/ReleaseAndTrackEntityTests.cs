@@ -155,6 +155,29 @@ public class ReleaseEntityTests
 
         Assert.Equal(BandId, release.BandId);
     }
+
+    [Fact]
+    public void ReplaceTracks_WithDuplicateTrackNumbers_Should_ThrowArgumentException()
+    {
+        var release = CreateRelease();
+
+        Assert.Throws<ArgumentException>(() => release.ReplaceTracks(
+        [
+            ("First", 1),
+            ("Duplicate", 1)
+        ]));
+    }
+
+    [Fact]
+    public void ReplaceTracks_WithValidTracks_Should_ReplaceTheCompleteTrackList()
+    {
+        var release = CreateRelease();
+
+        release.ReplaceTracks([("First", 1), ("Second", 2)]);
+
+        Assert.Equal(2, release.Tracks.Count);
+        Assert.Equal("Second", release.Tracks.Single(track => track.TrackNumber == 2).Title);
+    }
 }
 
 public class TrackEntityTests

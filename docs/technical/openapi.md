@@ -17,6 +17,7 @@
    - [BandListItemModel](#BandListItemModel)
 3. [Endpoints](#endpoints)
    - [GET /api/bands](#get-apibands)
+   - [Admin catalog management](#admin-catalog-management)
 4. [Enum reference](#enum-reference)
 5. [Error code catalogue](#error-code-catalogue)
 6. [Frontend integration guide](#frontend-integration-guide)
@@ -146,6 +147,40 @@ GET /api/bands?name=discharge&status=Active
 
 ---
 
+### Admin catalog management
+
+All endpoints in this section require a bearer token for a user with the `Admin` role. Anonymous
+requests receive `401`; authenticated non-admin requests receive `403`.
+
+| Method and path | Purpose | Success |
+|---|---|---|
+| `POST /api/bands` | Create a band | `201` with `BandDetailModel` |
+| `PUT /api/bands/{id}` | Update the band profile | `200` with `BandDetailModel` |
+| `POST /api/bands/{bandId}/members` | Add a current or past member | `201` with `BandMemberModel` |
+| `PUT /api/bands/{bandId}/members/{memberId}` | Update a member | `200` with `BandMemberModel` |
+| `POST /api/bands/{bandId}/releases` | Create a release with its complete track list | `201` with `ReleaseDetailModel` |
+| `PUT /api/bands/{bandId}/releases/{releaseId}` | Update a release and replace its complete track list | `200` with `ReleaseDetailModel` |
+
+Band request fields are `name`, `country`, `genreId`, `status`, `location`, `formationYear`,
+`description`, `logoImageUrl`, `bandImageUrl`, `musicUrlPortal`, and `bandContact`. `name`,
+`country`, and `genreId` are required.
+
+Member request fields are `name`, `instrument`, `startYear`, `endYear`, and `isCurrent`. An end
+year makes the member past regardless of `isCurrent`.
+
+Release request fields are `title`, `releaseType`, `releaseDate`, `year`, `labelText`,
+`coverImageUrl`, and `tracks`. Each track has `title` and a positive `trackNumber`. Track numbers
+must be unique within the submitted list. Replacing a release's tracks is atomic: tracks omitted
+from a `PUT` request are removed.
+
+`POST` never upserts. It returns `409 Conflict` with `Catalog.Duplicate` for a duplicate business
+identity. `PUT` returns `404` for an unknown resource and `409` when the change collides with a
+different existing resource. Invalid request data returns `400` with `Catalog.InvalidRequest`.
+Write responses contain the current persisted DTO, so the frontend can update local state without a
+follow-up detail request.
+
+---
+
 #### Responses
 
 ##### 200 OK
@@ -223,6 +258,8 @@ Returned when the filtered result set exceeds **100 bands** before pagination. T
 |---|---|---|
 | `Band.InvalidFilter` | 400 | One or more query parameters failed validation |
 | `Band.TooManyResults` | 422 | Filters matched > 100 bands — refine the search |
+| `Catalog.Duplicate` | 409 | A catalog business identity already exists |
+| `Catalog.InvalidRequest` | 400 | Catalog input failed validation |
 
 ---
 

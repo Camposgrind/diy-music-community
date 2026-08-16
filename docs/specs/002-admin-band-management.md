@@ -14,23 +14,45 @@ accurate and curated.
 
 - [ ] Given I am authenticated as an Admin, when I submit valid band data, then a band is created.
 - [ ] Given I am authenticated as an Admin, when I submit valid changes to an existing band, then the band is updated.
+- [ ] Given I am authenticated as an Admin, when I submit a release and its valid tracks, then both are created atomically.
+- [ ] Given I am authenticated as an Admin, when I update a release and its tracks, then the release and its complete track list are updated atomically.
+- [ ] Given I submit a duplicate band, release, member, or track identity, when the request is processed, then I receive 409 and no data is changed.
 - [ ] Given I am unauthenticated, when I call a band create or update endpoint, then I receive 401.
 - [ ] Given I am authenticated without the Admin role, when I call a band create or update endpoint, then I receive 403.
 - [ ] Given I am a public visitor, when I browse bands, then no authentication is required.
 
 ## API contract
 
-The intended catalog-management endpoints are pending implementation:
+The catalog-management endpoints are pending implementation:
 
 - `POST /api/bands` — Admin only.
 - `PUT /api/bands/{id}` — Admin only.
+- `POST /api/bands/{bandId}/members` — Admin only.
+- `PUT /api/bands/{bandId}/members/{memberId}` — Admin only.
+- `POST /api/bands/{bandId}/releases` — Admin only. The request includes the release and all of its tracks.
+- `PUT /api/bands/{bandId}/releases/{releaseId}` — Admin only. The request replaces the release's complete track list.
 
-The request and response fields must be defined alongside the implementation and added to
-`docs/technical/openapi.md` before the endpoints are delivered.
+`POST` creates a resource and must return `409 Conflict` when its business identity already
+exists; it never silently overwrites catalog data. `PUT` identifies the target by its route ID and
+returns `404 Not Found` when that target does not exist.
+
+Business identities are case-insensitive and ignore leading/trailing whitespace:
+
+- Band: `Name + Country`.
+- Member: `BandId + Name + StartYear`.
+- Release: `BandId + Title + ReleaseDate`; when `ReleaseDate` is absent, `Year` is used.
+- Track: `ReleaseId + TrackNumber`.
+
+The request and response fields must be added to `docs/technical/openapi.md` before the endpoints
+are delivered.
 
 ## Domain rules
 
 - A band belongs to one genre and may have releases and band members.
+- A release is managed with its tracks as one aggregate. A release update replaces all its tracks;
+  omitting a previously stored track removes it.
+- A member with an end year is a past member; otherwise its `IsCurrent` value determines whether it
+  is current.
 - `BandProposal`, `BandClaim`, and `ModerationAction` are not part of the domain model.
 - A band has no claim or community-trust state; catalog integrity comes from administrator-only
   write access.

@@ -14,7 +14,7 @@ public sealed class TrackConfiguration : IEntityTypeConfiguration<Track>
             .IsRequired()
             .HasMaxLength(300);
 
-        builder.HasIndex(t => t.ReleaseId);
+        builder.HasIndex(t => new { t.ReleaseId, t.TrackNumber }).IsUnique();
 
         builder.HasData(
             new { Id = new Guid("c0de0000-cafe-beef-dead-000000000001"), ReleaseId = new Guid("a1b2cafe-dead-beef-f00d-c0de00000001"), Title = "Crear Y Creer",              TrackNumber = 1  },

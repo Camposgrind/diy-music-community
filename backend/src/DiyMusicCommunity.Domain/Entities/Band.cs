@@ -126,6 +126,26 @@ public sealed class Band : Entity
         UpdatedAt = DateTime.UtcNow;
     }
 
+    public void AddMember(BandMember member)
+    {
+        if (member.BandId != Id)
+        {
+            throw new ArgumentException("The member must belong to this band.", nameof(member));
+        }
+
+        _members.Add(member);
+    }
+
+    public void AddRelease(Release release)
+    {
+        if (release.BandId != Id)
+        {
+            throw new ArgumentException("The release must belong to this band.", nameof(release));
+        }
+
+        _releases.Add(release);
+    }
+
     // --- Trust state transitions ---
 
     public void MarkClaimPending()

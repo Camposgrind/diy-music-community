@@ -55,6 +55,19 @@ public sealed class BandMember : Entity
         }
     }
 
+    public void Update(string name, string? instrument, int? startYear, int? endYear, bool isCurrent)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("Member name cannot be empty.", nameof(name));
+        }
+
+        SetYears(startYear, endYear);
+        Name = name;
+        Instrument = instrument;
+        IsCurrent = !endYear.HasValue && isCurrent;
+    }
+
     public void SetDeparted(int endYear)
     {
         if (endYear < (StartYear ?? 0))
