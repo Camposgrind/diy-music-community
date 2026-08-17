@@ -27,6 +27,27 @@
 
 .search-section {
   margin-top: 2rem;
+
+  &__admin-action {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: .75rem;
+  }
+
+  &__add-band {
+    background: #8b0000;
+    border: 1px solid #8b0000;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Oswald', sans-serif;
+    font-size: .875rem;
+    letter-spacing: 1px;
+    padding: .625rem 1.25rem;
+    text-transform: uppercase;
+
+    &:hover { background: #a00000; border-color: #a00000; }
+  }
 }
 
 .results-section {

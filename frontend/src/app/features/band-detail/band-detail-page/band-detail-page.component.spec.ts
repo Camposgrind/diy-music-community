@@ -3,8 +3,10 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideHttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { provideRouter } from '@angular/router';
+import { signal } from '@angular/core';
 import { BandDetailPageComponent } from './band-detail-page.component';
-import { BandDetailModel } from '../../../infrastructure/api/models';
+import { BandDetailModel, BandWriteRequest, MemberWriteRequest, ReleaseWriteRequest } from '../../../infrastructure/api/models';
+import { AuthService } from '../../../core/auth/auth.service';
 
 const mockBand: BandDetailModel = {
   id: 'b1',
@@ -32,6 +34,7 @@ describe('BandDetailPageComponent', () => {
   let fixture: ComponentFixture<BandDetailPageComponent>;
   let component: BandDetailPageComponent;
   let httpMock: HttpTestingController;
+  const isAdmin = signal(false);
 
   const setup = async (paramId: string | null) => {
     TestBed.resetTestingModule();
@@ -41,6 +44,7 @@ describe('BandDetailPageComponent', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideRouter([]),
+        { provide: AuthService, useValue: { isAdmin } },
         {
           provide: ActivatedRoute,
           useValue: {
@@ -53,6 +57,7 @@ describe('BandDetailPageComponent', () => {
     fixture = TestBed.createComponent(BandDetailPageComponent);
     component = fixture.componentInstance;
     httpMock = TestBed.inject(HttpTestingController);
+    isAdmin.set(false);
   };
 
   afterEach(() => {
@@ -168,5 +173,147 @@ describe('BandDetailPageComponent', () => {
     httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
     expect(component.error()).toBeNull();
     expect(component.band()).toEqual(mockBand);
+  });
+
+  it('should show the edit control only for an Admin', async () => {
+    await setup('b1');
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[data-testid="edit-band"]')).toBeNull();
+
+    isAdmin.set(true);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[data-testid="edit-band"]')).toBeTruthy();
+  });
+
+  it('should open the preloaded edit modal for an Admin', async () => {
+    await setup('b1');
+    isAdmin.set(true);
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
+    fixture.detectChanges();
+
+    (fixture.nativeElement.querySelector('[data-testid="edit-band"]') as HTMLButtonElement).click();
+    const countries = httpMock.expectOne((r) => r.url.endsWith('data/countries.json'));
+    const genres = httpMock.expectOne((r) => r.url.endsWith('/api/genres'));
+    countries.flush(['United Kingdom']);
+    genres.flush([{ id: 'genre-1', name: 'Grindcore' }]);
+    fixture.detectChanges();
+
+    expect(component.isEditModalOpen()).toBe(true);
+    expect(fixture.nativeElement.querySelector('dmc-band-edit-modal')).toBeTruthy();
+  });
+
+  it('should update the band and reload its full detail', async () => {
+    await setup('b1');
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
+    const update: BandWriteRequest = { name: 'Napalm Death', country: 'United Kingdom', genreId: 'genre-1', status: 'OnHold' };
+
+    component.saveBand(update);
+    const updateRequest = httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'PUT');
+    updateRequest.flush({ ...mockBand, ...update });
+    httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'GET').flush({ ...mockBand, status: 'OnHold' });
+
+    expect(component.isEditModalOpen()).toBe(false);
+    expect(component.band()?.status).toBe('OnHold');
+  });
+
+  it('should open the release modal in create mode for an Admin', async () => {
+    await setup('b1');
+    isAdmin.set(true);
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
+    fixture.detectChanges();
+
+    (fixture.nativeElement.querySelector('[data-testid="add-release"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(component.releaseModalMode()).toBe('create');
+    expect(fixture.nativeElement.querySelector('dmc-release-modal')).toBeTruthy();
+  });
+
+  it('should open the release modal preloaded in edit mode for an Admin', async () => {
+    await setup('b1');
+    isAdmin.set(true);
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
+    fixture.detectChanges();
+
+    (fixture.nativeElement.querySelector('[data-testid="edit-release-r1"]') as HTMLButtonElement).click();
+    httpMock.expectOne((r) => r.url.endsWith('/releases/r1')).flush({
+      id: 'r1', title: 'Scum', releaseType: 'Album', releaseDate: null, year: 1987, labelText: null,
+      coverImageUrl: null, band: null, formats: [], tracks: [],
+    });
+    fixture.detectChanges();
+
+    expect(component.releaseModalMode()).toBe('edit');
+    expect(component.releaseModalData()).toEqual({ title: 'Scum', releaseType: 'Album', year: 1987 });
+  });
+
+  it('should create a release and reload the full band detail', async () => {
+    await setup('b1');
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
+    component.openCreateReleaseModal();
+    component.saveRelease({ title: 'Harmony Corruption', releaseType: 'Album', year: 1990 });
+
+    const create = httpMock.expectOne((r) => r.url.endsWith('/bands/b1/releases') && r.method === 'POST');
+    expect(create.request.body).toMatchObject({ title: 'Harmony Corruption', releaseType: 'Album', year: 1990, tracks: [] } satisfies Partial<ReleaseWriteRequest>);
+    create.flush({ id: 'r2' });
+    httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'GET').flush({ ...mockBand, releases: [...mockBand.releases, { id: 'r2', title: 'Harmony Corruption', releaseType: 'Album', year: 1990 }] });
+
+    expect(component.releaseModalMode()).toBeNull();
+    expect(component.band()?.releases).toHaveLength(2);
+  });
+
+  it('should update a release and reload the full band detail', async () => {
+    await setup('b1');
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
+    component.openEditReleaseModal(mockBand.releases[0]);
+    httpMock.expectOne((r) => r.url.endsWith('/releases/r1')).flush({
+      id: 'r1', title: 'Scum', releaseType: 'Album', releaseDate: null, year: 1987, labelText: 'Earache',
+      coverImageUrl: 'https://example.com/scum.jpg', band: null, formats: [], tracks: [{ id: 't1', title: 'Multinational Corporations', trackNumber: 1 }],
+    });
+    component.saveRelease({ title: 'Scum', releaseType: 'Album', year: 1988 });
+
+    const update = httpMock.expectOne((r) => r.url.endsWith('/bands/b1/releases/r1') && r.method === 'PUT');
+    expect(update.request.body).toMatchObject({ year: 1988, labelText: 'Earache', coverImageUrl: 'https://example.com/scum.jpg', tracks: [{ title: 'Multinational Corporations' }] });
+    update.flush({ id: 'r1' });
+    httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'GET').flush({ ...mockBand, releases: [{ ...mockBand.releases[0], year: 1988 }] });
+
+    expect(component.band()?.releases[0].year).toBe(1988);
+  });
+
+  it('should open a current-member modal for an Admin', async () => {
+    await setup('b1');
+    isAdmin.set(true);
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
+    fixture.detectChanges();
+
+    const buttons = fixture.nativeElement.querySelectorAll('[data-testid="add-member"]') as NodeListOf<HTMLButtonElement>;
+    buttons[0].click();
+    fixture.detectChanges();
+    expect(component.memberModalMode()).toBe('create');
+    expect(component.memberModalType()).toBe('current');
+  });
+
+  it('should preload and update a past member, then reload the band', async () => {
+    await setup('b1');
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
+    const pastMember = mockBand.members[1];
+    component.openEditMemberModal(pastMember);
+    expect(component.memberModalData()).toMatchObject({ name: 'Bill Steer', memberType: 'past', endYear: 1989 });
+
+    component.saveMember({ name: 'Bill Steer', instrument: 'Guitar', startYear: 1985, endYear: 1990, memberType: 'past' });
+    const update = httpMock.expectOne((r) => r.url.endsWith('/bands/b1/members/m2') && r.method === 'PUT');
+    expect(update.request.body).toEqual({ name: 'Bill Steer', instrument: 'Guitar', startYear: 1985, endYear: 1990, isCurrent: false } satisfies MemberWriteRequest);
+    update.flush({ id: 'm2' });
+    httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'GET').flush({ ...mockBand, members: [...mockBand.members.slice(0, 1), { ...pastMember, endYear: 1990 }] });
+    expect(component.band()?.members[1].endYear).toBe(1990);
   });
 });

@@ -1,0 +1,17 @@
+.band-create-modal {
+  position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 1rem;
+  &__backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, .72); }
+  &__panel { position: relative; width: min(720px, 100%); max-height: calc(100vh - 2rem); overflow-y: auto; background: #1a1a1a; border: 1px solid #8b0000; border-radius: 10px; box-shadow: 0 16px 40px rgba(0, 0, 0, .65); padding: 1.5rem; }
+  &__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid #2a2a2a; }
+  &__title { font-family: 'Oswald', sans-serif; color: #cc2222; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 .75rem; }
+  &__close { background: transparent; border: 0; color: #aaa; cursor: pointer; font-size: 1.75rem; line-height: 1; &:hover { color: #fff; } }
+  &__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  &__field { display: flex; flex-direction: column; gap: .375rem; label { color: #aaa; font-size: .75rem; text-transform: uppercase; letter-spacing: .5px; } input, select { background: #111; color: #ddd; border: 1px solid #333; border-radius: 4px; padding: .5rem .75rem; font: inherit; &:focus { outline: none; border-color: #8b0000; box-shadow: 0 0 0 2px rgba(139,0,0,.18); } } option { background: #1a1a1a; } }
+  &__year-input { position: relative; input { width: 100%; box-sizing: border-box; padding-right: 4rem; } span { color: #666; font-family: 'Oswald', sans-serif; font-size: .75rem; letter-spacing: 1px; pointer-events: none; position: absolute; right: .75rem; top: 50%; transform: translateY(-50%); } }
+  &__help { color: #666; font-size: .75rem; margin: 0; }
+  &__error, &__submit-error { color: #e06060; font-size: .75rem; margin: 0; }
+  &__submit-error { margin-top: 1rem; }
+  &__actions { display: flex; justify-content: flex-end; gap: .75rem; margin-top: 1.5rem; }
+  &__button { border-radius: 4px; cursor: pointer; font-family: 'Oswald', sans-serif; letter-spacing: 1px; padding: .625rem 1.25rem; text-transform: uppercase; &:disabled { cursor: not-allowed; opacity: .55; } &--primary { background: #8b0000; border: 1px solid #8b0000; color: #fff; } &--secondary { background: transparent; border: 1px solid #333; color: #aaa; } }
+}
+@media (max-width: 640px) { .band-create-modal__fields { grid-template-columns: 1fr; } }

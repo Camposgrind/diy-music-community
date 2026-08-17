@@ -2,7 +2,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { BandDetailModel, BandListItemModel, GetBandsQuery, PagedResult } from './models';
+import { BandDetailModel, BandListItemModel, BandWriteRequest, GetBandsQuery, PagedResult } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class BandsApiService {
@@ -32,5 +32,13 @@ export class BandsApiService {
 
   getBandDetail(id: string): Observable<BandDetailModel> {
     return this.http.get<BandDetailModel>(`${this.baseUrl}/${id}`);
+  }
+
+  createBand(request: BandWriteRequest): Observable<BandDetailModel> {
+    return this.http.post<BandDetailModel>(this.baseUrl, request);
+  }
+
+  updateBand(id: string, request: BandWriteRequest): Observable<BandDetailModel> {
+    return this.http.put<BandDetailModel>(`${this.baseUrl}/${id}`, request);
   }
 }

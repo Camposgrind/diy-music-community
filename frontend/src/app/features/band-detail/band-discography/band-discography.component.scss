@@ -26,6 +26,12 @@
     }
   }
 
+  &__title-row { align-items: flex-start; display: flex; gap: 1rem; justify-content: space-between; }
+  &__add, &__edit { background: transparent; border: 1px solid #333; border-radius: 4px; color: #aaa; cursor: pointer; font-family: 'Oswald', sans-serif; font-size: .72rem; letter-spacing: 1px; padding: .35rem .75rem; text-transform: uppercase; &:hover { border-color: #8b0000; color: #fff; } }
+  &__add { flex-shrink: 0; }
+  &__edit { justify-self: end; }
+  &__empty { color: #666; font-size: .875rem; margin: 0; padding: 1rem 0; }
+
   &__list {
     display: flex;
     flex-direction: column;
@@ -35,7 +41,7 @@
   // ── Column header row ─────────────────────────────
   &__header {
     display: grid;
-    grid-template-columns: 100px 1fr 80px;
+    grid-template-columns: 100px 1fr 80px auto;
     gap: 1rem;
     padding: 0 1.125rem 0.6rem calc(4px + 1.125rem);
     margin-bottom: 0.4rem;
@@ -105,7 +111,7 @@
   &__item-content {
     flex: 1;
     display: grid;
-    grid-template-columns: 100px 1fr 80px;
+    grid-template-columns: 100px 1fr 80px auto;
     align-items: center;
     gap: 1rem;
     padding: 0.8rem 1.125rem;
@@ -204,7 +210,7 @@
 
 @media (max-width: 480px) {
   .discography__item-content {
-    grid-template-columns: 76px 1fr 52px;
+    grid-template-columns: 76px 1fr 52px auto;
     gap: 0.5rem;
   }
 }

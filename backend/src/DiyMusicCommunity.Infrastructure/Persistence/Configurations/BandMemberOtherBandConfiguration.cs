@@ -9,6 +9,7 @@ public sealed class BandMemberOtherBandConfiguration : IEntityTypeConfiguration<
     public void Configure(EntityTypeBuilder<BandMemberOtherBand> builder)
     {
         builder.HasKey(b => b.Id);
+        builder.Property(b => b.Id).ValueGeneratedNever();
 
         builder.HasOne(b => b.OtherBand)
             .WithMany()

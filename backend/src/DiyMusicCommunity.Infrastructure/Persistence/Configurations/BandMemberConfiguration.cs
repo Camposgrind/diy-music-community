@@ -9,6 +9,7 @@ public sealed class BandMemberConfiguration : IEntityTypeConfiguration<BandMembe
     public void Configure(EntityTypeBuilder<BandMember> builder)
     {
         builder.HasKey(m => m.Id);
+        builder.Property(m => m.Id).ValueGeneratedNever();
 
         builder.Property(m => m.Name)
             .IsRequired()

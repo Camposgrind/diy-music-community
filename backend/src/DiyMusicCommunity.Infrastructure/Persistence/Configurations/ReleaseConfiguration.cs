@@ -10,6 +10,7 @@ public sealed class ReleaseConfiguration : IEntityTypeConfiguration<Release>
     public void Configure(EntityTypeBuilder<Release> builder)
     {
         builder.HasKey(r => r.Id);
+        builder.Property(r => r.Id).ValueGeneratedNever();
 
         builder.Property(r => r.Title)
             .IsRequired()

@@ -1,4 +1,4 @@
-import { Component, input, signal } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { BandDetailModel } from '../../../infrastructure/api/models';
 import { StatusBadgeComponent } from '../status-badge/status-badge.component';
 
@@ -11,6 +11,8 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
 })
 export class BandHeroComponent {
   readonly band = input.required<BandDetailModel>();
+  readonly isAdmin = input(false);
+  readonly edit = output<void>();
 
   readonly fallback = 'images/grindLogo.jpg';
 

@@ -3,7 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ReleasesApiService } from './releases-api.service';
 import { environment } from '../../../environments/environment';
-import { ReleaseDetailModel } from './models';
+import { ReleaseDetailModel, ReleaseWriteRequest } from './models';
 
 describe('ReleasesApiService', () => {
   let service: ReleasesApiService;
@@ -40,5 +40,22 @@ describe('ReleasesApiService', () => {
     service.getReleaseDetail('missing').subscribe({ error: () => (errorCaught = true) });
     httpMock.expectOne(`${base}/missing`).flush('Not found', { status: 404, statusText: 'Not Found' });
     expect(errorCaught).toBe(true);
+  });
+
+  it('should POST a release to its parent band', () => {
+    const request: ReleaseWriteRequest = { title: 'Scum', releaseType: 'Album', releaseDate: null, year: 1987, labelText: null, coverImageUrl: null, tracks: [] };
+    service.createRelease('band-1', request).subscribe();
+    const req = httpMock.expectOne(`${environment.apiBaseUrl}/bands/band-1/releases`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(request);
+    req.flush({ id: 'release-1' });
+  });
+
+  it('should PUT a release to update it', () => {
+    const request: ReleaseWriteRequest = { title: 'Scum', releaseType: 'Album', releaseDate: null, year: 1987, labelText: null, coverImageUrl: null, tracks: [] };
+    service.updateRelease('band-1', 'release-1', request).subscribe();
+    const req = httpMock.expectOne(`${environment.apiBaseUrl}/bands/band-1/releases/release-1`);
+    expect(req.request.method).toBe('PUT');
+    req.flush({ id: 'release-1' });
   });
 });

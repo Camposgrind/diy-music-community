@@ -34,9 +34,4 @@ public sealed class ClaimRepository : IClaimRepository
     {
         await _context.BandClaims.AddAsync(claim, cancellationToken);
     }
-
-    public void Update(BandClaim claim)
-    {
-        _context.BandClaims.Update(claim);
-    }
 }

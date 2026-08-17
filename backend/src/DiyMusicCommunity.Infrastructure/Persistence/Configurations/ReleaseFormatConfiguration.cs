@@ -10,6 +10,7 @@ public sealed class ReleaseFormatConfiguration : IEntityTypeConfiguration<Releas
     public void Configure(EntityTypeBuilder<ReleaseFormat> builder)
     {
         builder.HasKey(rf => rf.Id);
+        builder.Property(rf => rf.Id).ValueGeneratedNever();
 
         builder.Property(rf => rf.Format)
             .HasConversion<string>()

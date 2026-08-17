@@ -9,5 +9,4 @@ public interface IClaimRepository
     Task<IReadOnlyList<BandClaim>> GetByStatusAsync(ClaimStatus status, CancellationToken cancellationToken = default);
     Task<bool> HasPendingClaimAsync(Guid userId, Guid bandId, CancellationToken cancellationToken = default);
     Task AddAsync(BandClaim claim, CancellationToken cancellationToken = default);
-    void Update(BandClaim claim);
 }

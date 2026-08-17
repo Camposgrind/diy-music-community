@@ -10,6 +10,7 @@ public sealed class BandClaimConfiguration : IEntityTypeConfiguration<BandClaim>
     public void Configure(EntityTypeBuilder<BandClaim> builder)
     {
         builder.HasKey(c => c.Id);
+        builder.Property(c => c.Id).ValueGeneratedNever();
 
         builder.Property(c => c.Message)
             .HasMaxLength(1000);

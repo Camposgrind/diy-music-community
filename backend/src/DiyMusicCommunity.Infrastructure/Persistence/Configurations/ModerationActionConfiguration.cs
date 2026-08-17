@@ -9,6 +9,7 @@ public sealed class ModerationActionConfiguration : IEntityTypeConfiguration<Mod
     public void Configure(EntityTypeBuilder<ModerationAction> builder)
     {
         builder.HasKey(m => m.Id);
+        builder.Property(m => m.Id).ValueGeneratedNever();
 
         builder.Property(m => m.ActionType)
             .IsRequired()

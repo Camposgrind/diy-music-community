@@ -1,0 +1,18 @@
+<div class="member-modal" role="dialog" aria-modal="true" aria-labelledby="member-modal-title">
+  <div class="member-modal__backdrop" aria-hidden="true"></div>
+  <section class="member-modal__panel">
+    <header class="member-modal__header"><h2 id="member-modal-title" class="member-modal__title">{{ mode() === 'create' ? 'Add' : 'Edit' }} {{ form.controls.memberType.value === 'current' ? 'Current' : 'Past' }} Member</h2><button type="button" class="member-modal__close" (click)="close.emit()" [disabled]="saving()" aria-label="Close member editor">×</button></header>
+    <form [formGroup]="form" (ngSubmit)="onSave()" novalidate>
+      <div class="member-modal__fields">
+        <div class="member-modal__field"><label for="member-name">Name *</label><input #nameInput id="member-name" type="text" maxlength="200" formControlName="name" />@if (form.controls.name.invalid && form.controls.name.touched) { <p class="member-modal__error">Member name is required.</p> }</div>
+        <div class="member-modal__field"><label for="member-instrument">Instrument / role</label><input id="member-instrument" type="text" formControlName="instrument" /></div>
+        <div class="member-modal__field"><label for="member-type">Member type</label><select id="member-type" formControlName="memberType" (change)="onMemberTypeChange()"><option value="current">Current</option><option value="past">Past</option></select></div>
+        <div class="member-modal__field"><label for="member-start-year">Start year</label><input id="member-start-year" type="text" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="e.g. 1989" formControlName="startYear" />@if (form.controls.startYear.invalid && form.controls.startYear.touched) { <p class="member-modal__error">Enter a valid four-digit year.</p> }</div>
+        @if (form.controls.memberType.value === 'past') { <div class="member-modal__field"><label for="member-end-year">End year *</label><input id="member-end-year" type="text" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="e.g. 1999" formControlName="endYear" />@if (form.controls.endYear.invalid && form.controls.endYear.touched) { <p class="member-modal__error">End year is required for past members.</p> }</div> }
+      </div>
+      @if (form.errors?.['yearOrder']) { <p class="member-modal__error" role="alert">End year cannot be before start year.</p> }
+      @if (error(); as message) { <p class="member-modal__submit-error" role="alert">{{ message }}</p> }
+      <footer class="member-modal__actions"><button type="button" class="member-modal__button member-modal__button--secondary" (click)="close.emit()" [disabled]="saving()">Cancel</button><button type="submit" class="member-modal__button member-modal__button--primary" data-testid="save-member" [disabled]="form.invalid || saving()">{{ saving() ? 'Saving…' : 'Save member' }}</button></footer>
+    </form>
+  </section>
+</div>

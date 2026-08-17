@@ -1,7 +1,9 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { BandsSearchFormComponent, BandSearchFilters } from '../bands-search-form/bands-search-form.component';
 import { BandsResultsComponent } from '../bands-results/bands-results.component';
+import { BandCreateModalComponent } from '../band-create-modal/band-create-modal.component';
 import {
   BandsApiService,
   CountriesService,
@@ -10,21 +12,26 @@ import {
   PagedResult,
   GetBandsQuery,
   GenreModel,
+  BandWriteRequest,
 } from '../../../infrastructure/api';
 import { SearchStateService } from '../search-state.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'dmc-home',
   standalone: true,
-  imports: [BandsSearchFormComponent, BandsResultsComponent],
+  imports: [BandsSearchFormComponent, BandsResultsComponent, BandCreateModalComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit {
   private readonly bandsApi = inject(BandsApiService);
   private readonly countriesService = inject(CountriesService);
   private readonly genresApi = inject(GenresApiService);
   private readonly searchState = inject(SearchStateService);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
   readonly countries = signal<string[]>([]);
   readonly genres = signal<GenreModel[]>([]);
@@ -34,6 +41,10 @@ export class HomeComponent implements OnInit {
   readonly error = signal<string | null>(null);
   readonly toastMessage = signal<string | null>(null);
   readonly savedFilters = signal<BandSearchFilters | null>(null);
+  readonly isCreateModalOpen = signal(false);
+  readonly isCreatingBand = signal(false);
+  readonly createBandError = signal<string | null>(null);
+  readonly isAdmin = this.auth.isAdmin;
 
   private currentFilters: BandSearchFilters = { name: '', country: '', genreId: '' };
   private currentPage = 1;
@@ -91,6 +102,37 @@ export class HomeComponent implements OnInit {
 
   dismissToast(): void {
     this.toastMessage.set(null);
+  }
+
+  openCreateModal(): void {
+    this.createBandError.set(null);
+    this.isCreateModalOpen.set(true);
+  }
+
+  closeCreateModal(): void {
+    if (!this.isCreatingBand()) {
+      this.isCreateModalOpen.set(false);
+      this.createBandError.set(null);
+    }
+  }
+
+  createBand(request: BandWriteRequest): void {
+    if (this.isCreatingBand()) return;
+
+    this.isCreatingBand.set(true);
+    this.createBandError.set(null);
+    this.bandsApi.createBand(request).subscribe({
+      next: (band) => {
+        this.isCreatingBand.set(false);
+        this.isCreateModalOpen.set(false);
+        this.toastMessage.set('Band created successfully.');
+        void this.router.navigate(['/bands', band.id]);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.isCreatingBand.set(false);
+        this.createBandError.set(err.error?.message ?? 'Could not create band. Please try again.');
+      },
+    });
   }
 
   private fetchBands(): void {

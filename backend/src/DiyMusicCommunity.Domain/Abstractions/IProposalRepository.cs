@@ -9,5 +9,4 @@ public interface IProposalRepository
     Task<IReadOnlyList<BandProposal>> GetByStatusAsync(ProposalStatus status, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<BandProposal>> GetByUserAsync(Guid userId, CancellationToken cancellationToken = default);
     Task AddAsync(BandProposal proposal, CancellationToken cancellationToken = default);
-    void Update(BandProposal proposal);
 }

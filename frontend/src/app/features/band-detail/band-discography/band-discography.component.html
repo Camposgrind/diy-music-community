@@ -1,31 +1,28 @@
 <section class="discography">
-  <h2 class="discography__title">Discography</h2>
-
-  <!-- Column headers -->
-  <div class="discography__header">
-    <span class="discography__header-type">Type</span>
-    <span class="discography__header-name">Release</span>
-    <span class="discography__header-year">Year</span>
+  <div class="discography__title-row">
+    <h2 class="discography__title">Discography</h2>
+    @if (isAdmin()) { <button type="button" class="discography__add" data-testid="add-release" (click)="addRelease.emit()">Add Release</button> }
   </div>
 
-  <div class="discography__list">
-    @for (release of releases(); track release.id) {
-      <div class="discography__item discography__item--clickable" (click)="navigateToRelease(release.id)">
-        <div class="discography__item-accent" [ngClass]="accentClass(release.releaseType)"></div>
-        <div class="discography__item-content">
-          <div class="discography__item-type" [ngClass]="typeClass(release.releaseType)">
-            {{ release.releaseType }}
-          </div>
-          <div
-            class="discography__item-title"
-            [class.discography__item-title--album]="release.releaseType === 'Album'">
-            {{ release.title }}
-          </div>
-          <div class="discography__item-year">
-            @if (release.year) { {{ release.year }} }
+  @if (releases().length) {
+    <div class="discography__header">
+      <span class="discography__header-type">Type</span>
+      <span class="discography__header-name">Release</span>
+      <span class="discography__header-year">Year</span>
+    </div>
+
+    <div class="discography__list">
+      @for (release of releases(); track release.id) {
+        <div class="discography__item discography__item--clickable" (click)="navigateToRelease(release.id)">
+          <div class="discography__item-accent" [ngClass]="accentClass(release.releaseType)"></div>
+          <div class="discography__item-content">
+            <div class="discography__item-type" [ngClass]="typeClass(release.releaseType)">{{ release.releaseType }}</div>
+            <div class="discography__item-title" [class.discography__item-title--album]="release.releaseType === 'Album'">{{ release.title }}</div>
+            <div class="discography__item-year">@if (release.year) { {{ release.year }} }</div>
+            @if (isAdmin()) { <button type="button" class="discography__edit" [attr.data-testid]="'edit-release-' + release.id" (click)="onEditRelease($event, release)">Edit</button> }
           </div>
         </div>
-      </div>
-    }
-  </div>
+      }
+    </div>
+  } @else { <p class="discography__empty">No releases listed yet.</p> }
 </section>

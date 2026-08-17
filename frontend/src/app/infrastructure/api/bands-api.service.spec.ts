@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { BandsApiService } from './bands-api.service';
-import { GetBandsQuery, PagedResult, BandListItemModel } from './models';
+import { BandDetailModel, BandWriteRequest, GetBandsQuery, PagedResult, BandListItemModel } from './models';
 
 describe('BandsApiService', () => {
   let service: BandsApiService;
@@ -86,5 +86,50 @@ describe('BandsApiService', () => {
     req.flush(mockResult);
 
     expect(result).toEqual(mockResult);
+  });
+
+  it('should post a band write request and return the created band', () => {
+    const request: BandWriteRequest = {
+      name: 'Discharge',
+      country: 'United Kingdom',
+      genreId: 'genre-1',
+      status: 'Active',
+    };
+    const created: BandDetailModel = {
+      id: 'band-1',
+      ...request,
+      location: null,
+      formationYear: null,
+      description: null,
+      logoImageUrl: null,
+      bandImageUrl: null,
+      musicUrlPortal: null,
+      bandContact: null,
+      genre: 'D-Beat',
+      releases: [],
+      members: [],
+    };
+
+    let result: BandDetailModel | undefined;
+    service.createBand(request).subscribe((band) => (result = band));
+
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/bands'));
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(request);
+    req.flush(created);
+
+    expect(result).toEqual(created);
+  });
+
+  it('should put a band write request to update a band', () => {
+    const request: BandWriteRequest = {
+      name: 'Napalm Death', country: 'United Kingdom', genreId: 'genre-1', status: 'Active',
+    };
+    service.updateBand('band-1', request).subscribe();
+
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/bands/band-1'));
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual(request);
+    req.flush({ id: 'band-1' });
   });
 });

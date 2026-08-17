@@ -1,0 +1,57 @@
+<div class="band-create-modal" role="dialog" aria-modal="true" aria-labelledby="band-create-title">
+  <div class="band-create-modal__backdrop" aria-hidden="true"></div>
+  <section class="band-create-modal__panel">
+    <header class="band-create-modal__header">
+      <h2 id="band-create-title" class="band-create-modal__title">Add Band</h2>
+      <button type="button" class="band-create-modal__close" data-testid="close-band-modal" (click)="close.emit()" [disabled]="saving()" aria-label="Close add band form">×</button>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="onSave()" novalidate>
+      <div class="band-create-modal__fields">
+        <div class="band-create-modal__field">
+          <label for="new-band-name">Name *</label>
+          <input #nameInput id="new-band-name" type="text" formControlName="name" maxlength="200" [attr.aria-describedby]="form.controls.name.invalid && form.controls.name.touched ? 'new-band-name-error' : null" />
+          @if (form.controls.name.invalid && form.controls.name.touched) { <p id="new-band-name-error" class="band-create-modal__error">Band name is required.</p> }
+        </div>
+        <div class="band-create-modal__field">
+          <label for="new-band-country">Country *</label>
+          <select id="new-band-country" formControlName="country" [attr.aria-describedby]="form.controls.country.invalid && form.controls.country.touched ? 'new-band-country-error' : null">
+            <option value="">Select country</option>
+            @for (country of countries(); track country) { <option [value]="country">{{ country }}</option> }
+          </select>
+          @if (form.controls.country.invalid && form.controls.country.touched) { <p id="new-band-country-error" class="band-create-modal__error">Country is required.</p> }
+        </div>
+        <div class="band-create-modal__field">
+          <label for="new-band-genre">Genre *</label>
+          <select id="new-band-genre" formControlName="genreId" [attr.aria-describedby]="form.controls.genreId.invalid && form.controls.genreId.touched ? 'new-band-genre-error' : null">
+            <option value="">Select genre</option>
+            @for (genre of genres(); track genre.id) { <option [value]="genre.id">{{ genre.name }}</option> }
+          </select>
+          @if (form.controls.genreId.invalid && form.controls.genreId.touched) { <p id="new-band-genre-error" class="band-create-modal__error">Genre is required.</p> }
+        </div>
+        <div class="band-create-modal__field">
+          <label for="new-band-status">Status</label>
+          <select id="new-band-status" formControlName="status"><option value="Active">Active</option><option value="SplitUp">Split-up</option><option value="OnHold">On hold</option></select>
+        </div>
+        <div class="band-create-modal__field"><label for="new-band-location">Location</label><input id="new-band-location" type="text" formControlName="location" /></div>
+        <div class="band-create-modal__field band-create-modal__field--year">
+          <label for="new-band-formation-year">Formed year</label>
+          <div class="band-create-modal__year-input">
+            <input id="new-band-formation-year" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 1999" maxlength="4" formControlName="formationYear" [attr.aria-describedby]="form.controls.formationYear.invalid && form.controls.formationYear.touched ? 'new-band-formation-year-error' : 'new-band-formation-year-help'" />
+            <span aria-hidden="true">YYYY</span>
+          </div>
+          @if (form.controls.formationYear.invalid && form.controls.formationYear.touched) { <p id="new-band-formation-year-error" class="band-create-modal__error">Enter a valid four-digit year.</p> } @else { <p id="new-band-formation-year-help" class="band-create-modal__help">Optional — type the year directly.</p> }
+        </div>
+        <div class="band-create-modal__field"><label for="new-band-portal">Portal URL</label><input id="new-band-portal" type="url" formControlName="musicUrlPortal" /></div>
+        <div class="band-create-modal__field"><label for="new-band-contact">Contact</label><input id="new-band-contact" type="text" formControlName="bandContact" /></div>
+      </div>
+
+      @if (error(); as message) { <p class="band-create-modal__submit-error" role="alert">{{ message }}</p> }
+
+      <footer class="band-create-modal__actions">
+        <button type="button" class="band-create-modal__button band-create-modal__button--secondary" (click)="close.emit()" [disabled]="saving()">Cancel</button>
+        <button type="submit" class="band-create-modal__button band-create-modal__button--primary" data-testid="save-band" [disabled]="form.invalid || saving()">{{ saving() ? 'Saving…' : 'Save band' }}</button>
+      </footer>
+    </form>
+  </section>
+</div>

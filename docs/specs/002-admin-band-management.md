@@ -12,10 +12,17 @@ accurate and curated.
 
 ## Acceptance criteria (Given/When/Then checkboxes)
 
-- [ ] Given I am authenticated as an Admin, when I submit valid band data, then a band is created.
-- [ ] Given I am authenticated as an Admin, when I submit valid changes to an existing band, then the band is updated.
-- [ ] Given I am authenticated as an Admin, when I submit a release and its valid tracks, then both are created atomically.
-- [ ] Given I am authenticated as an Admin, when I update a release and its tracks, then the release and its complete track list are updated atomically.
+- [x] Given I am authenticated as an Admin, when I submit valid general band data from Home, then a band is created and I am redirected to its detail page.
+- [x] Given I am not an Admin, when I view Home, then the add-band control is not available.
+- [x] Given I am an Admin and submit invalid general band data, then saving is unavailable and field errors explain the missing required data.
+- [x] Given I open the initial creation form, when I provide a formation year, then I can type a four-digit year directly; logo and band-photo management remain out of this flow.
+- [x] Given I am authenticated as an Admin, when I submit valid general-info changes from a band detail page, then the band is updated and its full detail is reloaded.
+- [x] Given I am not an Admin, when I view a band detail page, then the general-info edit control is not available.
+- [x] Given I am authenticated as an Admin, when I submit a valid release from the band detail page, then it is created and the band detail is reloaded.
+- [x] Given I am authenticated as an Admin, when I edit a release's title, type, or year, then the release is updated, its unchanged metadata and tracks are preserved, and the band detail is reloaded.
+- [x] Given I am not an Admin, when I view discography, then release creation and editing controls are not available.
+- [x] Given I am an Admin, when I add or edit a current or past member from band detail, then the member is saved and the complete band detail is reloaded.
+- [x] Given I am not an Admin, when I view current or past members, then member-management controls are not available.
 - [ ] Given I submit a duplicate band, release, member, or track identity, when the request is processed, then I receive 409 and no data is changed.
 - [ ] Given I am unauthenticated, when I call a band create or update endpoint, then I receive 401.
 - [ ] Given I am authenticated without the Admin role, when I call a band create or update endpoint, then I receive 403.
@@ -69,9 +76,22 @@ are delivered.
 - API: an unauthenticated caller receives 401 for create and update.
 - API: a non-Admin caller receives 403 for create and update.
 - API: a public caller can still browse the catalog.
+- Frontend: Home shows the add-band control only for an Admin, opens the creation modal, and navigates to the created band.
+- Frontend: the creation modal validates name, country, and genre before emitting a save request.
+- Frontend: the initial creation modal accepts a directly entered four-digit formation year and excludes media fields.
+- Frontend: the bands API service posts a `BandWriteRequest` and returns `BandDetailModel`.
+- Frontend: the detail page shows an Admin-only edit control, preloads the edit form, updates the band, and reloads its detail.
+- Frontend: Admins can create or edit a release from discography; the page reloads after either action.
+- Frontend: Admins can add or edit current and past members with one reusable modal; the page reloads after saving.
 
 ## Out of scope
 
 - Community submissions.
 - Band ownership claims and claim-holder editing.
 - Proposal and claim review queues or moderation audit records.
+- Editing releases or current/past members.
+- Advanced band-section editing.
+- Logo and band-photo management, which will be available in a later edit flow.
+- General-info editing does not expose description, logo, or photo changes; their stored values are preserved.
+- Release-track editing and release cover uploads.
+- Member photo, image, and other-band management.

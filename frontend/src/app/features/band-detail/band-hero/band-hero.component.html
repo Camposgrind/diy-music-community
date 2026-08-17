@@ -32,7 +32,12 @@
   <div class="band-hero__info">
 
     <!-- Band name (no logo thumbnail here — logo is in the header above) -->
-    <h1 class="band-hero__name">{{ band().name }}</h1>
+    <div class="band-hero__title-row">
+      <h1 class="band-hero__name">{{ band().name }}</h1>
+      @if (isAdmin()) {
+        <button type="button" class="band-hero__edit" data-testid="edit-band" (click)="edit.emit()">Edit</button>
+      }
+    </div>
 
     <!-- Status + genre badges -->
     <div class="band-hero__meta">

@@ -1,6 +1,9 @@
 <section class="members">
-  <h2 class="members__title">{{ title() }}</h2>
-  <div class="members__grid">
+  <div class="members__title-row">
+    <h2 class="members__title">{{ title() }}</h2>
+    @if (isAdmin()) { <button type="button" class="members__add" data-testid="add-member" (click)="addMember.emit(memberType())">{{ memberType() === 'current' ? 'Add Member' : 'Add Past Member' }}</button> }
+  </div>
+  @if (members().length) { <div class="members__grid">
     @for (member of members(); track member.id) {
       <div class="members__card">
         <div class="members__card-accent"></div>
@@ -8,9 +11,14 @@
 
           <div class="members__top">
             <div class="members__name">{{ member.name }}</div>
+            <div class="members__actions">
             @if (member.isCurrent) {
               <span class="members__present-badge">Present</span>
             }
+            @if (isAdmin()) {
+              <button type="button" class="members__edit" [attr.data-testid]="'edit-member-' + member.id" (click)="editMember.emit(member)">Edit</button>
+            }
+            </div>
           </div>
 
           @if (member.instrument) {
@@ -46,4 +54,7 @@
       </div>
     }
   </div>
+  } @else {
+    <p class="members__empty">No {{ memberType() === 'current' ? 'current' : 'past' }} members listed yet.</p>
+  }
 </section>

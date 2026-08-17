@@ -91,9 +91,4 @@ public sealed class BandRepository : IBandRepository
     {
         await _context.Bands.AddAsync(band, cancellationToken);
     }
-
-    public void Update(Band band)
-    {
-        _context.Bands.Update(band);
-    }
 }

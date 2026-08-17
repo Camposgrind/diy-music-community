@@ -6,6 +6,11 @@
 </section>
 
 <section class="search-section container">
+  @if (isAdmin()) {
+    <div class="search-section__admin-action">
+      <button type="button" class="search-section__add-band" (click)="openCreateModal()">+ Add Band</button>
+    </div>
+  }
   <dmc-bands-search-form
     [countries]="countries()"
     [genres]="genres()"
@@ -14,6 +19,16 @@
     (search)="onSearch($event)"
     (reset)="onReset()" />
 </section>
+
+@if (isCreateModalOpen()) {
+  <dmc-band-create-modal
+    [countries]="countries()"
+    [genres]="genres()"
+    [saving]="isCreatingBand()"
+    [error]="createBandError()"
+    (save)="createBand($event)"
+    (close)="closeCreateModal()" />
+}
 
 <section class="results-section container">
   <dmc-bands-results

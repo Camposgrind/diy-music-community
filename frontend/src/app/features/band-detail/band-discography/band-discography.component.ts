@@ -1,4 +1,4 @@
-import { Component, input, inject } from '@angular/core';
+import { Component, input, inject, output } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 import { BandReleaseModel } from '../../../infrastructure/api/models';
@@ -17,10 +17,18 @@ export class BandDiscographyComponent {
 
   readonly releases = input.required<BandReleaseModel[]>();
   readonly bandId = input.required<string>();
+  readonly isAdmin = input(false);
+  readonly addRelease = output<void>();
+  readonly editRelease = output<BandReleaseModel>();
 
   navigateToRelease(releaseId: string): void {
     this.releaseState.saveBandId(this.bandId());
     this.router.navigate(['/releases', releaseId]);
+  }
+
+  onEditRelease(event: Event, release: BandReleaseModel): void {
+    event.stopPropagation();
+    this.editRelease.emit(release);
   }
 
   typeClass(releaseType: string): string {

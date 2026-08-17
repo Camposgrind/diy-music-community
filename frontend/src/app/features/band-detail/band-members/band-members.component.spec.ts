@@ -23,6 +23,7 @@ describe('BandMembersComponent', () => {
     componentRef = fixture.componentRef;
     componentRef.setInput('members', mockMembers);
     componentRef.setInput('title', 'Current Members');
+    componentRef.setInput('memberType', 'current');
     fixture.detectChanges();
     el = fixture.nativeElement;
   });
@@ -49,5 +50,13 @@ describe('BandMembersComponent', () => {
     componentRef.setInput('members', []);
     fixture.detectChanges();
     expect(el.textContent).not.toContain('Barney Greenway');
+  });
+
+  it('should show management controls only for an Admin', () => {
+    expect(el.querySelector('[data-testid="add-member"]')).toBeNull();
+    componentRef.setInput('isAdmin', true);
+    fixture.detectChanges();
+    expect(el.querySelector('[data-testid="add-member"]')).toBeTruthy();
+    expect(el.querySelector('[data-testid="edit-member-m1"]')).toBeTruthy();
   });
 });

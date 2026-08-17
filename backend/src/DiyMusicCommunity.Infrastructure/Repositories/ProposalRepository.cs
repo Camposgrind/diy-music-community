@@ -34,9 +34,4 @@ public sealed class ProposalRepository : IProposalRepository
     {
         await _context.BandProposals.AddAsync(proposal, cancellationToken);
     }
-
-    public void Update(BandProposal proposal)
-    {
-        _context.BandProposals.Update(proposal);
-    }
 }

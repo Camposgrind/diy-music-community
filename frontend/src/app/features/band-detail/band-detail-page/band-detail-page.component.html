@@ -17,18 +17,48 @@
       </div>
     </div>
   } @else if (band(); as b) {
-    <dmc-band-hero [band]="b" />
+    <dmc-band-hero [band]="b" [isAdmin]="isAdmin()" (edit)="openEditModal()" />
 
-    @if (hasReleases()) {
-      <dmc-band-discography [releases]="b.releases" [bandId]="b.id" />
-    }
+    <dmc-band-discography
+      [releases]="b.releases"
+      [bandId]="b.id"
+      [isAdmin]="isAdmin()"
+      (addRelease)="openCreateReleaseModal()"
+      (editRelease)="openEditReleaseModal($event)" />
 
-    @if (hasCurrentMembers()) {
-      <dmc-band-members [members]="currentMembers()" title="Current Members" />
-    }
-
-    @if (hasPastMembers()) {
-      <dmc-band-members [members]="pastMembers()" title="Past Members" />
-    }
+    <dmc-band-members [members]="currentMembers()" title="Current Members" memberType="current" [isAdmin]="isAdmin()" (addMember)="openCreateMemberModal($event)" (editMember)="openEditMemberModal($event)" />
+    <dmc-band-members [members]="pastMembers()" title="Past Members" memberType="past" [isAdmin]="isAdmin()" (addMember)="openCreateMemberModal($event)" (editMember)="openEditMemberModal($event)" />
   }
 </div>
+
+@if (isEditModalOpen() && editData(); as data) {
+  <dmc-band-edit-modal
+    [countries]="countries()"
+    [genres]="genres()"
+    [initialData]="data"
+    [saving]="isUpdatingBand()"
+    [error]="editError()"
+    (save)="saveBand($event)"
+    (close)="closeEditModal()" />
+}
+
+@if (releaseModalMode(); as mode) {
+  <dmc-release-modal
+    [mode]="mode"
+    [initialData]="releaseModalData()"
+    [saving]="isSavingRelease()"
+    [error]="releaseError()"
+    (save)="saveRelease($event)"
+    (close)="closeReleaseModal()" />
+}
+
+@if (memberModalMode(); as mode) {
+  <dmc-member-modal
+    [mode]="mode"
+    [memberType]="memberModalType()"
+    [initialData]="memberModalData()"
+    [saving]="isSavingMember()"
+    [error]="memberError()"
+    (save)="saveMember($event)"
+    (close)="closeMemberModal()" />
+}

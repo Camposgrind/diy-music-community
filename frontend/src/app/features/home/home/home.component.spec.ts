@@ -1,13 +1,19 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { signal } from '@angular/core';
+import { vi } from 'vitest';
 import { HomeComponent } from './home.component';
-import { BandListItemModel, PagedResult } from '../../../infrastructure/api/models';
+import { BandDetailModel, BandListItemModel, BandWriteRequest, PagedResult } from '../../../infrastructure/api/models';
+import { AuthService } from '../../../core/auth/auth.service';
 
 describe('HomeComponent', () => {
   let fixture: ComponentFixture<HomeComponent>;
   let component: HomeComponent;
   let httpMock: HttpTestingController;
+  const isAdmin = signal(false);
+  const router = { navigate: vi.fn().mockResolvedValue(true) };
 
   const mockBand: BandListItemModel = {
     id: '1',
@@ -22,12 +28,19 @@ describe('HomeComponent', () => {
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [HomeComponent],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: AuthService, useValue: { isAdmin } },
+        { provide: Router, useValue: router },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
     httpMock = TestBed.inject(HttpTestingController);
+    isAdmin.set(false);
+    router.navigate.mockClear();
   });
 
   afterEach(() => {
@@ -45,6 +58,62 @@ describe('HomeComponent', () => {
     fixture.detectChanges();
     flushInitialRequests();
     expect(component).toBeTruthy();
+  });
+
+  it('should show the add-band control only for an Admin', () => {
+    fixture.detectChanges();
+    flushInitialRequests();
+    expect(fixture.nativeElement.querySelector('.search-section__add-band')).toBeNull();
+
+    isAdmin.set(true);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.search-section__add-band')).toBeTruthy();
+  });
+
+  it('should open the creation modal when an Admin uses add band', () => {
+    isAdmin.set(true);
+    fixture.detectChanges();
+    flushInitialRequests();
+
+    (fixture.nativeElement.querySelector('.search-section__add-band') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(component.isCreateModalOpen()).toBe(true);
+    expect(fixture.nativeElement.querySelector('dmc-band-create-modal')).toBeTruthy();
+  });
+
+  it('should create a band and navigate to its detail page', () => {
+    fixture.detectChanges();
+    flushInitialRequests();
+    component.openCreateModal();
+    const request: BandWriteRequest = { name: 'Discharge', country: 'United Kingdom', genreId: 'genre-1', status: 'Active' };
+    component.createBand(request);
+
+    const createRequest = httpMock.expectOne((r) => r.url.endsWith('/api/bands') && r.method === 'POST');
+    createRequest.flush({
+      id: 'band-1', ...request, genre: 'D-Beat', location: null, formationYear: null, description: null,
+      logoImageUrl: null, bandImageUrl: null, musicUrlPortal: null, bandContact: null, releases: [], members: [],
+    } satisfies BandDetailModel);
+
+    expect(component.isCreateModalOpen()).toBe(false);
+    expect(router.navigate).toHaveBeenCalledWith(['/bands', 'band-1']);
+  });
+
+  it('should keep the creation modal open when creating a band fails', () => {
+    fixture.detectChanges();
+    flushInitialRequests();
+    component.openCreateModal();
+    component.createBand({ name: 'Discharge', country: 'United Kingdom', genreId: 'genre-1', status: 'Active' });
+
+    const createRequest = httpMock.expectOne((r) => r.url.endsWith('/api/bands') && r.method === 'POST');
+    createRequest.flush(
+      { code: 'Catalog.Duplicate', message: 'A band with this name already exists.' },
+      { status: 409, statusText: 'Conflict' },
+    );
+
+    expect(component.isCreateModalOpen()).toBe(true);
+    expect(component.createBandError()).toBe('A band with this name already exists.');
   });
 
   it('should load countries on init', () => {

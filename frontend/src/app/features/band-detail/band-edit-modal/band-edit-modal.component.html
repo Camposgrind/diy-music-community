@@ -1,0 +1,23 @@
+<div class="band-edit-modal" role="dialog" aria-modal="true" aria-labelledby="band-edit-title">
+  <div class="band-edit-modal__backdrop" aria-hidden="true"></div>
+  <section class="band-edit-modal__panel">
+    <header class="band-edit-modal__header">
+      <h2 id="band-edit-title" class="band-edit-modal__title">Edit Band</h2>
+      <button type="button" class="band-edit-modal__close" (click)="close.emit()" [disabled]="saving()" aria-label="Close band editor">×</button>
+    </header>
+    <form [formGroup]="form" (ngSubmit)="onSave()" novalidate>
+      <div class="band-edit-modal__fields">
+        <div class="band-edit-modal__field"><label for="edit-band-name">Name *</label><input #nameInput id="edit-band-name" type="text" formControlName="name" maxlength="200" />@if (form.controls.name.invalid && form.controls.name.touched) { <p class="band-edit-modal__error">Band name is required.</p> }</div>
+        <div class="band-edit-modal__field"><label for="edit-band-country">Country *</label><select id="edit-band-country" formControlName="country"><option value="">Select country</option>@for (country of countries(); track country) { <option [value]="country">{{ country }}</option> }</select>@if (form.controls.country.invalid && form.controls.country.touched) { <p class="band-edit-modal__error">Country is required.</p> }</div>
+        <div class="band-edit-modal__field"><label for="edit-band-genre">Genre *</label><select id="edit-band-genre" formControlName="genreId"><option value="">Select genre</option>@for (genre of genres(); track genre.id) { <option [value]="genre.id">{{ genre.name }}</option> }</select>@if (form.controls.genreId.invalid && form.controls.genreId.touched) { <p class="band-edit-modal__error">Genre is required.</p> }</div>
+        <div class="band-edit-modal__field"><label for="edit-band-status">Status</label><select id="edit-band-status" formControlName="status"><option value="Active">Active</option><option value="SplitUp">Split-up</option><option value="OnHold">On hold</option></select></div>
+        <div class="band-edit-modal__field"><label for="edit-band-location">Location</label><input id="edit-band-location" type="text" formControlName="location" /></div>
+        <div class="band-edit-modal__field"><label for="edit-band-formation-year">Formed year</label><div class="band-edit-modal__year-input"><input id="edit-band-formation-year" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 1999" maxlength="4" formControlName="formationYear" /><span aria-hidden="true">YYYY</span></div>@if (form.controls.formationYear.invalid && form.controls.formationYear.touched) { <p class="band-edit-modal__error">Enter a valid four-digit year.</p> }</div>
+        <div class="band-edit-modal__field"><label for="edit-band-portal">Portal URL</label><input id="edit-band-portal" type="url" formControlName="musicUrlPortal" /></div>
+        <div class="band-edit-modal__field"><label for="edit-band-contact">Contact</label><input id="edit-band-contact" type="text" formControlName="bandContact" /></div>
+      </div>
+      @if (error(); as message) { <p class="band-edit-modal__submit-error" role="alert">{{ message }}</p> }
+      <footer class="band-edit-modal__actions"><button type="button" class="band-edit-modal__button band-edit-modal__button--secondary" (click)="close.emit()" [disabled]="saving()">Cancel</button><button type="submit" class="band-edit-modal__button band-edit-modal__button--primary" data-testid="save-band-edit" [disabled]="form.invalid || saving()">{{ saving() ? 'Saving…' : 'Save changes' }}</button></footer>
+    </form>
+  </section>
+</div>

@@ -69,4 +69,12 @@ describe('BandDiscographyComponent', () => {
     expect(saveBandIdSpy).toHaveBeenCalledWith('b1');
     expect(navSpy).toHaveBeenCalledWith(['/releases', 'r1']);
   });
+
+  it('should show release management controls only for an Admin', () => {
+    expect(fixture.nativeElement.querySelector('[data-testid="add-release"]')).toBeNull();
+    componentRef.setInput('isAdmin', true);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[data-testid="add-release"]')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('[data-testid="edit-release-r1"]')).toBeTruthy();
+  });
 });
