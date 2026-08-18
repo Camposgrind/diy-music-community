@@ -1,7 +1,7 @@
 import { afterNextRender, ChangeDetectionStrategy, Component, effect, ElementRef, input, output, viewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 
-export type MemberType = 'current' | 'past';
+export type MemberType = 'current' | 'past' | 'lastKnown';
 
 export interface MemberModalForm {
   name: string;
@@ -24,6 +24,7 @@ function yearOrderValidator(control: AbstractControl): ValidationErrors | null {
 export class MemberModalComponent {
   readonly mode = input.required<'create' | 'edit'>();
   readonly memberType = input.required<MemberType>();
+  readonly isSplitUp = input(false);
   readonly initialData = input<MemberModalForm | null>(null);
   readonly saving = input(false);
   readonly error = input<string | null>(null);
@@ -62,14 +63,14 @@ export class MemberModalComponent {
     this.save.emit({
       name: value.name.trim(), instrument: value.instrument.trim() || null,
       startYear: value.startYear ? Number(value.startYear) : null,
-      endYear: value.memberType === 'past' ? Number(value.endYear) : null,
+      endYear: value.memberType === 'past' || value.memberType === 'lastKnown' ? Number(value.endYear) : null,
       memberType: value.memberType,
     });
   }
 
   private applyMemberType(type: MemberType): void {
     const endYear = this.form.controls.endYear;
-    endYear.setValidators(type === 'past'
+    endYear.setValidators(type === 'past' || type === 'lastKnown'
       ? [Validators.required, Validators.min(1000), Validators.max(new Date().getFullYear()), Validators.pattern(/^\d{4}$/)]
       : [Validators.min(1000), Validators.max(new Date().getFullYear()), Validators.pattern(/^\d{4}$/)]);
     if (type === 'current') endYear.setValue('', { emitEvent: false });

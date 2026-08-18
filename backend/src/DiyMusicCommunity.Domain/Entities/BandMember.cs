@@ -10,6 +10,7 @@ public sealed class BandMember : Entity
     public int? StartYear { get; private set; }
     public int? EndYear { get; private set; }
     public bool IsCurrent { get; private set; }
+    public bool IsLastKnownLineup { get; private set; }
 
     public IReadOnlyList<BandMemberOtherBand> OtherBands
     {
@@ -55,17 +56,22 @@ public sealed class BandMember : Entity
         }
     }
 
-    public void Update(string name, string? instrument, int? startYear, int? endYear, bool isCurrent)
+    public void Update(string name, string? instrument, int? startYear, int? endYear, bool isCurrent, bool isLastKnownLineup)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
             throw new ArgumentException("Member name cannot be empty.", nameof(name));
+        }
+        if (isLastKnownLineup && !endYear.HasValue)
+        {
+            throw new ArgumentException("Last known lineup members require an end year.", nameof(endYear));
         }
 
         SetYears(startYear, endYear);
         Name = name;
         Instrument = instrument;
         IsCurrent = !endYear.HasValue && isCurrent;
+        IsLastKnownLineup = isLastKnownLineup;
     }
 
     public void SetDeparted(int endYear)

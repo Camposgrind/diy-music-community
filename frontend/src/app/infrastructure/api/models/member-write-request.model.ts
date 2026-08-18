@@ -4,4 +4,5 @@ export interface MemberWriteRequest {
   startYear: number | null;
   endYear: number | null;
   isCurrent: boolean;
+  isLastKnownLineup: boolean;
 }

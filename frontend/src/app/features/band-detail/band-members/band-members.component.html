@@ -1,7 +1,7 @@
 <section class="members">
   <div class="members__title-row">
     <h2 class="members__title">{{ title() }}</h2>
-    @if (isAdmin()) { <button type="button" class="members__add" data-testid="add-member" (click)="addMember.emit(memberType())">{{ memberType() === 'current' ? 'Add Member' : 'Add Past Member' }}</button> }
+    @if (isAdmin()) { <button type="button" class="members__add" data-testid="add-member" (click)="addMember.emit(memberType())">{{ memberType() === 'lastKnown' ? 'Add Last Known Member' : memberType() === 'current' ? 'Add Member' : 'Add Past Member' }}</button> }
   </div>
   @if (members().length) { <div class="members__grid">
     @for (member of members(); track member.id) {
@@ -55,6 +55,6 @@
     }
   </div>
   } @else {
-    <p class="members__empty">No {{ memberType() === 'current' ? 'current' : 'past' }} members listed yet.</p>
+    <p class="members__empty">No {{ memberType() === 'lastKnown' ? 'last known lineup' : memberType() === 'current' ? 'current' : 'past' }} members listed yet.</p>
   }
 </section>

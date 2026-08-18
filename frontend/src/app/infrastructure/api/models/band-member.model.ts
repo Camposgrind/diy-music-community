@@ -7,5 +7,6 @@ export interface BandMemberModel {
   startYear: number | null;
   endYear: number | null;
   isCurrent: boolean;
+  isLastKnownLineup: boolean;
   otherBands: BandMemberOtherBandModel[];
 }

@@ -24,6 +24,7 @@ public sealed class MemberWriteRequest
     public int? StartYear { get; init; }
     public int? EndYear { get; init; }
     public bool IsCurrent { get; init; }
+    public bool IsLastKnownLineup { get; init; }
 }
 
 public sealed class ReleaseWriteRequest

@@ -71,8 +71,14 @@ export class BandDetailPageComponent implements OnInit {
     (this.band()?.members ?? []).filter((m) => m.isCurrent)
   );
 
+  readonly isSplitUp = computed(() => this.band()?.status === 'SplitUp');
+
+  readonly lastKnownMembers = computed(() =>
+    (this.band()?.members ?? []).filter((m) => m.isLastKnownLineup)
+  );
+
   readonly pastMembers = computed(() =>
-    (this.band()?.members ?? []).filter((m) => !m.isCurrent)
+    (this.band()?.members ?? []).filter((m) => !m.isCurrent && !m.isLastKnownLineup)
   );
 
   readonly hasReleases = computed(() => (this.band()?.releases.length ?? 0) > 0);
@@ -221,7 +227,7 @@ export class BandDetailPageComponent implements OnInit {
 
   openEditMemberModal(member: BandMemberModel): void {
     if (this.isSavingMember()) return;
-    const type: MemberType = member.isCurrent ? 'current' : 'past';
+    const type: MemberType = member.isLastKnownLineup ? 'lastKnown' : member.isCurrent ? 'current' : 'past';
     this.memberError.set(null);
     this.editingMemberId.set(member.id);
     this.memberModalType.set(type);
@@ -243,8 +249,9 @@ export class BandDetailPageComponent implements OnInit {
 
     const request: MemberWriteRequest = {
       name: data.name, instrument: data.instrument, startYear: data.startYear,
-      endYear: data.memberType === 'past' ? data.endYear : null,
+      endYear: data.memberType === 'past' || data.memberType === 'lastKnown' ? data.endYear : null,
       isCurrent: data.memberType === 'current',
+      isLastKnownLineup: data.memberType === 'lastKnown',
     };
     this.isSavingMember.set(true);
     this.memberError.set(null);

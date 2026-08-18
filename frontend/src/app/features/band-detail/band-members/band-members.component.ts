@@ -11,8 +11,8 @@ import { BandMemberModel } from '../../../infrastructure/api/models';
 export class BandMembersComponent {
   readonly members = input.required<BandMemberModel[]>();
   readonly title = input.required<string>();
-  readonly memberType = input.required<'current' | 'past'>();
+  readonly memberType = input.required<'current' | 'past' | 'lastKnown'>();
   readonly isAdmin = input(false);
-  readonly addMember = output<'current' | 'past'>();
+  readonly addMember = output<'current' | 'past' | 'lastKnown'>();
   readonly editMember = output<BandMemberModel>();
 }

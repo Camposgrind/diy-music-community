@@ -4,8 +4,8 @@ import { BandMembersComponent } from './band-members.component';
 import { BandMemberModel } from '../../../infrastructure/api/models';
 
 const mockMembers: BandMemberModel[] = [
-  { id: 'm1', name: 'Barney Greenway', instrument: 'Vocals', startYear: 1989, endYear: null, isCurrent: true, otherBands: [] },
-  { id: 'm2', name: 'Shane Embury', instrument: 'Bass', startYear: 1987, endYear: null, isCurrent: true, otherBands: [] },
+  { id: 'm1', name: 'Barney Greenway', instrument: 'Vocals', startYear: 1989, endYear: null, isCurrent: true, isLastKnownLineup: false, otherBands: [] },
+  { id: 'm2', name: 'Shane Embury', instrument: 'Bass', startYear: 1987, endYear: null, isCurrent: true, isLastKnownLineup: false, otherBands: [] },
 ];
 
 describe('BandMembersComponent', () => {

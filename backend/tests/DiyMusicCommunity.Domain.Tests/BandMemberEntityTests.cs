@@ -60,6 +60,27 @@ public class BandMemberEntityTests
         Assert.Null(member.EndYear);
     }
 
+    [Fact]
+    public void Update_WithLastKnownLineupAndEndYear_Should_PersistLastKnownLineup()
+    {
+        var member = CreateCurrentMember();
+
+        member.Update("Dave Reeves", "Vocals", 1980, 1985, isCurrent: false, isLastKnownLineup: true);
+
+        Assert.True(member.IsLastKnownLineup);
+        Assert.False(member.IsCurrent);
+        Assert.Equal(1985, member.EndYear);
+    }
+
+    [Fact]
+    public void Update_WithLastKnownLineupButNoEndYear_Should_ThrowArgumentException()
+    {
+        var member = CreateCurrentMember();
+
+        Assert.Throws<ArgumentException>(() =>
+            member.Update("Dave Reeves", "Vocals", 1980, null, isCurrent: false, isLastKnownLineup: true));
+    }
+
     // --- SetDeparted ---
 
     [Fact]

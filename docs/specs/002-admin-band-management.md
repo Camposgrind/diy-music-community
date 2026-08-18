@@ -23,6 +23,8 @@ accurate and curated.
 - [x] Given I am not an Admin, when I view discography, then release creation and editing controls are not available.
 - [x] Given I am an Admin, when I add or edit a current or past member from band detail, then the member is saved and the complete band detail is reloaded.
 - [x] Given I am not an Admin, when I view current or past members, then member-management controls are not available.
+- [x] Given a band is SplitUp, when I view its detail, then its persisted last known lineup is shown separately from past members.
+- [x] Given an Admin adds a member to a SplitUp band's last known lineup, when they submit the form, then an end year is required and the member is persisted as part of that lineup.
 - [ ] Given I submit a duplicate band, release, member, or track identity, when the request is processed, then I receive 409 and no data is changed.
 - [ ] Given I am unauthenticated, when I call a band create or update endpoint, then I receive 401.
 - [ ] Given I am authenticated without the Admin role, when I call a band create or update endpoint, then I receive 403.
@@ -83,6 +85,7 @@ are delivered.
 - Frontend: the detail page shows an Admin-only edit control, preloads the edit form, updates the band, and reloads its detail.
 - Frontend: Admins can create or edit a release from discography; the page reloads after either action.
 - Frontend: Admins can add or edit current and past members with one reusable modal; the page reloads after saving.
+- Frontend: SplitUp bands show their persisted last known lineup and require an end year for its members.
 
 ## Out of scope
 

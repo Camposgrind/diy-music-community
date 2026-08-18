@@ -25,8 +25,8 @@ const mockBand: BandDetailModel = {
     { id: 'r1', title: 'Scum', releaseType: 'Album', year: 1987 },
   ],
   members: [
-    { id: 'm1', name: 'Barney Greenway', instrument: 'Vocals', startYear: 1989, endYear: null, isCurrent: true, otherBands: [] },
-    { id: 'm2', name: 'Bill Steer', instrument: 'Guitar', startYear: 1985, endYear: 1989, isCurrent: false, otherBands: [] },
+    { id: 'm1', name: 'Barney Greenway', instrument: 'Vocals', startYear: 1989, endYear: null, isCurrent: true, isLastKnownLineup: false, otherBands: [] },
+    { id: 'm2', name: 'Bill Steer', instrument: 'Guitar', startYear: 1985, endYear: 1989, isCurrent: false, isLastKnownLineup: false, otherBands: [] },
   ],
 };
 
@@ -311,9 +311,24 @@ describe('BandDetailPageComponent', () => {
 
     component.saveMember({ name: 'Bill Steer', instrument: 'Guitar', startYear: 1985, endYear: 1990, memberType: 'past' });
     const update = httpMock.expectOne((r) => r.url.endsWith('/bands/b1/members/m2') && r.method === 'PUT');
-    expect(update.request.body).toEqual({ name: 'Bill Steer', instrument: 'Guitar', startYear: 1985, endYear: 1990, isCurrent: false } satisfies MemberWriteRequest);
+    expect(update.request.body).toEqual({ name: 'Bill Steer', instrument: 'Guitar', startYear: 1985, endYear: 1990, isCurrent: false, isLastKnownLineup: false } satisfies MemberWriteRequest);
     update.flush({ id: 'm2' });
     httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'GET').flush({ ...mockBand, members: [...mockBand.members.slice(0, 1), { ...pastMember, endYear: 1990 }] });
     expect(component.band()?.members[1].endYear).toBe(1990);
+  });
+
+  it('should show a split-up band\'s last known lineup and use that member type', async () => {
+    await setup('b1');
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush({
+      ...mockBand,
+      status: 'SplitUp',
+      members: [{ ...mockBand.members[1], isLastKnownLineup: true }],
+    });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Last Known Lineup');
+    component.openCreateMemberModal('lastKnown');
+    expect(component.memberModalType()).toBe('lastKnown');
   });
 });

@@ -21,6 +21,9 @@ public sealed class BandMemberModel
     /// <summary>Whether the member is currently active in the band.</summary>
     public bool IsCurrent { get; init; }
 
+    /// <summary>Whether the member belongs to a split-up band's final known lineup.</summary>
+    public bool IsLastKnownLineup { get; init; }
+
     /// <summary>Other bands the member has been part of.</summary>
     public IReadOnlyList<BandMemberOtherBandModel> OtherBands { get; init; } = [];
 }

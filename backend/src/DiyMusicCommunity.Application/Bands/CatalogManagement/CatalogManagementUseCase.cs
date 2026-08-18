@@ -81,9 +81,9 @@ public sealed class CatalogManagementUseCase
             return Result<BandMemberModel>.Failure(BandErrors.NotFound(bandId)); 
         }
 
-        if (string.IsNullOrWhiteSpace(request.Name) || (request.EndYear.HasValue && request.StartYear.HasValue && request.EndYear < request.StartYear)) 
+        if (string.IsNullOrWhiteSpace(request.Name) || (request.EndYear.HasValue && request.StartYear.HasValue && request.EndYear < request.StartYear) || (request.IsLastKnownLineup && !request.EndYear.HasValue))
         { 
-            return Result<BandMemberModel>.Failure(BandErrors.InvalidRequest("Member name is required and end year cannot precede start year."));
+            return Result<BandMemberModel>.Failure(BandErrors.InvalidRequest("Member name is required, last known lineup members require an end year, and end year cannot precede start year."));
         }
 
         if (band.Members.Any(member => Same(member.Name, request.Name) && member.StartYear == request.StartYear)) 
@@ -93,7 +93,7 @@ public sealed class CatalogManagementUseCase
 
         var member = new BandMember(Guid.NewGuid(), bandId, request.Name.Trim(), request.IsCurrent);
 
-        member.Update(request.Name.Trim(), request.Instrument, request.StartYear, request.EndYear, request.IsCurrent);
+        member.Update(request.Name.Trim(), request.Instrument, request.StartYear, request.EndYear, request.IsCurrent, request.IsLastKnownLineup);
 
         band.AddMember(member);
 
@@ -116,9 +116,9 @@ public sealed class CatalogManagementUseCase
             return Result<BandMemberModel>.Failure(Error.NotFound("Member.NotFound", $"No member with id '{memberId}' was found for this band.")); 
         }
 
-        if (string.IsNullOrWhiteSpace(request.Name) || (request.EndYear.HasValue && request.StartYear.HasValue && request.EndYear < request.StartYear)) 
+        if (string.IsNullOrWhiteSpace(request.Name) || (request.EndYear.HasValue && request.StartYear.HasValue && request.EndYear < request.StartYear) || (request.IsLastKnownLineup && !request.EndYear.HasValue))
         { 
-            return Result<BandMemberModel>.Failure(BandErrors.InvalidRequest("Member name is required and end year cannot precede start year.")); 
+            return Result<BandMemberModel>.Failure(BandErrors.InvalidRequest("Member name is required, last known lineup members require an end year, and end year cannot precede start year."));
         }
 
         if (band.Members.Any(item => item.Id != memberId && Same(item.Name, request.Name) && item.StartYear == request.StartYear)) 
@@ -126,7 +126,7 @@ public sealed class CatalogManagementUseCase
             return Result<BandMemberModel>.Failure(BandErrors.Duplicate("member")); 
         }
         
-        member.Update(request.Name.Trim(), request.Instrument, request.StartYear, request.EndYear, request.IsCurrent);
+        member.Update(request.Name.Trim(), request.Instrument, request.StartYear, request.EndYear, request.IsCurrent, request.IsLastKnownLineup);
        
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         

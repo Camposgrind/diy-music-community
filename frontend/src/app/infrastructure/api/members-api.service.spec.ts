@@ -8,7 +8,7 @@ import { MemberWriteRequest } from './models';
 describe('MembersApiService', () => {
   let service: MembersApiService;
   let httpMock: HttpTestingController;
-  const request: MemberWriteRequest = { name: 'Barney Greenway', instrument: 'Vocals', startYear: 1989, endYear: null, isCurrent: true };
+  const request: MemberWriteRequest = { name: 'Barney Greenway', instrument: 'Vocals', startYear: 1989, endYear: null, isCurrent: true, isLastKnownLineup: false };
 
   beforeEach(() => {
     TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });

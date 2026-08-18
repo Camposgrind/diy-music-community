@@ -41,4 +41,13 @@ describe('MemberModalComponent', () => {
     component.onSave();
     expect(emitted).toEqual({ name: 'Mick Harris', instrument: 'Drums', startYear: 1985, endYear: 1987, memberType: 'past' });
   });
+
+  it('should require an end year for a last known lineup member', () => {
+    componentRef.setInput('mode', 'create');
+    componentRef.setInput('memberType', 'lastKnown');
+    fixture.detectChanges();
+    component.form.patchValue({ name: 'Mick Harris', memberType: 'lastKnown' });
+    component.onMemberTypeChange();
+    expect(component.form.controls.endYear.hasError('required')).toBe(true);
+  });
 });

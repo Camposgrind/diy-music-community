@@ -26,7 +26,7 @@
       (addRelease)="openCreateReleaseModal()"
       (editRelease)="openEditReleaseModal($event)" />
 
-    <dmc-band-members [members]="currentMembers()" title="Current Members" memberType="current" [isAdmin]="isAdmin()" (addMember)="openCreateMemberModal($event)" (editMember)="openEditMemberModal($event)" />
+    <dmc-band-members [members]="isSplitUp() ? lastKnownMembers() : currentMembers()" [title]="isSplitUp() ? 'Last Known Lineup' : 'Current Members'" [memberType]="isSplitUp() ? 'lastKnown' : 'current'" [isAdmin]="isAdmin()" (addMember)="openCreateMemberModal($event)" (editMember)="openEditMemberModal($event)" />
     <dmc-band-members [members]="pastMembers()" title="Past Members" memberType="past" [isAdmin]="isAdmin()" (addMember)="openCreateMemberModal($event)" (editMember)="openEditMemberModal($event)" />
   }
 </div>
@@ -56,6 +56,7 @@
   <dmc-member-modal
     [mode]="mode"
     [memberType]="memberModalType()"
+    [isSplitUp]="isSplitUp()"
     [initialData]="memberModalData()"
     [saving]="isSavingMember()"
     [error]="memberError()"

@@ -56,6 +56,7 @@ public sealed class GetBandDetailUseCase
                     StartYear = m.StartYear,
                     EndYear = m.EndYear,
                     IsCurrent = m.IsCurrent,
+                    IsLastKnownLineup = m.IsLastKnownLineup,
                     OtherBands = m.OtherBands
                         .Select(ob => new BandMemberOtherBandModel
                         {

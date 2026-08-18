@@ -165,8 +165,9 @@ Band request fields are `name`, `country`, `genreId`, `status`, `location`, `for
 `description`, `logoImageUrl`, `bandImageUrl`, `musicUrlPortal`, and `bandContact`. `name`,
 `country`, and `genreId` are required.
 
-Member request fields are `name`, `instrument`, `startYear`, `endYear`, and `isCurrent`. An end
-year makes the member past regardless of `isCurrent`.
+Member request fields are `name`, `instrument`, `startYear`, `endYear`, `isCurrent`, and
+`isLastKnownLineup`. An end year makes the member past regardless of `isCurrent`. A last-known
+lineup member must have an end year and is used to identify a split-up band's final lineup.
 
 Release request fields are `title`, `releaseType`, `releaseDate`, `year`, `labelText`,
 `coverImageUrl`, and `tracks`. Each track has `title` and a positive `trackNumber`. Track numbers

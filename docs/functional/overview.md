@@ -26,6 +26,10 @@ From band detail, administrators can also manage current and past members. A sha
 both types, including a change of type when a member joins or leaves the band; member images and
 other-band links remain separate future flows.
 
+For a split-up band, the normal current-member section becomes **Last Known Lineup**. This is a
+persisted member designation rather than a guess based on historical members, and new entries in
+that lineup require an end year.
+
 ## Out of scope
 
 The MVP does not support community band proposals, band claims, claim-holder editing, or a

@@ -37,6 +37,7 @@ internal static class CatalogDetailMapper
             StartYear = member.StartYear,
             EndYear = member.EndYear,
             IsCurrent = member.IsCurrent,
+            IsLastKnownLineup = member.IsLastKnownLineup,
             OtherBands = member.OtherBands.Select(otherBand => new BandMemberOtherBandModel
             {
                 BandId = otherBand.OtherBandId,

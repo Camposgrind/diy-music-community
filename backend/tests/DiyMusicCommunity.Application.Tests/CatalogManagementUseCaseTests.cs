@@ -54,4 +54,18 @@ public sealed class CatalogManagementUseCaseTests
         Assert.True(result.IsFailure);
         Assert.Equal(BandErrors.Codes.Duplicate, result.Error!.Code);
     }
+
+    [Fact]
+    public async Task CreateMember_WithLastKnownLineupAndNoEndYear_Should_ReturnInvalidRequest()
+    {
+        var band = new Band(Guid.NewGuid(), "Discharge", "UK", Guid.NewGuid(), BandStatus.SplitUp, DateTime.UtcNow);
+        var repository = new Mock<IBandRepository>();
+        repository.Setup(item => item.GetDetailAsync(band.Id, It.IsAny<CancellationToken>())).ReturnsAsync(band);
+        var useCase = new CatalogManagementUseCase(repository.Object, Mock.Of<IGenreRepository>(), Mock.Of<IUnitOfWork>(), Mock.Of<IReleaseRepository>());
+
+        var result = await useCase.CreateMember(band.Id, new MemberWriteRequest { Name = "Bones", IsLastKnownLineup = true, IsCurrent = false });
+
+        Assert.True(result.IsFailure);
+        Assert.Equal(BandErrors.Codes.InvalidRequest, result.Error!.Code);
+    }
 }
