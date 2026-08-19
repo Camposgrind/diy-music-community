@@ -27,7 +27,8 @@ public class GetBandsUseCaseTests
             country,
             genreId ?? Guid.NewGuid(),
             status,
-            DateTime.UtcNow);
+            DateTime.UtcNow,
+            status == BandStatus.SplitUp ? 2000 : null);
 
         if (formationYear.HasValue)
             band.SetFormationYear(formationYear);

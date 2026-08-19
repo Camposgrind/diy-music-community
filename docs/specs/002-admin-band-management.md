@@ -28,6 +28,9 @@ accurate and curated.
 - [x] Given I am authenticated as an Admin, when I choose to delete a current, past, or last-known-lineup member and confirm the action, then the member is deleted and the band detail reloads without it.
 - [x] Given I am an Admin, when I initiate member deletion, then I can cancel in a confirmation modal without changing the catalog.
 - [x] Given I edit a current member as a past member, when the refreshed detail loads, then the member appears in Past Members; when I change the band to SplitUp, then Current Members becomes Last Known Lineup.
+- [x] Given an Admin creates or updates a band with status SplitUp, when no split-up year is provided, then saving is blocked and the API rejects the request.
+- [x] Given an Admin creates or updates a SplitUp band with a split-up year, when the request succeeds, then that year is persisted and returned in the band detail.
+- [x] Given a visitor views a SplitUp band with formation and split-up years, when the detail is displayed, then it shows `Years active: FormationYear – SplitUpYear`.
 - [ ] Given I submit a duplicate band, release, member, or track identity, when the request is processed, then I receive 409 and no data is changed.
 - [ ] Given I am unauthenticated, when I call a band create or update endpoint, then I receive 401.
 - [ ] Given I am authenticated without the Admin role, when I call a band create or update endpoint, then I receive 403.
@@ -59,9 +62,13 @@ Business identities are case-insensitive and ignore leading/trailing whitespace:
 The request and response fields must be added to `docs/technical/openapi.md` before the endpoints
 are delivered.
 
+Band requests and details include nullable `splitUpYear`. It is required only when `status` is
+`SplitUp`; changing to any other status clears it.
+
 ## Domain rules
 
 - A band belongs to one genre and may have releases and band members.
+- A SplitUp band requires `SplitUpYear`. A band that is not SplitUp stores no split-up year.
 - A release is managed with its tracks as one aggregate. A release update replaces all its tracks;
   omitting a previously stored track removes it.
 - A member with an end year is a past member; otherwise its `IsCurrent` value determines whether it

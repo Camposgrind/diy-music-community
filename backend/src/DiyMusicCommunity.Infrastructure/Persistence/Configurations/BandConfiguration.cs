@@ -26,6 +26,8 @@ public sealed class BandConfiguration : IEntityTypeConfiguration<Band>
         builder.Property(b => b.Description)
             .HasMaxLength(2000);
 
+        builder.Property(b => b.SplitUpYear);
+
         builder.Property(b => b.LogoImageUrl)
             .HasMaxLength(500);
 

@@ -121,6 +121,7 @@ export class BandDetailPageComponent implements OnInit {
           country: band.country,
           location: band.location,
           formationYear: band.formationYear,
+          splitUpYear: band.splitUpYear ?? null,
           genreId: genres.find((genre) => genre.name === band.genre)?.id ?? '',
           status: band.status as BandGeneralEditForm['status'],
           musicUrlPortal: band.musicUrlPortal,

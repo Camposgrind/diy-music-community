@@ -10,6 +10,7 @@ public sealed class BandWriteRequest
     public BandStatus Status { get; init; }
     public string? Location { get; init; }
     public int? FormationYear { get; init; }
+    public int? SplitUpYear { get; init; }
     public string? Description { get; init; }
     public string? LogoImageUrl { get; init; }
     public string? BandImageUrl { get; init; }

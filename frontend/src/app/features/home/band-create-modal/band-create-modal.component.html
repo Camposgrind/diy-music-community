@@ -31,8 +31,11 @@
         </div>
         <div class="band-create-modal__field">
           <label for="new-band-status">Status</label>
-          <select id="new-band-status" formControlName="status"><option value="Active">Active</option><option value="SplitUp">Split-up</option><option value="OnHold">On hold</option></select>
+          <select id="new-band-status" formControlName="status" (change)="onStatusChange()"><option value="Active">Active</option><option value="SplitUp">Split-up</option><option value="OnHold">On hold</option></select>
         </div>
+        @if (form.controls.status.value === 'SplitUp') {
+          <div class="band-create-modal__field"><label for="new-band-split-up-year">Split-up year *</label><input id="new-band-split-up-year" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 1999" maxlength="4" formControlName="splitUpYear" />@if (form.controls.splitUpYear.invalid && form.controls.splitUpYear.touched) { <p class="band-create-modal__error">Split-up year is required and must be a valid four-digit year.</p> }</div>
+        }
         <div class="band-create-modal__field"><label for="new-band-location">Location</label><input id="new-band-location" type="text" formControlName="location" /></div>
         <div class="band-create-modal__field band-create-modal__field--year">
           <label for="new-band-formation-year">Formed year</label>

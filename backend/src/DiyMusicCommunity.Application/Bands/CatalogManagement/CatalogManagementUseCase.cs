@@ -35,7 +35,7 @@ public sealed class CatalogManagementUseCase
             return Result<BandDetailModel>.Failure(BandErrors.Duplicate("band")); 
         }
 
-        var band = new Band(Guid.NewGuid(), request.Name.Trim(), request.Country.Trim(), request.GenreId, request.Status, DateTime.UtcNow);
+        var band = new Band(Guid.NewGuid(), request.Name.Trim(), request.Country.Trim(), request.GenreId, request.Status, DateTime.UtcNow, request.SplitUpYear);
 
         ApplyBandFields(band, request);
 
@@ -62,7 +62,7 @@ public sealed class CatalogManagementUseCase
             return Result<BandDetailModel>.Failure(BandErrors.NotFound(bandId));
         }
 
-        band.Update(request.Name.Trim(), request.Country.Trim(), request.GenreId, request.Status);
+        band.Update(request.Name.Trim(), request.Country.Trim(), request.GenreId, request.Status, request.SplitUpYear);
 
         ApplyBandFields(band, request);
 
@@ -200,9 +200,9 @@ public sealed class CatalogManagementUseCase
 
     private async Task<Error?> ValidateBand(BandWriteRequest request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.Name) || request.Name.Length > 200 || string.IsNullOrWhiteSpace(request.Country) || request.Country.Length > 100 || request.GenreId == Guid.Empty) 
+        if (string.IsNullOrWhiteSpace(request.Name) || request.Name.Length > 200 || string.IsNullOrWhiteSpace(request.Country) || request.Country.Length > 100 || request.GenreId == Guid.Empty || (request.Status == Domain.Enums.BandStatus.SplitUp && !request.SplitUpYear.HasValue))
         { 
-            return BandErrors.InvalidRequest("Name, country, and genreId are required; name and country must be within their maximum lengths."); 
+            return BandErrors.InvalidRequest("Name, country, and genreId are required; name and country must be within their maximum lengths; splitUpYear is required when status is SplitUp.");
         }
 
         var genres = await _genreRepository.GetAllAsync(cancellationToken);

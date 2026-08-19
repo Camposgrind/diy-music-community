@@ -26,6 +26,9 @@ public sealed class BandDetailModel
     /// <summary>Year the band was formed. Null if not specified.</summary>
     public int? FormationYear { get; init; }
 
+    /// <summary>Year the band split up. Null unless its status is SplitUp.</summary>
+    public int? SplitUpYear { get; init; }
+
     /// <summary>Biography or description. Null if not specified.</summary>
     public string? Description { get; init; }
 

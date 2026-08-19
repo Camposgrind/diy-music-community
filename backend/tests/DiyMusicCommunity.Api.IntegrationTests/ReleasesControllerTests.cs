@@ -44,7 +44,7 @@ public sealed class ReleasesControllerTests
 
         var (factory, client) = CreateClient(db =>
         {
-            var band = new Band(bandId, "Terrorizer", "USA", GrindcoreGenreId, BandStatus.SplitUp, DateTime.UtcNow);
+            var band = new Band(bandId, "Terrorizer", "USA", GrindcoreGenreId, BandStatus.SplitUp, DateTime.UtcNow, 1989);
             db.Bands.Add(band);
 
             var release = new Release(releaseId, bandId, "World Downfall", ReleaseType.Album);
@@ -135,7 +135,7 @@ public sealed class ReleasesControllerTests
 
         var (factory, client) = CreateClient(db =>
         {
-            db.Bands.Add(new Band(bandId, "Repulsion", "USA", GrindcoreGenreId, BandStatus.SplitUp, DateTime.UtcNow));
+            db.Bands.Add(new Band(bandId, "Repulsion", "USA", GrindcoreGenreId, BandStatus.SplitUp, DateTime.UtcNow, 1994));
             var release = new Release(releaseId, bandId, "Horrified", ReleaseType.Album);
             release.AddFormat(Format.Vinyl12);
             release.AddFormat(Format.CD);
@@ -161,7 +161,7 @@ public sealed class ReleasesControllerTests
 
         var (factory, client) = CreateClient(db =>
         {
-            db.Bands.Add(new Band(bandId, "Assück", "USA", GrindcoreGenreId, BandStatus.SplitUp, DateTime.UtcNow));
+            db.Bands.Add(new Band(bandId, "Assück", "USA", GrindcoreGenreId, BandStatus.SplitUp, DateTime.UtcNow, 1998));
             db.Releases.Add(new Release(releaseId, bandId, "Misery Index", ReleaseType.Album));
         });
         using var _ = factory;

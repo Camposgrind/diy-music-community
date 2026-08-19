@@ -61,7 +61,7 @@ public sealed class CatalogDeletionRepositoryTests
         using var _ = factory;
         factory.CreateClientWithDb(db =>
         {
-            db.Bands.Add(new Band(bandId, "Split Up", "UK", GenreId, BandStatus.SplitUp, DateTime.UtcNow));
+            db.Bands.Add(new Band(bandId, "Split Up", "UK", GenreId, BandStatus.SplitUp, DateTime.UtcNow, 2000));
             var member = new BandMember(memberId, bandId, "Last Known", false);
             member.Update("Last Known", null, 1990, 2000, false, true);
             db.BandMembers.Add(member);

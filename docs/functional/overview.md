@@ -22,6 +22,9 @@ Administrators can also add a release or edit its title, type, and year from a b
 discography. Editing preserves the release's existing tracks and other stored release metadata;
 track and cover management remain separate future flows.
 
+When creating or editing a split-up band, administrators must record its split-up year. Its detail
+page shows the years it was active when both formation and split-up years are known.
+
 Administrators can remove an incorrect band, member, release, or track. Removing a band removes
 its dependent catalog data and member-to-other-band links; removing a track keeps the remaining
 track list consecutively numbered.

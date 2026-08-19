@@ -25,7 +25,8 @@ public class GetBandDetailUseCaseTests
             country,
             genreId ?? Guid.NewGuid(),
             status,
-            DateTime.UtcNow);
+            DateTime.UtcNow,
+            status == BandStatus.SplitUp ? 1991 : null);
     }
 
     private static Genre MakeGenre(string name = "Grindcore")
@@ -134,5 +135,19 @@ public class GetBandDetailUseCaseTests
         Assert.Null(result.Value.BandImageUrl);
         Assert.Null(result.Value.MusicUrlPortal);
         Assert.Null(result.Value.BandContact);
+    }
+
+    [Fact]
+    public async Task Handle_SplitUpBand_Should_MapSplitUpYear()
+    {
+        var (sut, repo) = BuildSut();
+        var band = MakeBand(status: BandStatus.SplitUp);
+        repo.Setup(r => r.GetDetailAsync(band.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(band);
+
+        var result = await sut.Handle(band.Id);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(1991, result.Value!.SplitUpYear);
     }
 }

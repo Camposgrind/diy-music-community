@@ -10,6 +10,28 @@ namespace DiyMusicCommunity.Application.Tests;
 public sealed class CatalogManagementUseCaseTests
 {
     [Fact]
+    public async Task CreateBand_SplitUpWithoutYear_Should_ReturnInvalidRequest()
+    {
+        var genreId = Guid.NewGuid();
+        var genreRepository = new Mock<IGenreRepository>();
+        genreRepository.Setup(item => item.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([new Genre(genreId, "Grindcore")]);
+        var useCase = new CatalogManagementUseCase(Mock.Of<IBandRepository>(), genreRepository.Object, Mock.Of<IUnitOfWork>(), Mock.Of<IReleaseRepository>());
+
+        var result = await useCase.CreateBand(new BandWriteRequest
+        {
+            Name = "Nasum",
+            Country = "Sweden",
+            GenreId = genreId,
+            Status = BandStatus.SplitUp,
+            SplitUpYear = null
+        });
+
+        Assert.True(result.IsFailure);
+        Assert.Equal(BandErrors.Codes.InvalidRequest, result.Error!.Code);
+    }
+
+    [Fact]
     public async Task CreateRelease_WithTracks_Should_PersistReleaseAndCompleteTrackList()
     {
         var band = new Band(Guid.NewGuid(), "Discharge", "UK", Guid.NewGuid(), BandStatus.Active, DateTime.UtcNow);
@@ -58,7 +80,7 @@ public sealed class CatalogManagementUseCaseTests
     [Fact]
     public async Task CreateMember_WithLastKnownLineupAndNoEndYear_Should_ReturnInvalidRequest()
     {
-        var band = new Band(Guid.NewGuid(), "Discharge", "UK", Guid.NewGuid(), BandStatus.SplitUp, DateTime.UtcNow);
+        var band = new Band(Guid.NewGuid(), "Discharge", "UK", Guid.NewGuid(), BandStatus.SplitUp, DateTime.UtcNow, 1983);
         var repository = new Mock<IBandRepository>();
         repository.Setup(item => item.GetDetailAsync(band.Id, It.IsAny<CancellationToken>())).ReturnsAsync(band);
         var useCase = new CatalogManagementUseCase(repository.Object, Mock.Of<IGenreRepository>(), Mock.Of<IUnitOfWork>(), Mock.Of<IReleaseRepository>());

@@ -47,6 +47,26 @@ describe('BandCreateModalComponent', () => {
     expect(fixture.nativeElement.querySelector('#new-band-photo')).toBeNull();
   });
 
+  it('should require a split-up year when status is SplitUp', () => {
+    component.form.patchValue({ name: 'Discharge', country: 'United Kingdom', genreId: 'genre-1', status: 'SplitUp' });
+    component.onStatusChange();
+    fixture.detectChanges();
+
+    expect(component.form.controls.splitUpYear.invalid).toBe(true);
+    expect((fixture.nativeElement.querySelector('[data-testid="save-band"]') as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('should emit splitUpYear for a valid split-up band', () => {
+    let emitted: unknown;
+    component.save.subscribe((request) => (emitted = request));
+    component.form.patchValue({ name: 'Discharge', country: 'United Kingdom', genreId: 'genre-1', status: 'SplitUp', splitUpYear: '1986' });
+    component.onStatusChange();
+
+    component.onSave();
+
+    expect(emitted).toMatchObject({ status: 'SplitUp', splitUpYear: 1986 });
+  });
+
   it('should emit close when its close button is used', () => {
     let wasClosed = false;
     component.close.subscribe(() => (wasClosed = true));

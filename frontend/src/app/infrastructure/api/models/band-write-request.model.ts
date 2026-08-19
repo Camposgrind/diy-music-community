@@ -5,6 +5,7 @@ export interface BandWriteRequest {
   status: 'Active' | 'SplitUp' | 'OnHold';
   location?: string | null;
   formationYear?: number | null;
+  splitUpYear?: number | null;
   description?: string | null;
   logoImageUrl?: string | null;
   bandImageUrl?: string | null;

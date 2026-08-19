@@ -9,6 +9,7 @@ export interface BandDetailModel {
   status: string;
   genre: string | null;
   formationYear: number | null;
+  splitUpYear?: number | null;
   description: string | null;
   logoImageUrl: string | null;
   bandImageUrl: string | null;

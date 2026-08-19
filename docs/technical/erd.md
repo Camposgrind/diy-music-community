@@ -24,6 +24,7 @@ erDiagram
 		Guid GenreId FK
 		BandStatus Status
 		int FormationYear
+		int SplitUpYear
 		string Description
 		string LogoImageUrl
 		string BandImageUrl

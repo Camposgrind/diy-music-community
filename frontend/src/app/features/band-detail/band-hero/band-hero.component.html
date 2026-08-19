@@ -69,6 +69,13 @@
         </div>
       }
 
+      @if (band().status === 'SplitUp' && band().formationYear && band().splitUpYear) {
+        <div class="band-hero__info-row">
+          <dt class="band-hero__info-label">Years active</dt>
+          <dd class="band-hero__info-value">{{ band().formationYear }} – {{ band().splitUpYear }}</dd>
+        </div>
+      }
+
       @if (band().genre) {
         <div class="band-hero__info-row">
           <dt class="band-hero__info-label">Genre</dt>

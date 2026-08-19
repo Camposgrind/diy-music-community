@@ -73,6 +73,35 @@ public class BandEntityTests
     }
 
     [Fact]
+    public void Update_SplitUpWithYear_Should_SetSplitUpYear()
+    {
+        var band = CreateBand();
+
+        band.Update("Discharge", "UK", Guid.NewGuid(), BandStatus.SplitUp, 1986);
+
+        Assert.Equal(1986, band.SplitUpYear);
+    }
+
+    [Fact]
+    public void Update_SplitUpWithoutYear_Should_ThrowArgumentException()
+    {
+        var band = CreateBand();
+
+        Assert.Throws<ArgumentException>(() => band.Update("Discharge", "UK", Guid.NewGuid(), BandStatus.SplitUp, null));
+    }
+
+    [Fact]
+    public void Update_NonSplitUp_Should_ClearSplitUpYear()
+    {
+        var band = CreateBand();
+        band.Update("Discharge", "UK", Guid.NewGuid(), BandStatus.SplitUp, 1986);
+
+        band.Update("Discharge", "UK", Guid.NewGuid(), BandStatus.Active, 1986);
+
+        Assert.Null(band.SplitUpYear);
+    }
+
+    [Fact]
     public void SetDescription_Should_UpdateDescription()
     {
         var band = CreateBand();
@@ -240,7 +269,7 @@ public class BandEntityTests
         var band = CreateBand();
         var newGenreId = Guid.NewGuid();
 
-        band.Update("Amebix", "UK", newGenreId, BandStatus.SplitUp);
+        band.Update("Amebix", "UK", newGenreId, BandStatus.SplitUp, 1993);
 
         Assert.Equal("Amebix", band.Name);
         Assert.Equal("UK", band.Country);
@@ -256,6 +285,6 @@ public class BandEntityTests
         var band = CreateBand();
 
         Assert.Throws<ArgumentException>(() =>
-            band.Update(name, "UK", Guid.NewGuid(), BandStatus.Active));
+            band.Update(name, "UK", Guid.NewGuid(), BandStatus.Active, null));
     }
 }

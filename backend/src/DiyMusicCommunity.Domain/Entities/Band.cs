@@ -11,6 +11,7 @@ public sealed class Band : Entity
     public Guid GenreId { get; private set; }
     public BandStatus Status { get; private set; }
     public int? FormationYear { get; private set; }
+    public int? SplitUpYear { get; private set; }
     public string? Description { get; private set; }
     public string? LogoImageUrl { get; private set; }
     public string? BandImageUrl { get; private set; }
@@ -37,7 +38,8 @@ public sealed class Band : Entity
         string country,
         Guid genreId,
         BandStatus status,
-        DateTime createdAt)
+        DateTime createdAt,
+        int? splitUpYear = null)
         : base(id)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -57,6 +59,7 @@ public sealed class Band : Entity
         Country = country;
         GenreId = genreId;
         Status = status;
+        SplitUpYear = GetSplitUpYear(status, splitUpYear);
         TrustStatus = TrustStatus.CommunityCreated;
         IsClaimed = false;
         CreatedAt = createdAt;
@@ -104,7 +107,7 @@ public sealed class Band : Entity
 
     // --- Required field update ---
 
-    public void Update(string name, string country, Guid genreId, BandStatus status)
+    public void Update(string name, string country, Guid genreId, BandStatus status, int? splitUpYear)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -123,7 +126,18 @@ public sealed class Band : Entity
         Country = country;
         GenreId = genreId;
         Status = status;
+        SplitUpYear = GetSplitUpYear(status, splitUpYear);
         UpdatedAt = DateTime.UtcNow;
+    }
+
+    private static int? GetSplitUpYear(BandStatus status, int? splitUpYear)
+    {
+        if (status == BandStatus.SplitUp && !splitUpYear.HasValue)
+        {
+            throw new ArgumentException("Split-up year is required for a split-up band.", nameof(splitUpYear));
+        }
+
+        return status == BandStatus.SplitUp ? splitUpYear : null;
     }
 
     public void AddMember(BandMember member)

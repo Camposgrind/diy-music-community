@@ -44,4 +44,13 @@ describe('BandEditModalComponent', () => {
     expect(emitted).not.toHaveProperty('logoImageUrl');
     expect(emitted).not.toHaveProperty('bandImageUrl');
   });
+
+  it('should require a split-up year when the status changes to SplitUp', () => {
+    component.form.controls.status.setValue('SplitUp');
+    component.onStatusChange();
+    fixture.detectChanges();
+
+    expect(component.form.controls.splitUpYear.invalid).toBe(true);
+    expect((fixture.nativeElement.querySelector('[data-testid="save-band-edit"]') as HTMLButtonElement).disabled).toBe(true);
+  });
 });

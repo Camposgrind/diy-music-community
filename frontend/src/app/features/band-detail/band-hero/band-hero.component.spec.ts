@@ -83,4 +83,12 @@ describe('BandHeroComponent', () => {
     component.onImgError({ target: img } as unknown as Event);
     expect(img.src).toContain(component.fallback);
   });
+
+  it('should display years active for a split-up band with both years', () => {
+    componentRef.setInput('band', { ...mockBand, status: 'SplitUp', splitUpYear: 1991 });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Years active');
+    expect(fixture.nativeElement.textContent).toContain('1981 – 1991');
+  });
 });

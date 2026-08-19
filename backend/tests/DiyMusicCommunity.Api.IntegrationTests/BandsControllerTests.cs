@@ -38,7 +38,7 @@ public sealed class BandsControllerTests
         TrustStatus trust = TrustStatus.CommunityCreated,
         int? formationYear = null)
     {
-        var band = new Band(Guid.NewGuid(), name, country, genreId, status, DateTime.UtcNow);
+        var band = new Band(Guid.NewGuid(), name, country, genreId, status, DateTime.UtcNow, status == BandStatus.SplitUp ? 2000 : null);
         if (formationYear.HasValue) band.SetFormationYear(formationYear);
         if (trust == TrustStatus.Blocked) band.Block();
         return band;
@@ -277,7 +277,7 @@ public sealed class BandsControllerTests
         var (factory, client) = CreateClient(db =>
         {
             // GrindcoreGenreId is already seeded via HasData in GenreConfiguration
-            var band = new Band(bandId, "Terrorizer", "USA", GrindcoreGenreId, BandStatus.SplitUp, DateTime.UtcNow);
+            var band = new Band(bandId, "Terrorizer", "USA", GrindcoreGenreId, BandStatus.SplitUp, DateTime.UtcNow, 1989);
             band.SetFormationYear(1986);
             band.SetLocation("Los Angeles");
             db.Bands.Add(band);
@@ -294,6 +294,7 @@ public sealed class BandsControllerTests
         body.Country.Should().Be("USA");
         body.Location.Should().Be("Los Angeles");
         body.FormationYear.Should().Be(1986);
+        body.SplitUpYear.Should().Be(1989);
         body.Status.Should().Be(BandStatus.SplitUp);
     }
 

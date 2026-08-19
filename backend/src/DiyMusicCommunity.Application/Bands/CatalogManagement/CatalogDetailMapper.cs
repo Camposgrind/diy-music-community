@@ -17,6 +17,7 @@ internal static class CatalogDetailMapper
             Status = band.Status,
             Genre = band.Genre?.Name,
             FormationYear = band.FormationYear,
+            SplitUpYear = band.SplitUpYear,
             Description = band.Description,
             LogoImageUrl = band.LogoImageUrl,
             BandImageUrl = band.BandImageUrl,

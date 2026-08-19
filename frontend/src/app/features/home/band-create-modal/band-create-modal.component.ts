@@ -25,6 +25,7 @@ export class BandCreateModalComponent {
     country: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(100)] }),
     location: new FormControl('', { nonNullable: true }),
     formationYear: new FormControl('', [Validators.min(1000), Validators.max(new Date().getFullYear()), Validators.pattern(/^\d{4}$/)]),
+    splitUpYear: new FormControl('', [Validators.min(1000), Validators.max(new Date().getFullYear()), Validators.pattern(/^\d{4}$/)]),
     genreId: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     status: new FormControl<'Active' | 'SplitUp' | 'OnHold'>('Active', { nonNullable: true, validators: [Validators.required] }),
     musicUrlPortal: new FormControl('', { nonNullable: true }),
@@ -49,8 +50,20 @@ export class BandCreateModalComponent {
       status: value.status,
       location: value.location.trim() || null,
       formationYear: value.formationYear ? Number(value.formationYear) : null,
+      splitUpYear: value.status === 'SplitUp' ? Number(value.splitUpYear) : null,
       musicUrlPortal: value.musicUrlPortal.trim() || null,
       bandContact: value.bandContact.trim() || null,
     });
+  }
+
+  onStatusChange(): void {
+    const splitUpYear = this.form.controls.splitUpYear;
+    if (this.form.controls.status.value === 'SplitUp') {
+      splitUpYear.setValidators([Validators.required, Validators.min(1000), Validators.max(new Date().getFullYear()), Validators.pattern(/^\d{4}$/)]);
+    } else {
+      splitUpYear.setValue('', { emitEvent: false });
+      splitUpYear.setValidators([Validators.min(1000), Validators.max(new Date().getFullYear()), Validators.pattern(/^\d{4}$/)]);
+    }
+    splitUpYear.updateValueAndValidity({ emitEvent: false });
   }
 }

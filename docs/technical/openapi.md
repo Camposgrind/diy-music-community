@@ -166,8 +166,11 @@ requests receive `401`; authenticated non-admin requests receive `403`.
 | `DELETE /api/releases/{releaseId}/tracks/{trackId}` | Delete a track and renumber later tracks | `204` |
 
 Band request fields are `name`, `country`, `genreId`, `status`, `location`, `formationYear`,
-`description`, `logoImageUrl`, `bandImageUrl`, `musicUrlPortal`, and `bandContact`. `name`,
+`splitUpYear`, `description`, `logoImageUrl`, `bandImageUrl`, `musicUrlPortal`, and `bandContact`. `name`,
 `country`, and `genreId` are required.
+
+`splitUpYear` is required when `status` is `SplitUp`; it is cleared when the band changes to any
+other status. A SplitUp band detail includes both years so clients can display its active period.
 
 Member request fields are `name`, `instrument`, `startYear`, `endYear`, `isCurrent`, and
 `isLastKnownLineup`. An end year makes the member past regardless of `isCurrent`. A last-known
