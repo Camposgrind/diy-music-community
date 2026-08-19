@@ -3,10 +3,11 @@ import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './shared/layout/header/header.component';
 import { FooterComponent } from './shared/layout/footer/footer.component';
 import { ToastComponent } from './core/toast/toast.component';
+import { GlobalLoaderComponent } from './core/loading/global-loader.component';
 
 @Component({
   selector: 'dmc-root',
-  imports: [RouterOutlet, HeaderComponent, FooterComponent, ToastComponent],
+  imports: [RouterOutlet, HeaderComponent, FooterComponent, ToastComponent, GlobalLoaderComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

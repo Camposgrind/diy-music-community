@@ -34,6 +34,15 @@ Los archivos temporales se almacenan bajo `FileUpload:TemporaryDirectory`; si no
 3. Configura `AzureKeyVaultEndpoint` (por ejemplo `https://<vault>.vault.azure.net/`). La API detecta este valor al arrancar y carga los secretos mediante `DefaultAzureCredential`: Azure CLI/Visual Studio en local y Managed Identity en Azure.
 4. No incluyas secretos en `appsettings*.json`, variables de CI visibles, repositorios ni logs.
 
+## Configuración Live preparada
+
+- Backend: `backend/src/DiyMusicCommunity.Api/appsettings.Live.json`. Sustituye únicamente el endpoint del vault, el hostname del backend y el origen público del frontend. No añadas secretos a este archivo.
+- Frontend: `frontend/src/environments/environment.live.ts`. Sustituye `SET_YOUR_BACKEND_APP_URL` por el hostname HTTPS público del backend.
+
+El backend se debe ejecutar con `ASPNETCORE_ENVIRONMENT=Live`. En Key Vault usa nombres con doble guion para la jerarquía de .NET, por ejemplo: `ConnectionStrings--DefaultConnection`, `Jwt--Key`, `Jwt--Issuer`, `Jwt--Audience`, `AzureStorage--ConnectionString`, `AzureStorage--ContainerName`, `AzureStorage--SasLifetimeDays`, `FileUpload--MaxImageSizeMb` y `FileUpload--TemporaryFileLifetimeMinutes`.
+
+El build del frontend Live se ejecutará con `npm run build -- --configuration live`. La futura canalización YAML será responsable de sustituir o proporcionar las URLs públicas correspondientes; no se ha creado ninguna canalización todavía.
+
 ## Seguridad operativa
 
 - SAS exclusivamente de lectura, con duración configurable y sin permisos de escritura, borrado o listado.

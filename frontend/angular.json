@@ -27,7 +27,8 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/assets"
             ],
             "styles": [
               "src/styles.scss"
@@ -53,6 +54,15 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "live": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.live.ts"
+                }
+              ],
+              "outputHashing": "all"
             }
           },
           "defaultConfiguration": "production"
@@ -68,6 +78,9 @@
             },
             "development": {
               "buildTarget": "diy-music-community-web:build:development"
+            },
+            "live": {
+              "buildTarget": "diy-music-community-web:build:live"
             }
           },
           "defaultConfiguration": "development"
