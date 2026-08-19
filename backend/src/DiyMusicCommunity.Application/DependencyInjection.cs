@@ -7,6 +7,7 @@ using DiyMusicCommunity.Application.Bands.CatalogDeletion;
 using DiyMusicCommunity.Application.Bands.Images;
 using DiyMusicCommunity.Application.Genres.GetGenres;
 using DiyMusicCommunity.Application.Releases.GetReleaseDetail;
+using DiyMusicCommunity.Application.Releases.Images;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,6 +24,7 @@ public static class DependencyInjection
         services.AddScoped<CatalogDeletionUseCase>();
         services.AddScoped<BandImagesUseCase>();
         services.AddScoped<GetReleaseDetailUseCase>();
+        services.AddScoped<ReleaseImagesUseCase>();
         services.AddScoped<GetGenresUseCase>();
         services.AddScoped<RegisterUseCase>();
         services.AddScoped<LoginUseCase>();

@@ -47,7 +47,7 @@ public sealed class BandImagesUseCase
         await _temporaryImageStorage.DeleteExpiredAsync(cancellationToken);
         var temporaryFileId = Guid.NewGuid().ToString("N");
         var sanitizedFileName = $"{temporaryFileId}.{validation.Extension}";
-        var temporaryFile = new TemporaryImageFile(temporaryFileId, bandId, request.ImageType, originalFileName, validation.ContentType!, validation.Extension!, request.Content, DateTime.UtcNow.Add(_imageUploadSettings.TemporaryFileLifetime));
+        var temporaryFile = new TemporaryImageFile(temporaryFileId, bandId, request.ImageType.ToString(), originalFileName, validation.ContentType!, validation.Extension!, request.Content, DateTime.UtcNow.Add(_imageUploadSettings.TemporaryFileLifetime));
         await _temporaryImageStorage.SaveAsync(temporaryFile, cancellationToken);
 
         return Result<TemporaryBandImageModel>.Success(new TemporaryBandImageModel
@@ -81,7 +81,7 @@ public sealed class BandImagesUseCase
             return Result<ConfirmBandImageModel>.Failure(BandErrors.InvalidRequest("The temporary image file was not found or has expired."));
         }
 
-        if (temporaryFile.BandId != bandId || temporaryFile.ImageType != request.ImageType)
+        if (temporaryFile.OwnerId != bandId || temporaryFile.ImageType != request.ImageType.ToString())
         {
             return Result<ConfirmBandImageModel>.Failure(BandErrors.InvalidRequest("The temporary image file does not belong to this band and image type."));
         }

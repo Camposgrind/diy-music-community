@@ -1,5 +1,3 @@
-using DiyMusicCommunity.Domain.Enums;
-
 namespace DiyMusicCommunity.Application.Abstractions;
 
 public interface ITemporaryImageStorage
@@ -12,10 +10,10 @@ public interface ITemporaryImageStorage
 
 public sealed class TemporaryImageFile
 {
-    public TemporaryImageFile(string id, Guid bandId, BandImageType imageType, string originalFileName, string contentType, string extension, byte[] content, DateTime expiresAtUtc)
+    public TemporaryImageFile(string id, Guid ownerId, string imageType, string originalFileName, string contentType, string extension, byte[] content, DateTime expiresAtUtc)
     {
         Id = id;
-        BandId = bandId;
+        OwnerId = ownerId;
         ImageType = imageType;
         OriginalFileName = originalFileName;
         ContentType = contentType;
@@ -25,8 +23,8 @@ public sealed class TemporaryImageFile
     }
 
     public string Id { get; }
-    public Guid BandId { get; }
-    public BandImageType ImageType { get; }
+    public Guid OwnerId { get; }
+    public string ImageType { get; }
     public string OriginalFileName { get; }
     public string ContentType { get; }
     public string Extension { get; }

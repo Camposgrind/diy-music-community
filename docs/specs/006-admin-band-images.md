@@ -90,6 +90,6 @@ The existing public fields `bandImageUrl` and `logoImageUrl` remain the response
 
 ## Out of scope
 
-- Angular UI.
+- [x] Angular UI for administrators: local preview, drag-and-drop, temporary upload, confirmation, and in-place SAS URL update.
 - Release cover images.
 - Public writes and direct client-side Azure uploads.

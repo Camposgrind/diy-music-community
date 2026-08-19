@@ -14,3 +14,4 @@ export type { ReleaseWriteRequest, ReleaseFormat } from './release-write-request
 export type { ReleaseBandModel } from './release-band.model';
 export type { ReleaseTrackModel } from './release-track.model';
 export type { LoginRequest, RegisterRequest, LoginResponse, AuthUser } from './auth.models';
+export type { BandImageType, ImageUploadType, TemporaryBandImageUploadResponse, ConfirmBandImageResponse } from './band-image.model';

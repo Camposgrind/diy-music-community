@@ -14,7 +14,7 @@ public sealed class Release : Entity
     public DateOnly? ReleaseDate { get; private set; }
     public int? Year { get; private set; }
     public string? LabelText { get; private set; }
-    public string? CoverImageUrl { get; private set; }
+    public string? ReleaseCoverBlobPath { get; private set; }
 
     public IReadOnlyList<ReleaseFormat> Formats
     {
@@ -58,7 +58,6 @@ public sealed class Release : Entity
     public void SetDetails(string? labelText, string? coverImageUrl)
     {
         LabelText = labelText;
-        CoverImageUrl = coverImageUrl;
     }
 
     public void Update(string title, ReleaseType releaseType, DateOnly? releaseDate, int? year, string? labelText, string? coverImageUrl)
@@ -73,7 +72,12 @@ public sealed class Release : Entity
         ReleaseDate = releaseDate;
         Year = releaseDate?.Year ?? year;
         LabelText = labelText;
-        CoverImageUrl = coverImageUrl;
+    }
+
+    public void SetCoverBlobPath(string blobPath)
+    {
+        if (string.IsNullOrWhiteSpace(blobPath)) { throw new ArgumentException("Blob path cannot be empty.", nameof(blobPath)); }
+        ReleaseCoverBlobPath = blobPath;
     }
 
     public void ReplaceTracks(IReadOnlyList<(string Title, int TrackNumber)> tracks)

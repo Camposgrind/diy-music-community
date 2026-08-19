@@ -20,6 +20,8 @@ import { MemberModalComponent, MemberModalForm, MemberType } from '../member-mod
 import { MemberDeleteConfirmationComponent } from '../member-delete-confirmation/member-delete-confirmation.component';
 import { BandDeleteConfirmationComponent } from '../band-delete-confirmation/band-delete-confirmation.component';
 import { ToastService } from '../../../core/toast/toast.service';
+import { BandImageModalComponent } from '../band-image-modal/band-image-modal.component';
+import { BandImageType } from '../../../infrastructure/api/models';
 
 @Component({
   selector: 'dmc-band-detail-page',
@@ -37,6 +39,7 @@ import { ToastService } from '../../../core/toast/toast.service';
     MemberModalComponent,
     MemberDeleteConfirmationComponent,
     BandDeleteConfirmationComponent,
+    BandImageModalComponent,
   ],
   templateUrl: './band-detail-page.component.html',
   styleUrl: './band-detail-page.component.scss',
@@ -83,6 +86,8 @@ export class BandDetailPageComponent implements OnInit {
   readonly isDeletingBand = signal(false);
   readonly deleteBandError = signal<string | null>(null);
   readonly isAdmin = this.auth.isAdmin;
+  readonly editingImageType = signal<BandImageType | null>(null);
+  readonly isSavingImage = signal(false);
   private readonly bandId = signal<string | null>(null);
 
   readonly currentMembers = computed(() =>
@@ -199,8 +204,8 @@ export class BandDetailPageComponent implements OnInit {
     const request: BandWriteRequest = {
       ...data,
       description: band.description,
-      logoImageUrl: band.logoImageUrl,
-      bandImageUrl: band.bandImageUrl,
+      logoImageUrl: null,
+      bandImageUrl: null,
     };
     this.isUpdatingBand.set(true);
     this.editError.set(null);
@@ -217,6 +222,21 @@ export class BandDetailPageComponent implements OnInit {
         this.editError.set(message);
         this.toast.error(message);
       },
+    });
+  }
+
+  openImageModal(imageType: BandImageType): void { if (!this.isSavingImage()) { this.editingImageType.set(imageType); } }
+  closeImageModal(): void { if (!this.isSavingImage()) { this.editingImageType.set(null); } }
+  saveImage(file: File): void {
+    const band = this.band(); const imageType = this.editingImageType();
+    if (!band || !imageType || this.isSavingImage()) { return; }
+    this.isSavingImage.set(true);
+    this.bandsApi.uploadTemporaryBandImage(band.id, imageType, file).subscribe({
+      next: (temporary) => this.bandsApi.confirmBandImage(band.id, imageType, temporary.temporaryFileId).subscribe({
+        next: (confirmed) => { this.band.update(current => current ? { ...current, ...(imageType === 'BandPhoto' ? { bandImageUrl: confirmed.imageUrl } : { logoImageUrl: confirmed.imageUrl }) } : current); this.isSavingImage.set(false); this.editingImageType.set(null); this.toast.success(`${imageType === 'BandPhoto' ? 'Band photo' : 'Band logo'} updated successfully.`); },
+        error: (err: { error?: { message?: string } }) => { this.isSavingImage.set(false); this.toast.error(err.error?.message ?? 'Could not confirm image. Please try again.'); },
+      }),
+      error: (err: { error?: { message?: string } }) => { this.isSavingImage.set(false); this.toast.error(err.error?.message ?? 'Could not upload image. Please try again.'); },
     });
   }
 

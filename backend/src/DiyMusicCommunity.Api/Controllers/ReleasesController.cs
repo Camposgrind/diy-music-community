@@ -2,6 +2,7 @@ using DiyMusicCommunity.Application.Common;
 using DiyMusicCommunity.Application.Releases;
 using DiyMusicCommunity.Application.Releases.GetReleaseDetail;
 using DiyMusicCommunity.Application.Bands.CatalogDeletion;
+using DiyMusicCommunity.Application.Releases.Images;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,12 +19,14 @@ public sealed class ReleasesController : ControllerBase
 {
     private readonly GetReleaseDetailUseCase _getReleaseDetailUseCase;
     private readonly CatalogDeletionUseCase _catalogDeletionUseCase;
+    private readonly ReleaseImagesUseCase _releaseImagesUseCase;
 
     /// <summary>Initialises a new instance of <see cref="ReleasesController"/>.</summary>
-    public ReleasesController(GetReleaseDetailUseCase getReleaseDetailUseCase, CatalogDeletionUseCase catalogDeletionUseCase)
+    public ReleasesController(GetReleaseDetailUseCase getReleaseDetailUseCase, CatalogDeletionUseCase catalogDeletionUseCase, ReleaseImagesUseCase releaseImagesUseCase)
     {
         _getReleaseDetailUseCase = getReleaseDetailUseCase;
         _catalogDeletionUseCase = catalogDeletionUseCase;
+        _releaseImagesUseCase = releaseImagesUseCase;
     }
 
     /// <summary>Get the full detail of a single release, including its tracks and formats.</summary>
@@ -44,6 +47,25 @@ public sealed class ReleasesController : ControllerBase
         }
 
         return Ok(result.Value);
+    }
+
+    [HttpPost("{releaseId:guid}/images/temporary")]
+    [Authorize(Roles = "Admin")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> UploadTemporaryCover(Guid releaseId, [FromForm] UploadReleaseCoverInput request, CancellationToken cancellationToken)
+    {
+        if (request.File is null) { return BadRequest(Error.Validation("Release.InvalidImage", "An image file is required.")); }
+        await using var source = request.File.OpenReadStream(); await using var target = new MemoryStream(); await source.CopyToAsync(target, cancellationToken);
+        var result = await _releaseImagesUseCase.UploadTemporaryAsync(releaseId, new UploadTemporaryReleaseImageRequest { OriginalFileName = request.File.FileName, DeclaredContentType = request.File.ContentType, Content = target.ToArray() }, cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : result.Error!.Code == ReleaseErrors.Codes.NotFound ? NotFound(result.Error) : BadRequest(result.Error);
+    }
+
+    [HttpPost("{releaseId:guid}/images/confirm")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ConfirmCover(Guid releaseId, [FromBody] ConfirmReleaseCoverInput request, CancellationToken cancellationToken)
+    {
+        var result = await _releaseImagesUseCase.ConfirmAsync(releaseId, new ConfirmReleaseImageRequest { TemporaryFileId = request.TemporaryFileId }, cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : result.Error!.Code == ReleaseErrors.Codes.NotFound ? NotFound(result.Error) : BadRequest(result.Error);
     }
 
     [HttpDelete("{releaseId:guid}")]
@@ -90,4 +112,7 @@ public sealed class ReleasesController : ControllerBase
 
         return NoContent();
     }
+
+    public sealed class UploadReleaseCoverInput { public IFormFile? File { get; init; } }
+    public sealed class ConfirmReleaseCoverInput { public string TemporaryFileId { get; init; } = string.Empty; }
 }

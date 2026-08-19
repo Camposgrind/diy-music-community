@@ -112,6 +112,7 @@
     line-height: 1.1;
     text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
   }
+  &__cover-edit { position:absolute; top:.5rem; right:.5rem; z-index:1; border:1px solid #333; border-radius:4px; background:rgba(17,17,17,.92); color:#aaa; padding:.4rem .75rem; cursor:pointer; font:700 .7rem Oswald,sans-serif; letter-spacing:1px; text-transform:uppercase; &:hover { border-color:#8b0000; color:#fff; } }
 
   &__title-row {
     align-items: center;

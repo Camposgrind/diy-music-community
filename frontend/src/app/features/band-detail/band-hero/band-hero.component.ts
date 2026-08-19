@@ -14,6 +14,8 @@ export class BandHeroComponent {
   readonly isAdmin = input(false);
   readonly edit = output<void>();
   readonly deleteBand = output<void>();
+  readonly editPhoto = output<void>();
+  readonly editLogo = output<void>();
 
   readonly fallback = 'images/grindLogo.jpg';
 

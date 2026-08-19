@@ -17,7 +17,7 @@
       </div>
     </div>
   } @else if (band(); as b) {
-    <dmc-band-hero [band]="b" [isAdmin]="isAdmin()" (edit)="openEditModal()" (deleteBand)="openBandDeleteConfirmation()" />
+    <dmc-band-hero [band]="b" [isAdmin]="isAdmin()" (edit)="openEditModal()" (deleteBand)="openBandDeleteConfirmation()" (editPhoto)="openImageModal('BandPhoto')" (editLogo)="openImageModal('BandLogo')" />
 
     <dmc-band-discography
       [releases]="b.releases"
@@ -42,6 +42,8 @@
     (save)="saveBand($event)"
     (close)="closeEditModal()" />
 }
+
+@if (editingImageType(); as imageType) { <dmc-band-image-modal [imageType]="imageType" [currentImageUrl]="imageType === 'BandPhoto' ? band()?.bandImageUrl ?? null : band()?.logoImageUrl ?? null" [saving]="isSavingImage()" (save)="saveImage($event)" (close)="closeImageModal()" /> }
 
 @if (isBandDeleteOpen() && band(); as band) {
   <dmc-band-delete-confirmation [band]="band" [deleting]="isDeletingBand()" [error]="deleteBandError()" (confirm)="confirmBandDeletion()" (close)="closeBandDeleteConfirmation()" />

@@ -14,6 +14,7 @@
     @if (isCustomImage(release().coverImageUrl)) {
       <div class="release-hero__cover-zoom">&#9654; View</div>
     }
+    @if (isAdmin()) { <button type="button" class="release-hero__cover-edit" (click)="$event.stopPropagation(); editCover.emit()">{{ release().coverImageUrl ? 'Edit cover' : 'Add cover' }}</button> }
   </div>
 
   <!-- Right: info panel -->

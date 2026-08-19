@@ -18,12 +18,13 @@ import { ReleaseModalComponent, ReleaseModalForm } from '../../band-detail/relea
 import { ReleaseDeleteConfirmationComponent } from '../../band-detail/release-delete-confirmation/release-delete-confirmation.component';
 import { TrackListDeleteConfirmationComponent } from '../track-list-delete-confirmation/track-list-delete-confirmation.component';
 import { ToastService } from '../../../core/toast/toast.service';
+import { BandImageModalComponent } from '../../band-detail/band-image-modal/band-image-modal.component';
 
 @Component({
   selector: 'dmc-release-detail-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, BackToBandComponent, ReleaseHeroComponent, ReleaseTracksComponent, ReleaseDetailEditModalComponent, ReleaseModalComponent, ReleaseDeleteConfirmationComponent, TrackListDeleteConfirmationComponent],
+  imports: [RouterLink, BackToBandComponent, ReleaseHeroComponent, ReleaseTracksComponent, ReleaseDetailEditModalComponent, ReleaseModalComponent, ReleaseDeleteConfirmationComponent, TrackListDeleteConfirmationComponent, BandImageModalComponent],
   templateUrl: './release-detail-page.component.html',
   styleUrl: './release-detail-page.component.scss',
 })
@@ -50,6 +51,8 @@ export class ReleaseDetailPageComponent implements OnInit {
   readonly isDeletingAllTracks = signal(false);
   readonly deleteAllTracksError = signal<string | null>(null);
   readonly isAdmin = this.auth.isAdmin;
+  readonly isCoverModalOpen = signal(false);
+  readonly isSavingCover = signal(false);
   private readonly releaseId = signal<string | null>(null);
 
   readonly hasTracks = computed(() => (this.release()?.tracks.length ?? 0) > 0);
@@ -105,12 +108,26 @@ export class ReleaseDetailPageComponent implements OnInit {
     const release = this.release();
     const bandId = release?.band?.bandId;
     if (!release || !bandId || this.isUpdatingRelease()) return;
-    const request: ReleaseWriteRequest = { ...data, coverImageUrl: release.coverImageUrl, tracks: release.tracks.map(track => ({ title: track.title })) };
+    const request: ReleaseWriteRequest = { ...data, coverImageUrl: null, tracks: release.tracks.map(track => ({ title: track.title })) };
     this.isUpdatingRelease.set(true);
     this.editError.set(null);
     this.releasesApi.updateRelease(bandId, release.id, request).subscribe({
       next: () => { this.isUpdatingRelease.set(false); this.isDetailsModalOpen.set(false); this.toast.success('Release updated successfully.'); this.loadReleaseDetail(); },
       error: (err: { error?: { message?: string } }) => { this.isUpdatingRelease.set(false); const message = err.error?.message ?? 'Could not update release. Please try again.'; this.editError.set(message); this.toast.error(message); },
+    });
+  }
+
+  openCoverModal(): void { if (!this.isSavingCover()) { this.isCoverModalOpen.set(true); } }
+  closeCoverModal(): void { if (!this.isSavingCover()) { this.isCoverModalOpen.set(false); } }
+  saveCover(file: File): void {
+    const release = this.release(); if (!release || this.isSavingCover()) { return; }
+    this.isSavingCover.set(true);
+    this.releasesApi.uploadTemporaryCover(release.id, file).subscribe({
+      next: temporary => this.releasesApi.confirmCover(release.id, temporary.temporaryFileId).subscribe({
+        next: confirmed => { this.release.update(current => current ? { ...current, coverImageUrl: confirmed.imageUrl } : current); this.isSavingCover.set(false); this.isCoverModalOpen.set(false); this.toast.success('Release cover updated successfully.'); },
+        error: (err: { error?: { message?: string } }) => { this.isSavingCover.set(false); this.toast.error(err.error?.message ?? 'Could not confirm release cover.'); },
+      }),
+      error: (err: { error?: { message?: string } }) => { this.isSavingCover.set(false); this.toast.error(err.error?.message ?? 'Could not upload release cover.'); },
     });
   }
 

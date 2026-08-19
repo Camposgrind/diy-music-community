@@ -1,12 +1,13 @@
 <!-- ── Logo header banner ─────────────────────────────────────── -->
-@if (isCustomImage(band().logoImageUrl)) {
+@if (isCustomImage(band().logoImageUrl) || isAdmin()) {
   <div class="band-hero__logo-header">
-    <img
+    @if (isCustomImage(band().logoImageUrl)) { <img
       class="band-hero__logo-header-img"
       [src]="band().logoImageUrl!"
       [alt]="band().name + ' logo'"
       (error)="onImgError($event)"
-      (click)="openLightbox(band().logoImageUrl)" />
+      (click)="openLightbox(band().logoImageUrl)" /> } @else { <span class="band-hero__logo-placeholder">No logo</span> }
+    @if (isAdmin()) { <button type="button" class="band-hero__image-edit" (click)="editLogo.emit()">{{ band().logoImageUrl ? 'Edit logo' : 'Add logo' }}</button> }
   </div>
 }
 
@@ -26,6 +27,7 @@
     @if (isCustomImage(band().bandImageUrl)) {
       <div class="band-hero__photo-zoom">&#9654; View</div>
     }
+    @if (isAdmin()) { <button type="button" class="band-hero__image-edit band-hero__image-edit--photo" (click)="$event.stopPropagation(); editPhoto.emit()">{{ band().bandImageUrl ? 'Edit photo' : 'Add photo' }}</button> }
   </div>
 
   <!-- Right: info panel -->

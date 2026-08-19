@@ -57,7 +57,7 @@ internal static class CatalogDetailMapper
             ReleaseDate = release.ReleaseDate,
             Year = release.Year,
             LabelText = release.LabelText,
-            CoverImageUrl = release.CoverImageUrl,
+            CoverImageUrl = null,
             Band = release.Band is null ? null : new ReleaseBandModel { BandId = release.Band.Id, Name = release.Band.Name },
             Formats = release.Formats.Select(format => format.Format).ToList().AsReadOnly(),
             Tracks = release.Tracks.OrderBy(track => track.TrackNumber).Select(track => new ReleaseTrackModel

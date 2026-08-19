@@ -19,7 +19,7 @@ public sealed class ReleaseConfiguration : IEntityTypeConfiguration<Release>
         builder.Property(r => r.LabelText)
             .HasMaxLength(300);
 
-        builder.Property(r => r.CoverImageUrl)
+        builder.Property(r => r.ReleaseCoverBlobPath)
             .HasMaxLength(500);
 
         builder.Property(r => r.ReleaseType)
@@ -50,7 +50,7 @@ public sealed class ReleaseConfiguration : IEntityTypeConfiguration<Release>
                 ReleaseType = Domain.Enums.ReleaseType.Album,
                 ReleaseDate = new DateOnly(2023, 3, 10),
                 Year = (int?)2023,
-                CoverImageUrl = (string?)null
+                ReleaseCoverBlobPath = (string?)null
             });
     }
 }

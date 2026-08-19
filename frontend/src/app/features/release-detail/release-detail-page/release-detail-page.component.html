@@ -17,10 +17,12 @@
       </div>
     </div>
   } @else if (release(); as r) {
-    <dmc-release-hero [release]="r" [isAdmin]="isAdmin()" (editDetails)="openEditDetailsModal()" (deleteRelease)="openReleaseDeleteConfirmation()" />
+    <dmc-release-hero [release]="r" [isAdmin]="isAdmin()" (editDetails)="openEditDetailsModal()" (deleteRelease)="openReleaseDeleteConfirmation()" (editCover)="openCoverModal()" />
     <dmc-release-tracks [tracks]="r.tracks" [isAdmin]="isAdmin()" (editTracks)="openEditReleaseModal()" (deleteAllTracks)="openDeleteAllTracksConfirmation()" />
   }
 </div>
+
+@if (isCoverModalOpen()) { <dmc-band-image-modal [imageType]="'ReleaseCover'" [currentImageUrl]="release()?.coverImageUrl ?? null" [saving]="isSavingCover()" (save)="saveCover($event)" (close)="closeCoverModal()" /> }
 
 @if (isEditModalOpen()) {
   <dmc-release-detail-edit-modal

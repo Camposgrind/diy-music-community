@@ -13,6 +13,7 @@ export class ReleaseHeroComponent {
   readonly isAdmin = input(false);
   readonly editDetails = output<void>();
   readonly deleteRelease = output<void>();
+  readonly editCover = output<void>();
 
   readonly fallback = 'images/grindLogo.jpg';
   readonly lightboxUrl = signal<string | null>(null);

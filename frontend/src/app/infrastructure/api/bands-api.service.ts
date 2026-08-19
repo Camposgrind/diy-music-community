@@ -2,7 +2,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { BandDetailModel, BandListItemModel, BandWriteRequest, GetBandsQuery, PagedResult } from './models';
+import { BandDetailModel, BandListItemModel, BandWriteRequest, GetBandsQuery, PagedResult, BandImageType, TemporaryBandImageUploadResponse, ConfirmBandImageResponse } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class BandsApiService {
@@ -44,5 +44,16 @@ export class BandsApiService {
 
   deleteBand(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  uploadTemporaryBandImage(bandId: string, imageType: BandImageType, file: File): Observable<TemporaryBandImageUploadResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('imageType', imageType);
+    return this.http.post<TemporaryBandImageUploadResponse>(`${this.baseUrl}/${bandId}/images/temporary`, formData);
+  }
+
+  confirmBandImage(bandId: string, imageType: BandImageType, temporaryFileId: string): Observable<ConfirmBandImageResponse> {
+    return this.http.post<ConfirmBandImageResponse>(`${this.baseUrl}/${bandId}/images/confirm`, { imageType, temporaryFileId });
   }
 }

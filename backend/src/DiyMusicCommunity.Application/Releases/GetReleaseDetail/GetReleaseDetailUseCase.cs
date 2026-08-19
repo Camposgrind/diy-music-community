@@ -1,15 +1,18 @@
 using DiyMusicCommunity.Application.Common;
 using DiyMusicCommunity.Domain.Abstractions;
+using DiyMusicCommunity.Application.Abstractions;
 
 namespace DiyMusicCommunity.Application.Releases.GetReleaseDetail;
 
 public sealed class GetReleaseDetailUseCase
 {
     private readonly IReleaseRepository _releaseRepository;
+    private readonly IImageUrlResolver _imageUrlResolver;
 
-    public GetReleaseDetailUseCase(IReleaseRepository releaseRepository)
+    public GetReleaseDetailUseCase(IReleaseRepository releaseRepository, IImageUrlResolver imageUrlResolver)
     {
         _releaseRepository = releaseRepository;
+        _imageUrlResolver = imageUrlResolver;
     }
 
     public async Task<Result<ReleaseDetailModel>> Handle(
@@ -31,7 +34,7 @@ public sealed class GetReleaseDetailUseCase
             ReleaseDate = release.ReleaseDate,
             Year = release.Year,
             LabelText = release.LabelText,
-            CoverImageUrl = release.CoverImageUrl,
+            CoverImageUrl = await _imageUrlResolver.ResolveAsync(release.ReleaseCoverBlobPath, cancellationToken),
             Band = release.Band is null
                 ? null
                 : new ReleaseBandModel

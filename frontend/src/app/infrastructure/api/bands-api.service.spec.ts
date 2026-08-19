@@ -140,4 +140,17 @@ describe('BandsApiService', () => {
     expect(req.request.method).toBe('DELETE');
     req.flush(null);
   });
+
+  it('should upload a temporary band image and confirm it', () => {
+    const file = new File(['image'], 'band.png', { type: 'image/png' });
+    service.uploadTemporaryBandImage('band-1', 'BandPhoto', file).subscribe();
+    const upload = httpMock.expectOne((r) => r.url.endsWith('/api/bands/band-1/images/temporary'));
+    expect(upload.request.method).toBe('POST');
+    expect(upload.request.body.get('imageType')).toBe('BandPhoto');
+    upload.flush({ temporaryFileId: 'temp-1', originalFileName: 'band.png', sanitizedFileName: 'band.png', detectedContentType: 'image/png', extension: 'png', size: 5, previewUrl: null });
+    service.confirmBandImage('band-1', 'BandPhoto', 'temp-1').subscribe();
+    const confirm = httpMock.expectOne((r) => r.url.endsWith('/api/bands/band-1/images/confirm'));
+    expect(confirm.request.body).toEqual({ imageType: 'BandPhoto', temporaryFileId: 'temp-1' });
+    confirm.flush({ bandId: 'band-1', imageType: 'BandPhoto', imageUrl: 'https://example.test/read' });
+  });
 });

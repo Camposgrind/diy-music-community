@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ReleaseDetailModel, ReleaseWriteRequest } from './models';
+import { ReleaseDetailModel, ReleaseWriteRequest, TemporaryBandImageUploadResponse, ConfirmBandImageResponse } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class ReleasesApiService {
@@ -32,5 +32,14 @@ export class ReleasesApiService {
 
   deleteAllTracks(releaseId: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${releaseId}/tracks`);
+  }
+
+  uploadTemporaryCover(releaseId: string, file: File): Observable<TemporaryBandImageUploadResponse> {
+    const formData = new FormData(); formData.append('file', file); formData.append('imageType', 'ReleaseCover');
+    return this.http.post<TemporaryBandImageUploadResponse>(`${this.baseUrl}/${releaseId}/images/temporary`, formData);
+  }
+
+  confirmCover(releaseId: string, temporaryFileId: string): Observable<ConfirmBandImageResponse> {
+    return this.http.post<ConfirmBandImageResponse>(`${this.baseUrl}/${releaseId}/images/confirm`, { imageType: 'ReleaseCover', temporaryFileId });
   }
 }
