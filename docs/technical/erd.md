@@ -26,8 +26,8 @@ erDiagram
 		int FormationYear
 		int SplitUpYear
 		string Description
-		string LogoImageUrl
-		string BandImageUrl
+		string LogoImageBlobPath
+		string BandPhotoBlobPath
 		string MusicUrlPortal
 		string BandContact
 		datetime CreatedAt

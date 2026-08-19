@@ -14,8 +14,9 @@ status, and view the available band, release, and member information.
 
 The band catalog is curated by administrators. On the Home page, only an authenticated user with
 the `Admin` role can open the initial band-creation form and create a general band profile. They
-can also edit its general information from the band detail page. These flows deliberately exclude
-logo and photo management, which belongs to a later edit flow. The successful creation flow opens
+can also edit its general information from the band detail page. They can upload a main photo or
+logo through a temporary upload and confirmation flow. Definitive media is stored in Azure Blob
+Storage, while the database stores stable blob paths and read-only URLs are generated on demand. The successful creation flow opens
 the new band detail page. Registered non-admin users have no band catalog write access.
 
 Administrators can add a release from a band's discography and are taken to its detail after a

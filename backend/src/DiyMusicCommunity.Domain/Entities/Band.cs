@@ -13,8 +13,8 @@ public sealed class Band : Entity
     public int? FormationYear { get; private set; }
     public int? SplitUpYear { get; private set; }
     public string? Description { get; private set; }
-    public string? LogoImageUrl { get; private set; }
-    public string? BandImageUrl { get; private set; }
+    public string? LogoImageBlobPath { get; private set; }
+    public string? BandPhotoBlobPath { get; private set; }
     public string? MusicUrlPortal { get; private set; }
     public string? BandContact { get; private set; }
     public TrustStatus TrustStatus { get; private set; }
@@ -86,10 +86,22 @@ public sealed class Band : Entity
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void SetImages(string? logoImageUrl, string? bandImageUrl)
+    public void SetImageBlobPath(BandImageType imageType, string blobPath)
     {
-        LogoImageUrl = logoImageUrl;
-        BandImageUrl = bandImageUrl;
+        if (string.IsNullOrWhiteSpace(blobPath))
+        {
+            throw new ArgumentException("Blob path cannot be empty.", nameof(blobPath));
+        }
+
+        if (imageType == BandImageType.BandPhoto)
+        {
+            BandPhotoBlobPath = blobPath;
+        }
+        else
+        {
+            LogoImageBlobPath = blobPath;
+        }
+
         UpdatedAt = DateTime.UtcNow;
     }
 

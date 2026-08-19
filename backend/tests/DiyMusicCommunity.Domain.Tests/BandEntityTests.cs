@@ -162,14 +162,15 @@ public class BandEntityTests
     }
 
     [Fact]
-    public void SetImages_Should_UpdateLogoAndBandImageUrl()
+    public void SetImageBlobPath_Should_UpdatePhotoAndLogoBlobPaths()
     {
         var band = CreateBand();
 
-        band.SetImages("https://example.com/logo.png", "https://example.com/band.jpg");
+        band.SetImageBlobPath(BandImageType.BandLogo, "bands/logo.png");
+        band.SetImageBlobPath(BandImageType.BandPhoto, "bands/photo.jpg");
 
-        Assert.Equal("https://example.com/logo.png", band.LogoImageUrl);
-        Assert.Equal("https://example.com/band.jpg", band.BandImageUrl);
+        Assert.Equal("bands/logo.png", band.LogoImageBlobPath);
+        Assert.Equal("bands/photo.jpg", band.BandPhotoBlobPath);
     }
 
     // --- SetMusicUrl ---

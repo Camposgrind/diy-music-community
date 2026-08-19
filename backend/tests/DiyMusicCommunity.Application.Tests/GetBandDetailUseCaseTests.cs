@@ -1,4 +1,5 @@
 using DiyMusicCommunity.Application.Bands;
+using DiyMusicCommunity.Application.Abstractions;
 using DiyMusicCommunity.Application.Bands.GetBandDetail;
 using DiyMusicCommunity.Domain.Abstractions;
 using DiyMusicCommunity.Domain.Entities;
@@ -35,7 +36,7 @@ public class GetBandDetailUseCaseTests
     private static (GetBandDetailUseCase UseCase, Mock<IBandRepository> Repo) BuildSut()
     {
         var repo = new Mock<IBandRepository>();
-        var useCase = new GetBandDetailUseCase(repo.Object);
+        var useCase = new GetBandDetailUseCase(repo.Object, Mock.Of<IBlobStorageService>());
         return (useCase, repo);
     }
 

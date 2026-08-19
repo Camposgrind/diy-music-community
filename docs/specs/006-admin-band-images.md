@@ -1,0 +1,89 @@
+# Feature: Administración de imágenes de banda
+
+## Functional goal
+
+Permitir que un administrador suba temporalmente y confirme una foto principal o un logo de una banda existente, persistiendo un identificador estable del archivo y devolviendo una URL de lectura temporal.
+
+## User story
+
+Como administrador, quiero reemplazar la foto o el logo de una banda para mantener actualizado su perfil sin guardar URLs temporales o credenciales de almacenamiento en la base de datos.
+
+## Acceptance criteria
+
+- [x] Given an administrator and an existing band, when they upload a valid PNG, JPG, or JPEG as `bandPhoto` or `bandLogo`, then the API stores a validated temporary file and returns its opaque identifier and detected metadata.
+- [x] Given a temporary file associated with the same band and image type, when an administrator confirms it before expiry, then the file is stored at a stable path and that path is persisted on the band.
+- [x] Given an image replacement, when the new file is persisted successfully, then deletion of the former definitive file is attempted only afterwards and a deletion failure does not invalidate the successful update.
+- [x] Given an invalid, empty, oversized, expired, or mismatched temporary file, when an administrator uploads or confirms it, then the API returns the standard structured error response and does not alter the band.
+- [x] Given a non-administrator or an unknown band, when they call either image endpoint, then the API rejects the request using the existing authorization and not-found conventions.
+- [x] Given a persisted image path, when a band is returned, then any read URL is generated on demand and the database never stores a SAS URL.
+- [x] Given expired or confirmed temporary files, when cleanup runs, then only temporary local files are deleted.
+
+## API contract
+
+### `POST /api/bands/{bandId}/images/temporary`
+
+Authenticated administrators only. Receives `multipart/form-data` with `file` and `imageType` (`bandPhoto` or `bandLogo`).
+
+Returns `200 OK`:
+
+```json
+{
+  "temporaryFileId": "opaque-id",
+  "originalFileName": "image.png",
+  "sanitizedFileName": "image.png",
+  "detectedContentType": "image/png",
+  "extension": "png",
+  "size": 123456,
+  "previewUrl": null
+}
+```
+
+### `POST /api/bands/{bandId}/images/confirm`
+
+Authenticated administrators only. Receives:
+
+```json
+{
+  "imageType": "bandPhoto",
+  "temporaryFileId": "opaque-id"
+}
+```
+
+Returns `200 OK` with the band identifier, image type, stable blob path, and a read-only URL generated for the configured lifetime.
+
+## Domain rules
+
+- A band has independent paths for its main photo and logo.
+- Supported image content is PNG, JPEG, and JPG only; the detected magic bytes determine the saved extension and content type.
+- Definitive paths follow `bands/{bandId}/{photo|logo}/{fileId}.{detectedExtension}`.
+- A temporary file belongs to exactly one band and one image type and cannot be confirmed after expiration.
+
+## Permission rules
+
+- Both endpoints require the existing `Admin` role authorization; no parallel authorization mechanism is introduced.
+
+## Validation rules
+
+- Reject missing and empty files.
+- Enforce the configured maximum image size.
+- Treat the supplied extension and MIME type only as supporting information; require valid PNG or JPEG magic bytes.
+- Generate unguessable temporary identifiers and never expose physical local paths.
+
+## Architecture decision
+
+The intended production storage abstraction is `IBlobStorageService`, with an Azure Blob implementation that generates read-only SAS URLs for a configured lifetime. The database persists stable `BandPhotoBlobPath` and `BandLogoBlobPath`, not SAS URLs.
+
+Azure Blob Storage is the approved definitive-media storage for this project. Short-lived local files are retained only until successful confirmation and are deleted immediately after the database update succeeds. Expired temporary files are also removed opportunistically on every upload or confirmation.
+
+## Test scenarios
+
+- Unit: image validator accepts PNG and JPEG signatures and rejects malformed, unsupported, empty, and oversized content.
+- Unit: temporary-file service enforces ownership, image type, and expiry.
+- Application: confirmation persists only a stable path and attempts prior-file deletion after persistence.
+- Integration: administrator upload and confirmation succeed; non-admin, invalid file, wrong band/type, and expired temporary file receive the appropriate responses.
+
+## Out of scope
+
+- Angular UI.
+- Release cover images.
+- Public writes and direct client-side Azure uploads.

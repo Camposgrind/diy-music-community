@@ -28,10 +28,10 @@ public sealed class BandConfiguration : IEntityTypeConfiguration<Band>
 
         builder.Property(b => b.SplitUpYear);
 
-        builder.Property(b => b.LogoImageUrl)
+        builder.Property(b => b.LogoImageBlobPath)
             .HasMaxLength(500);
 
-        builder.Property(b => b.BandImageUrl)
+        builder.Property(b => b.BandPhotoBlobPath)
             .HasMaxLength(500);
 
         builder.Property(b => b.MusicUrlPortal)

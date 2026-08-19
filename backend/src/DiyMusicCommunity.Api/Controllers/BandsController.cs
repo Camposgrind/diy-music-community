@@ -3,7 +3,9 @@ using DiyMusicCommunity.Application.Bands.GetBandDetail;
 using DiyMusicCommunity.Application.Bands.GetBands;
 using DiyMusicCommunity.Application.Bands.CatalogManagement;
 using DiyMusicCommunity.Application.Bands.CatalogDeletion;
+using DiyMusicCommunity.Application.Bands.Images;
 using DiyMusicCommunity.Application.Common;
+using DiyMusicCommunity.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -22,14 +24,16 @@ public sealed class BandsController : ControllerBase
     private readonly GetBandDetailUseCase _getBandDetailUseCase;
     private readonly CatalogManagementUseCase _catalogManagementUseCase;
     private readonly CatalogDeletionUseCase _catalogDeletionUseCase;
+    private readonly BandImagesUseCase _bandImagesUseCase;
 
     /// <summary>Initialises a new instance of <see cref="BandsController"/>.</summary>
-    public BandsController(GetBandsUseCase getBandsUseCase, GetBandDetailUseCase getBandDetailUseCase, CatalogManagementUseCase catalogManagementUseCase, CatalogDeletionUseCase catalogDeletionUseCase)
+    public BandsController(GetBandsUseCase getBandsUseCase, GetBandDetailUseCase getBandDetailUseCase, CatalogManagementUseCase catalogManagementUseCase, CatalogDeletionUseCase catalogDeletionUseCase, BandImagesUseCase bandImagesUseCase)
     {
         _getBandsUseCase = getBandsUseCase;
         _getBandDetailUseCase = getBandDetailUseCase;
         _catalogManagementUseCase = catalogManagementUseCase;
         _catalogDeletionUseCase = catalogDeletionUseCase;
+        _bandImagesUseCase = bandImagesUseCase;
     }
 
     /// <summary>Search and filter the public band catalog.</summary>
@@ -137,6 +141,37 @@ public sealed class BandsController : ControllerBase
         return WriteResult(result, Ok);
     }
 
+    [HttpPost("{bandId:guid}/images/temporary")]
+    [Authorize(Roles = "Admin")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> UploadTemporaryImage(Guid bandId, [FromForm] UploadTemporaryBandImageInput request, CancellationToken cancellationToken)
+    {
+        if (request.File is null)
+        {
+            return BadRequest(BandErrors.InvalidRequest("An image file is required."));
+        }
+
+        await using var sourceStream = request.File.OpenReadStream();
+        await using var contentStream = new MemoryStream();
+        await sourceStream.CopyToAsync(contentStream, cancellationToken);
+        var result = await _bandImagesUseCase.UploadTemporaryAsync(bandId, new UploadTemporaryBandImageRequest
+        {
+            ImageType = request.ImageType,
+            OriginalFileName = request.File.FileName,
+            DeclaredContentType = request.File.ContentType,
+            Content = contentStream.ToArray()
+        }, cancellationToken);
+        return WriteResult(result, Ok);
+    }
+
+    [HttpPost("{bandId:guid}/images/confirm")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ConfirmImage(Guid bandId, [FromBody] ConfirmBandImageInput request, CancellationToken cancellationToken)
+    {
+        var result = await _bandImagesUseCase.ConfirmAsync(bandId, new ConfirmBandImageRequest(request.ImageType, request.TemporaryFileId), cancellationToken);
+        return WriteResult(result, Ok);
+    }
+
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -180,5 +215,17 @@ public sealed class BandsController : ControllerBase
         }
 
         return NotFound(result.Error);
+    }
+
+    public sealed class ConfirmBandImageInput
+    {
+        public BandImageType ImageType { get; init; }
+        public string TemporaryFileId { get; init; } = string.Empty;
+    }
+
+    public sealed class UploadTemporaryBandImageInput
+    {
+        public IFormFile? File { get; init; }
+        public BandImageType ImageType { get; init; }
     }
 }

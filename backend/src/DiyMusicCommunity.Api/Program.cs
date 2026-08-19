@@ -1,4 +1,5 @@
 using System.Text;
+using Azure.Identity;
 using DiyMusicCommunity.Application;
 using DiyMusicCommunity.Application.Abstractions;
 using DiyMusicCommunity.Infrastructure;
@@ -13,8 +14,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var keyVaultEndpoint = builder.Configuration["AzureKeyVaultEndpoint"];
+if (Uri.TryCreate(keyVaultEndpoint, UriKind.Absolute, out var keyVaultUri))
+{
+    builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
+}
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
@@ -25,6 +33,12 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new FormatJsonConverter());
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+
+var maxImageSizeMb = builder.Configuration.GetValue<int>("FileUpload:MaxImageSizeMb");
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = (long)maxImageSizeMb * 1024 * 1024;
+});
 
 var allowedOrigins = builder.Configuration
     .GetSection("Cors:AllowedOrigins")

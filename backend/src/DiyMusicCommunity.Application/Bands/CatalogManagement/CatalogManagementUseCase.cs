@@ -264,7 +264,6 @@ public sealed class CatalogManagementUseCase
         band.SetLocation(request.Location); 
         band.SetFormationYear(request.FormationYear); 
         band.SetDescription(request.Description); 
-        band.SetImages(request.LogoImageUrl, request.BandImageUrl); 
         band.SetMusicUrlPortal(request.MusicUrlPortal); 
         band.SetBandContact(request.BandContact);
     }

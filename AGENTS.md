@@ -10,7 +10,7 @@ Functional scope: `docs/functional/overview.md`.
 ## Tech stack
 - Backend: .NET / ASP.NET Core Web API, EF Core, SQL Server, JWT, Clean Architecture.
 - Frontend: Angular, TypeScript, Reactive Forms, guards, interceptors.
-- Storage: local files now, Azure Blob later via `IFileStorageService`.
+- Storage: Azure Blob Storage for definitive media, with short-lived local temporary files via `IFileStorageService`.
 - Monorepo: `backend/`, `frontend/`, `docs/`, `skills/`.
 
 ## Golden rules (non-negotiable)
@@ -52,7 +52,7 @@ Single responsibility per class/component; depend on abstractions; keep componen
 - Do not add libraries not in the stack (no MediatR/AutoMapper unless asked).
 - Do not put business logic in controllers or Angular components.
 - Do not delete/skip tests or lower coverage to pass CI.
-- Do not implement Azure Blob Storage for the MVP.
+- Do not expose storage credentials, writable SAS URLs, or physical temporary-file paths.
 
 ## How to add a new feature
 1. Create/update `docs/specs/NNN-name.md`.
