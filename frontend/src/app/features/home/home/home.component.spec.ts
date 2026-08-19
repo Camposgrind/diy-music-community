@@ -7,6 +7,7 @@ import { vi } from 'vitest';
 import { HomeComponent } from './home.component';
 import { BandDetailModel, BandListItemModel, BandWriteRequest, PagedResult } from '../../../infrastructure/api/models';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ToastService } from '../../../core/toast/toast.service';
 
 describe('HomeComponent', () => {
   let fixture: ComponentFixture<HomeComponent>;
@@ -14,6 +15,8 @@ describe('HomeComponent', () => {
   let httpMock: HttpTestingController;
   const isAdmin = signal(false);
   const router = { navigate: vi.fn().mockResolvedValue(true) };
+  let toastSuccess: ReturnType<typeof vi.fn>;
+  let toastError: ReturnType<typeof vi.fn>;
 
   const mockBand: BandListItemModel = {
     id: '1',
@@ -26,6 +29,8 @@ describe('HomeComponent', () => {
 
   beforeEach(async () => {
     TestBed.resetTestingModule();
+    toastSuccess = vi.fn();
+    toastError = vi.fn();
     await TestBed.configureTestingModule({
       imports: [HomeComponent],
       providers: [
@@ -33,6 +38,7 @@ describe('HomeComponent', () => {
         provideHttpClientTesting(),
         { provide: AuthService, useValue: { isAdmin } },
         { provide: Router, useValue: router },
+        { provide: ToastService, useValue: { success: toastSuccess, error: toastError } },
       ],
     }).compileComponents();
 
@@ -98,6 +104,7 @@ describe('HomeComponent', () => {
 
     expect(component.isCreateModalOpen()).toBe(false);
     expect(router.navigate).toHaveBeenCalledWith(['/bands', 'band-1']);
+    expect(toastSuccess).toHaveBeenCalledWith('Band created successfully.');
   });
 
   it('should keep the creation modal open when creating a band fails', () => {
@@ -114,6 +121,7 @@ describe('HomeComponent', () => {
 
     expect(component.isCreateModalOpen()).toBe(true);
     expect(component.createBandError()).toBe('A band with this name already exists.');
+    expect(toastError).toHaveBeenCalledWith('A band with this name already exists.');
   });
 
   it('should load countries on init', () => {

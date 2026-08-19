@@ -116,6 +116,20 @@ public sealed class Release : Entity
         _formats.Remove(existing);
     }
 
+    public void ReplaceFormats(IReadOnlyList<Format> formats)
+    {
+        if (formats.GroupBy(format => format).Any(group => group.Count() > 1))
+        {
+            throw new ArgumentException("Release formats must be unique.", nameof(formats));
+        }
+
+        _formats.Clear();
+        foreach (var format in formats)
+        {
+            _formats.Add(new ReleaseFormat(Guid.NewGuid(), Id, format));
+        }
+    }
+
     public IReadOnlyList<Format> GetFormats()
     {
         return _formats.Select(f => f.Format).ToList().AsReadOnly();

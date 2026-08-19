@@ -132,4 +132,12 @@ describe('BandsApiService', () => {
     expect(req.request.body).toEqual(request);
     req.flush({ id: 'band-1' });
   });
+
+  it('should DELETE a band', () => {
+    service.deleteBand('band-1').subscribe();
+
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/bands/band-1'));
+    expect(req.request.method).toBe('DELETE');
+    req.flush(null);
+  });
 });

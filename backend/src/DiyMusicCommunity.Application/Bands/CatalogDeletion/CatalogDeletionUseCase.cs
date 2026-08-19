@@ -55,4 +55,15 @@ public sealed class CatalogDeletionUseCase
 
         return Result<bool>.Success(true);
     }
+
+    public async Task<Result<bool>> DeleteAllTracks(Guid releaseId, CancellationToken cancellationToken = default)
+    {
+        var deleted = await _repository.DeleteAllTracksAsync(releaseId, cancellationToken);
+        if (!deleted)
+        {
+            return Result<bool>.Failure(Error.NotFound("Release.NotFound", $"No release with id '{releaseId}' was found."));
+        }
+
+        return Result<bool>.Success(true);
+    }
 }

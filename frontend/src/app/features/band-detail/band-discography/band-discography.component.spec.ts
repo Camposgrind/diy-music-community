@@ -76,5 +76,17 @@ describe('BandDiscographyComponent', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('[data-testid="add-release"]')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('[data-testid="edit-release-r1"]')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('[data-testid="delete-release-r1"]')).toBeTruthy();
+  });
+
+  it('should emit the selected release when an Admin requests deletion', () => {
+    componentRef.setInput('isAdmin', true);
+    const deleteRelease = vi.fn();
+    component.deleteRelease.subscribe(deleteRelease);
+    fixture.detectChanges();
+
+    (fixture.nativeElement.querySelector('[data-testid="delete-release-r1"]') as HTMLButtonElement).click();
+
+    expect(deleteRelease).toHaveBeenCalledWith(mockReleases[0]);
   });
 });

@@ -129,6 +129,14 @@ public sealed class BandsController : ControllerBase
         return WriteResult(result, Ok);
     }
 
+    [HttpPut("{bandId:guid}/releases/{releaseId:guid}/tracks")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UpdateReleaseTracks(Guid bandId, Guid releaseId, [FromBody] TrackListWriteRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _catalogManagementUseCase.UpdateReleaseTracks(bandId, releaseId, request, cancellationToken);
+        return WriteResult(result, Ok);
+    }
+
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

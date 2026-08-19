@@ -25,7 +25,12 @@
     }
 
     <!-- Release title -->
-    <h1 class="release-hero__title">{{ release().title }}</h1>
+    <div class="release-hero__title-row">
+      <h1 class="release-hero__title">{{ release().title }}</h1>
+      @if (isAdmin()) {
+        <div class="release-hero__edit-actions"><button type="button" class="release-hero__edit" data-testid="edit-release-details" (click)="editDetails.emit()">Edit details</button><button type="button" class="release-hero__edit release-hero__edit--delete" data-testid="delete-release" (click)="deleteRelease.emit()">Delete release</button></div>
+      }
+    </div>
 
     <!-- Release type badge -->
     <div class="release-hero__meta">

@@ -71,4 +71,18 @@ describe('BandMembersComponent', () => {
 
     expect(deleteMember).toHaveBeenCalledWith(mockMembers[0]);
   });
+
+  it('should keep long member names and every admin action in the card', () => {
+    componentRef.setInput('members', [{
+      ...mockMembers[0],
+      name: 'A very long member name that must wrap without hiding any controls',
+    }]);
+    componentRef.setInput('isAdmin', true);
+    fixture.detectChanges();
+
+    expect(el.querySelector('.members__name')?.textContent).toContain('A very long member name');
+    expect(el.querySelector('.members__present-badge')).toBeTruthy();
+    expect(el.querySelector('[data-testid="edit-member-m1"]')).toBeTruthy();
+    expect(el.querySelector('[data-testid="delete-member-m1"]')).toBeTruthy();
+  });
 });

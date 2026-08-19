@@ -56,7 +56,7 @@ public sealed class CatalogManagementUseCase
             return Result<BandDetailModel>.Failure(validationError); 
         }
 
-        var band = await _bandRepository.GetByIdAsync(bandId, cancellationToken);
+        var band = await _bandRepository.GetDetailAsync(bandId, cancellationToken);
         if (band is null) 
         { 
             return Result<BandDetailModel>.Failure(BandErrors.NotFound(bandId));
@@ -198,6 +198,33 @@ public sealed class CatalogManagementUseCase
         return Result<ReleaseDetailModel>.Success(CatalogDetailMapper.ToReleaseDetail(detail!));
     }
 
+    public async Task<Result<ReleaseDetailModel>> UpdateReleaseTracks(Guid bandId, Guid releaseId, TrackListWriteRequest request, CancellationToken cancellationToken = default)
+    {
+        var band = await _bandRepository.GetDetailAsync(bandId, cancellationToken);
+        if (band is null)
+        {
+            return Result<ReleaseDetailModel>.Failure(BandErrors.NotFound(bandId));
+        }
+
+        var release = band.Releases.SingleOrDefault(item => item.Id == releaseId);
+        if (release is null)
+        {
+            return Result<ReleaseDetailModel>.Failure(Error.NotFound("Release.NotFound", $"No release with id '{releaseId}' was found for this band."));
+        }
+
+        var error = ValidateTracks(request.Tracks);
+        if (error is not null)
+        {
+            return Result<ReleaseDetailModel>.Failure(error);
+        }
+
+        release.ReplaceTracks(request.Tracks.Select((track, index) => (track.Title.Trim(), index + 1)).ToList());
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        var detail = await _releaseRepository.GetDetailAsync(release.Id, cancellationToken);
+        return Result<ReleaseDetailModel>.Success(CatalogDetailMapper.ToReleaseDetail(detail!));
+    }
+
     private async Task<Error?> ValidateBand(BandWriteRequest request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.Name) || request.Name.Length > 200 || string.IsNullOrWhiteSpace(request.Country) || request.Country.Length > 100 || request.GenreId == Guid.Empty || (request.Status == Domain.Enums.BandStatus.SplitUp && !request.SplitUpYear.HasValue))
@@ -212,12 +239,24 @@ public sealed class CatalogManagementUseCase
 
     private static Error? ValidateRelease(ReleaseWriteRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Title) || request.Title.Length > 300 || request.Tracks.Any(track => string.IsNullOrWhiteSpace(track.Title) || track.Title.Length > 300))
+        if (string.IsNullOrWhiteSpace(request.Title) || request.Title.Length > 300)
         {
-            return BandErrors.InvalidRequest("Release title and track titles are required, and text lengths must not exceed 300 characters.");
+            return BandErrors.InvalidRequest("Release title is required and must not exceed 300 characters.");
         }
 
-        return null;
+        if (request.Formats.GroupBy(format => format).Any(group => group.Count() > 1))
+        {
+            return BandErrors.InvalidRequest("Release formats must be unique.");
+        }
+
+        return ValidateTracks(request.Tracks);
+    }
+
+    private static Error? ValidateTracks(IReadOnlyList<TrackWriteRequest> tracks)
+    {
+        return tracks.Any(track => string.IsNullOrWhiteSpace(track.Title) || track.Title.Length > 300)
+            ? BandErrors.InvalidRequest("Track titles are required and must not exceed 300 characters.")
+            : null;
     }
 
     private static void ApplyBandFields(Band band, BandWriteRequest request)
@@ -233,6 +272,7 @@ public sealed class CatalogManagementUseCase
     private static void ApplyRelease(Release release, ReleaseWriteRequest request)
     {
         release.Update(request.Title.Trim(), request.ReleaseType, request.ReleaseDate, request.Year, request.LabelText, request.CoverImageUrl);
+        release.ReplaceFormats(request.Formats);
         release.ReplaceTracks(request.Tracks.Select((track, index) => (track.Title.Trim(), index + 1)).ToList());
     }
 

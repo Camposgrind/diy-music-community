@@ -90,4 +90,26 @@ describe('ReleaseHeroComponent', () => {
     expect(component.typeClass('Album')).toBe('type--album');
     expect(component.typeClass('EP')).toBe('type--ep');
   });
+
+  it('shows release edit and delete controls only for administrators', () => {
+    const editDetails = vi.fn();
+    const deleteRelease = vi.fn();
+    component.editDetails.subscribe(editDetails);
+    component.deleteRelease.subscribe(deleteRelease);
+    componentRef.setInput('isAdmin', true);
+    fixture.detectChanges();
+
+    const detailsButton = fixture.nativeElement.querySelector('[data-testid="edit-release-details"]') as HTMLButtonElement;
+    const deleteButton = fixture.nativeElement.querySelector('[data-testid="delete-release"]') as HTMLButtonElement;
+    expect(detailsButton).toBeTruthy();
+    expect(deleteButton).toBeTruthy();
+    detailsButton.click();
+    deleteButton.click();
+    expect(editDetails).toHaveBeenCalledOnce();
+    expect(deleteRelease).toHaveBeenCalledOnce();
+
+    componentRef.setInput('isAdmin', false);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[data-testid="edit-release-details"]')).toBeNull();
+  });
 });

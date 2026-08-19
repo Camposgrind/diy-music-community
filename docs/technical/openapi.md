@@ -158,8 +158,9 @@ requests receive `401`; authenticated non-admin requests receive `403`.
 | `PUT /api/bands/{id}` | Update the band profile | `200` with `BandDetailModel` |
 | `POST /api/bands/{bandId}/members` | Add a current or past member | `201` with `BandMemberModel` |
 | `PUT /api/bands/{bandId}/members/{memberId}` | Update a member | `200` with `BandMemberModel` |
-| `POST /api/bands/{bandId}/releases` | Create a release with its complete track list | `201` with `ReleaseDetailModel` |
-| `PUT /api/bands/{bandId}/releases/{releaseId}` | Update a release and replace its complete track list | `200` with `ReleaseDetailModel` |
+| `POST /api/bands/{bandId}/releases` | Create a release with its initial track list | `201` with `ReleaseDetailModel` |
+| `PUT /api/bands/{bandId}/releases/{releaseId}` | Update release information and formats, preserving tracks and cover | `200` with `ReleaseDetailModel` |
+| `PUT /api/bands/{bandId}/releases/{releaseId}/tracks` | Replace the complete ordered track list | `200` with `ReleaseDetailModel` |
 | `DELETE /api/bands/{id}` | Delete a band and its catalog dependents | `204` |
 | `DELETE /api/bands/{bandId}/members/{memberId}` | Delete a member and its other-band links | `204` |
 | `DELETE /api/releases/{releaseId}` | Delete a release, its tracks, and formats | `204` |
@@ -177,9 +178,10 @@ Member request fields are `name`, `instrument`, `startYear`, `endYear`, `isCurre
 lineup member must have an end year and is used to identify a split-up band's final lineup.
 
 Release request fields are `title`, `releaseType`, `releaseDate`, `year`, `labelText`,
-`coverImageUrl`, and `tracks`. Each track has `title` and a positive `trackNumber`. Track numbers
-must be unique within the submitted list. Replacing a release's tracks is atomic: tracks omitted
-from a `PUT` request are removed.
+`coverImageUrl`, `formats`, and `tracks`. Each track has only `title`; the API derives its
+consecutive number from the request order. The release-information `PUT` preserves both tracks and
+cover image. The `/tracks` `PUT` accepts `{ "tracks": [{ "title": "..." }] }` and replaces tracks
+atomically, so omitted tracks are removed.
 
 `POST` never upserts. It returns `409 Conflict` with `Catalog.Duplicate` for a duplicate business
 identity. `PUT` returns `404` for an unknown resource and `409` when the change collides with a

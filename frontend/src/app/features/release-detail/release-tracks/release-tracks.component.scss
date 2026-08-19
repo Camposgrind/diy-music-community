@@ -27,6 +27,12 @@
     }
   }
 
+  &__title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+  &__actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+  &__action { background: transparent; border: 1px solid #333; border-radius: 4px; color: #aaa; cursor: pointer; font-family: 'Oswald', sans-serif; font-size: .75rem; letter-spacing: 1px; padding: .4rem .85rem; text-transform: uppercase; &:hover { border-color: #8b0000; color: #fff; } &:disabled { cursor: not-allowed; opacity: .55; } }
+  &__action--delete { border-color: rgba(224, 96, 96, .7); color: #ff8080; &:hover:not(:disabled) { border-color: #e06060; background: rgba(181, 29, 29, .24); } }
+  &__empty { color: #888; font-style: italic; margin: 0; padding: 1rem 1.125rem; }
+
   // ── Column header row ────────────────────────────────────────
   &__header {
     display: grid;

@@ -150,6 +150,9 @@
     &:hover { border-color: #8b0000; color: #fff; }
   }
 
+  &__edit-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+  &__edit--delete { border-color: rgba(224, 96, 96, .7); color: #ff8080; &:hover { background: rgba(181, 29, 29, .24); border-color: #e06060; } }
+
   // ── Badges row ───────────────────────────────────────
   &__meta {
     display: flex;

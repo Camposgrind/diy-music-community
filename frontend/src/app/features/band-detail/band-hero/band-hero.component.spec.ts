@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ComponentRef } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { vi } from 'vitest';
 import { BandHeroComponent } from './band-hero.component';
 import { BandDetailModel } from '../../../infrastructure/api/models';
 
@@ -90,5 +91,19 @@ describe('BandHeroComponent', () => {
 
     expect(fixture.nativeElement.textContent).toContain('Years active');
     expect(fixture.nativeElement.textContent).toContain('1981 – 1991');
+  });
+
+  it('should emit band deletion only for an administrator', () => {
+    const deleteBand = vi.fn();
+    component.deleteBand.subscribe(deleteBand);
+    componentRef.setInput('isAdmin', true);
+    fixture.detectChanges();
+
+    (fixture.nativeElement.querySelector('[data-testid="delete-band"]') as HTMLButtonElement).click();
+    expect(deleteBand).toHaveBeenCalledOnce();
+
+    componentRef.setInput('isAdmin', false);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[data-testid="delete-band"]')).toBeNull();
   });
 });

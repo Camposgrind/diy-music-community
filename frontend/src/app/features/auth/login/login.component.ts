@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthApiService } from '../../../infrastructure/api/auth-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -18,6 +18,7 @@ export class LoginComponent {
   private readonly authApi = inject(AuthApiService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly toast = inject(ToastService);
 
   readonly loading = signal(false);
@@ -56,7 +57,12 @@ export class LoginComponent {
       .subscribe({
         next: (response) => {
           this.authService.setSession(response);
-          this.router.navigate(['/']);
+          const returnUrl = this.safeReturnUrl();
+          if (returnUrl) {
+            this.router.navigateByUrl(returnUrl);
+          } else {
+            this.router.navigate(['/']);
+          }
         },
         error: (err: HttpErrorResponse) => {
           this.loading.set(false);
@@ -65,5 +71,14 @@ export class LoginComponent {
         },
         complete: () => this.loading.set(false),
       });
+  }
+
+  private safeReturnUrl(): string | null {
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    if (!returnUrl || !returnUrl.startsWith('/') || returnUrl.startsWith('//') || returnUrl.includes('\\')) {
+      return null;
+    }
+
+    return returnUrl;
   }
 }

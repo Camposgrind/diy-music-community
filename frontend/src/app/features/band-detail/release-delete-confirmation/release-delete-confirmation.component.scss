@@ -1,0 +1,18 @@
+.release-delete-confirmation {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+
+  &__backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, .72); }
+  &__panel { position: relative; width: min(460px, 100%); padding: 1.5rem; background: #1a1a1a; border: 1px solid #cc2222; border-radius: 10px; box-shadow: 0 16px 40px rgba(0, 0, 0, .65); }
+  &__title { margin: 0; color: #ff8080; font-family: 'Oswald', sans-serif; letter-spacing: 2px; text-transform: uppercase; }
+  &__message { margin: 1rem 0; color: #ccc; line-height: 1.5; }
+  &__error { margin: 0; color: #ff8080; font-size: .85rem; }
+  &__actions { display: flex; justify-content: flex-end; gap: .75rem; margin-top: 1.5rem; }
+  &__cancel, &__delete { border-radius: 4px; cursor: pointer; font-family: 'Oswald', sans-serif; letter-spacing: 1px; padding: .625rem 1.25rem; text-transform: uppercase; &:disabled { cursor: not-allowed; opacity: .55; } }
+  &__cancel { color: #aaa; background: transparent; border: 1px solid #555; }
+  &__delete { color: #fff; background: #b51d1d; border: 1px solid #e06060; &:hover:not(:disabled) { background: #d42a2a; } }
+}

@@ -41,4 +41,8 @@ export class BandsApiService {
   updateBand(id: string, request: BandWriteRequest): Observable<BandDetailModel> {
     return this.http.put<BandDetailModel>(`${this.baseUrl}/${id}`, request);
   }
+
+  deleteBand(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
 }

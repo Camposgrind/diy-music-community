@@ -19,7 +19,7 @@
             <div class="discography__item-type" [ngClass]="typeClass(release.releaseType)">{{ release.releaseType }}</div>
             <div class="discography__item-title" [class.discography__item-title--album]="release.releaseType === 'Album'">{{ release.title }}</div>
             <div class="discography__item-year">@if (release.year) { {{ release.year }} }</div>
-            @if (isAdmin()) { <button type="button" class="discography__edit" [attr.data-testid]="'edit-release-' + release.id" (click)="onEditRelease($event, release)">Edit</button> }
+            @if (isAdmin()) { <div class="discography__actions"><button type="button" class="discography__edit" [attr.data-testid]="'edit-release-' + release.id" (click)="onEditRelease($event, release)">Edit</button><button type="button" class="discography__delete" [attr.data-testid]="'delete-release-' + release.id" (click)="onDeleteRelease($event, release)">Delete</button></div> }
           </div>
         </div>
       }

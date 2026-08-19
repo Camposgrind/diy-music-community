@@ -1,0 +1,12 @@
+<div class="band-delete-confirmation" role="dialog" aria-modal="true" aria-labelledby="delete-band-title">
+  <div class="band-delete-confirmation__backdrop" aria-hidden="true"></div>
+  <section class="band-delete-confirmation__panel">
+    <h2 id="delete-band-title" class="band-delete-confirmation__title">Delete band?</h2>
+    <p class="band-delete-confirmation__message">Remove <strong>{{ band().name }}</strong>, its releases, tracks, members, and related links? This action cannot be undone.</p>
+    @if (error(); as message) { <p class="band-delete-confirmation__error" role="alert">{{ message }}</p> }
+    <footer class="band-delete-confirmation__actions">
+      <button type="button" class="band-delete-confirmation__cancel" (click)="close.emit()" [disabled]="deleting()">Cancel</button>
+      <button type="button" class="band-delete-confirmation__delete" data-testid="confirm-delete-band" (click)="confirm.emit()" [disabled]="deleting()">{{ deleting() ? 'Deleting…' : 'Delete band' }}</button>
+    </footer>
+  </section>
+</div>

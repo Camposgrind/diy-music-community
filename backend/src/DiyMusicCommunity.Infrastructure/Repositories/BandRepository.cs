@@ -25,6 +25,8 @@ public sealed class BandRepository : IBandRepository
         return await _context.Bands
             .Include(b => b.Genre)
             .Include(b => b.Releases)
+                .ThenInclude(release => release.Formats)
+            .Include(b => b.Releases)
                 .ThenInclude(release => release.Tracks)
             .Include(b => b.Members)
                 .ThenInclude(m => m.OtherBands)

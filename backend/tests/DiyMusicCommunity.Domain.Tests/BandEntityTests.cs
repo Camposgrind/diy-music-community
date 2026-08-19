@@ -102,6 +102,56 @@ public class BandEntityTests
     }
 
     [Fact]
+    public void Update_SplitUpToActive_Should_MoveLastKnownLineupToPastMembers()
+    {
+        var band = new Band(Guid.NewGuid(), "Discharge", "UK", Guid.NewGuid(), BandStatus.SplitUp, DateTime.UtcNow, 1986);
+        var member = new BandMember(Guid.NewGuid(), band.Id, "Bones", false);
+        member.Update("Bones", "Bass", 1980, 1986, false, true);
+        band.AddMember(member);
+
+        band.Update("Discharge", "UK", band.GenreId, BandStatus.Active, null);
+
+        Assert.False(member.IsLastKnownLineup);
+        Assert.False(member.IsCurrent);
+    }
+
+    [Fact]
+    public void Update_ActiveToSplitUp_Should_PromoteMostRecentPastLineup()
+    {
+        var band = CreateBand();
+        var formerMember = new BandMember(Guid.NewGuid(), band.Id, "Older", false);
+        formerMember.Update("Older", "Guitar", 1980, 1985, false, false);
+        var lastMemberOne = new BandMember(Guid.NewGuid(), band.Id, "Latest One", false);
+        lastMemberOne.Update("Latest One", "Vocals", 1981, 1990, false, false);
+        var lastMemberTwo = new BandMember(Guid.NewGuid(), band.Id, "Latest Two", false);
+        lastMemberTwo.Update("Latest Two", "Drums", 1982, 1990, false, false);
+        band.AddMember(formerMember);
+        band.AddMember(lastMemberOne);
+        band.AddMember(lastMemberTwo);
+
+        band.Update("Discharge", "UK", band.GenreId, BandStatus.SplitUp, 1990);
+
+        Assert.False(formerMember.IsLastKnownLineup);
+        Assert.True(lastMemberOne.IsLastKnownLineup);
+        Assert.True(lastMemberTwo.IsLastKnownLineup);
+    }
+
+    [Fact]
+    public void Update_ActiveToSplitUp_WithCurrentMembers_Should_MakeThemLastKnownWithSplitUpYear()
+    {
+        var band = CreateBand();
+        var currentMember = new BandMember(Guid.NewGuid(), band.Id, "Rat", true);
+        currentMember.Update("Rat", "Drums", 1988, null, true, false);
+        band.AddMember(currentMember);
+
+        band.Update("Discharge", "UK", band.GenreId, BandStatus.SplitUp, 1991);
+
+        Assert.False(currentMember.IsCurrent);
+        Assert.True(currentMember.IsLastKnownLineup);
+        Assert.Equal(1991, currentMember.EndYear);
+    }
+
+    [Fact]
     public void SetDescription_Should_UpdateDescription()
     {
         var band = CreateBand();

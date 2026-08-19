@@ -61,6 +61,32 @@ public sealed class CatalogManagementUseCaseTests
     }
 
     [Fact]
+    public async Task UpdateReleaseTracks_WithOrderedTracks_Should_ReplaceTracksAndAssignConsecutiveNumbers()
+    {
+        var band = new Band(Guid.NewGuid(), "Discharge", "UK", Guid.NewGuid(), BandStatus.Active, DateTime.UtcNow);
+        var release = new Release(Guid.NewGuid(), band.Id, "Hear Nothing", ReleaseType.Album);
+        release.ReplaceTracks([("Old Track", 1)]);
+        band.AddRelease(release);
+        var repository = new Mock<IBandRepository>();
+        repository.Setup(item => item.GetDetailAsync(band.Id, It.IsAny<CancellationToken>())).ReturnsAsync(band);
+        var unitOfWork = new Mock<IUnitOfWork>();
+        unitOfWork.Setup(item => item.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        var releaseRepository = new Mock<IReleaseRepository>();
+        releaseRepository.Setup(item => item.GetDetailAsync(release.Id, It.IsAny<CancellationToken>())).ReturnsAsync(release);
+        var useCase = new CatalogManagementUseCase(repository.Object, Mock.Of<IGenreRepository>(), unitOfWork.Object, releaseRepository.Object);
+
+        var result = await useCase.UpdateReleaseTracks(band.Id, release.Id, new TrackListWriteRequest
+        {
+            Tracks = [new TrackWriteRequest { Title = "Second" }, new TrackWriteRequest { Title = "First" }]
+        });
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(["Second", "First"], release.Tracks.OrderBy(track => track.TrackNumber).Select(track => track.Title));
+        Assert.Equal([1, 2], release.Tracks.OrderBy(track => track.TrackNumber).Select(track => track.TrackNumber));
+        unitOfWork.Verify(item => item.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
     public async Task CreateMember_WithDuplicateIdentity_Should_ReturnConflict()
     {
         var band = new Band(Guid.NewGuid(), "Discharge", "UK", Guid.NewGuid(), BandStatus.Active, DateTime.UtcNow);
@@ -89,5 +115,29 @@ public sealed class CatalogManagementUseCaseTests
 
         Assert.True(result.IsFailure);
         Assert.Equal(BandErrors.Codes.InvalidRequest, result.Error!.Code);
+    }
+
+    [Fact]
+    public async Task UpdateBand_SplitUpToActive_Should_MoveLastKnownLineupToPastMembers()
+    {
+        var genreId = Guid.NewGuid();
+        var band = new Band(Guid.NewGuid(), "Discharge", "UK", genreId, BandStatus.SplitUp, DateTime.UtcNow, 1986);
+        var member = new BandMember(Guid.NewGuid(), band.Id, "Bones", false);
+        member.Update("Bones", "Bass", 1980, 1986, false, true);
+        band.AddMember(member);
+        var repository = new Mock<IBandRepository>();
+        repository.Setup(item => item.GetDetailAsync(band.Id, It.IsAny<CancellationToken>())).ReturnsAsync(band);
+        var genreRepository = new Mock<IGenreRepository>();
+        genreRepository.Setup(item => item.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync([new Genre(genreId, "Punk")]);
+        var unitOfWork = new Mock<IUnitOfWork>();
+        unitOfWork.Setup(item => item.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        var useCase = new CatalogManagementUseCase(repository.Object, genreRepository.Object, unitOfWork.Object, Mock.Of<IReleaseRepository>());
+
+        var result = await useCase.UpdateBand(band.Id, new BandWriteRequest { Name = "Discharge", Country = "UK", GenreId = genreId, Status = BandStatus.Active });
+
+        Assert.True(result.IsSuccess);
+        Assert.False(member.IsLastKnownLineup);
+        Assert.False(member.IsCurrent);
+        unitOfWork.Verify(item => item.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 }

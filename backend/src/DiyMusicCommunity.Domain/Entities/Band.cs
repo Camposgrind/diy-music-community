@@ -122,12 +122,58 @@ public sealed class Band : Entity
             throw new ArgumentException("GenreId cannot be empty.", nameof(genreId));
         }
 
+        var previousStatus = Status;
+
         Name = name;
         Country = country;
         GenreId = genreId;
         Status = status;
         SplitUpYear = GetSplitUpYear(status, splitUpYear);
+        UpdateMemberLineupForStatusTransition(previousStatus, status);
         UpdatedAt = DateTime.UtcNow;
+    }
+
+    private void UpdateMemberLineupForStatusTransition(BandStatus previousStatus, BandStatus newStatus)
+    {
+        if (previousStatus == BandStatus.SplitUp && newStatus != BandStatus.SplitUp)
+        {
+            foreach (var member in Members.Where(member => member.IsLastKnownLineup))
+            {
+                member.MoveToPastMembers();
+            }
+
+            return;
+        }
+
+        if (previousStatus != BandStatus.SplitUp && newStatus == BandStatus.SplitUp)
+        {
+            var currentMembers = Members.Where(member => member.IsCurrent).ToList();
+            if (currentMembers.Count > 0)
+            {
+                foreach (var member in currentMembers)
+                {
+                    member.SetDeparted(SplitUpYear!.Value);
+                    member.MarkAsLastKnownLineup();
+                }
+
+                return;
+            }
+
+            var mostRecentEndYear = Members
+                .Where(member => !member.IsCurrent && !member.IsLastKnownLineup && member.EndYear.HasValue)
+                .Select(member => member.EndYear)
+                .Max();
+
+            if (!mostRecentEndYear.HasValue)
+            {
+                return;
+            }
+
+            foreach (var member in Members.Where(member => !member.IsCurrent && !member.IsLastKnownLineup && member.EndYear == mostRecentEndYear))
+            {
+                member.MarkAsLastKnownLineup();
+            }
+        }
     }
 
     private static int? GetSplitUpYear(BandStatus status, int? splitUpYear)

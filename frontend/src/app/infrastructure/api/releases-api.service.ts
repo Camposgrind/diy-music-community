@@ -21,4 +21,16 @@ export class ReleasesApiService {
   updateRelease(bandId: string, releaseId: string, request: ReleaseWriteRequest): Observable<ReleaseDetailModel> {
     return this.http.put<ReleaseDetailModel>(`${this.bandsBaseUrl}/${bandId}/releases/${releaseId}`, request);
   }
+
+  updateReleaseTracks(bandId: string, releaseId: string, tracks: { title: string }[]): Observable<ReleaseDetailModel> {
+    return this.http.put<ReleaseDetailModel>(`${this.bandsBaseUrl}/${bandId}/releases/${releaseId}/tracks`, { tracks });
+  }
+
+  deleteRelease(releaseId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${releaseId}`);
+  }
+
+  deleteAllTracks(releaseId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${releaseId}/tracks`);
+  }
 }

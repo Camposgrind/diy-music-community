@@ -26,7 +26,7 @@
     }
   }
 
-  &__title-row { align-items: flex-start; display: flex; gap: 1rem; justify-content: space-between; }
+  &__title-row { align-items: flex-start; display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; }
   &__add, &__edit, &__delete { background: transparent; border: 1px solid #333; border-radius: 4px; color: #aaa; cursor: pointer; font-family: 'Oswald', sans-serif; font-size: .72rem; letter-spacing: 1px; padding: .35rem .75rem; text-transform: uppercase; &:hover { border-color: #8b0000; color: #fff; } }
   &__add { flex-shrink: 0; }
   &__edit { font-size: .65rem; padding: .2rem .45rem; }
@@ -92,13 +92,16 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+    flex-wrap: wrap;
     gap: 0.5rem;
-    min-height: 2.3rem; // reserves two lines of name text so all cards align
+    min-height: 2.3rem;
   }
 
-  &__actions { align-items: center; display: flex; flex-shrink: 0; gap: .4rem; }
+  &__actions { align-items: center; display: flex; flex: 0 1 auto; flex-shrink: 0; flex-wrap: wrap; gap: .4rem; justify-content: flex-end; }
 
   &__name {
+    flex: 1 1 9rem;
+    min-width: 0;
     font-family: 'Oswald', sans-serif;
     font-size: 0.92rem;
     font-weight: 600;
@@ -106,6 +109,7 @@
     letter-spacing: 0.75px;
     color: #fff;
     line-height: 1.25;
+    overflow-wrap: anywhere;
   }
 
   &__present-badge {
@@ -176,5 +180,13 @@
     border: 1px solid rgba(139, 0, 0, 0.22);
     border-radius: 3px;
     padding: 0.1rem 0.4rem;
+  }
+
+  @media (max-width: 480px) {
+    &__title-row { gap: .5rem; }
+    &__add { width: 100%; }
+    &__card-body { padding: .875rem 1rem; }
+    &__name { flex-basis: 100%; }
+    &__actions { justify-content: flex-start; }
   }
 }

@@ -50,4 +50,19 @@ describe('ReleaseTracksComponent', () => {
     fixture.detectChanges();
     expect(component.sortedTracks()).toEqual([]);
   });
+
+  it('should show edit and delete-all controls next to the track list title only for administrators', () => {
+    const editTracks = vi.fn();
+    const deleteAllTracks = vi.fn();
+    component.editTracks.subscribe(editTracks);
+    component.deleteAllTracks.subscribe(deleteAllTracks);
+    componentRef.setInput('isAdmin', true);
+    fixture.detectChanges();
+
+    (fixture.nativeElement.querySelector('[data-testid="edit-release-tracks"]') as HTMLButtonElement).click();
+    (fixture.nativeElement.querySelector('[data-testid="delete-all-tracks"]') as HTMLButtonElement).click();
+
+    expect(editTracks).toHaveBeenCalledOnce();
+    expect(deleteAllTracks).toHaveBeenCalledOnce();
+  });
 });

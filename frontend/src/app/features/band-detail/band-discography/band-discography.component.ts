@@ -20,6 +20,7 @@ export class BandDiscographyComponent {
   readonly isAdmin = input(false);
   readonly addRelease = output<void>();
   readonly editRelease = output<BandReleaseModel>();
+  readonly deleteRelease = output<BandReleaseModel>();
 
   navigateToRelease(releaseId: string): void {
     this.releaseState.saveBandId(this.bandId());
@@ -29,6 +30,11 @@ export class BandDiscographyComponent {
   onEditRelease(event: Event, release: BandReleaseModel): void {
     event.stopPropagation();
     this.editRelease.emit(release);
+  }
+
+  onDeleteRelease(event: Event, release: BandReleaseModel): void {
+    event.stopPropagation();
+    this.deleteRelease.emit(release);
   }
 
   typeClass(releaseType: string): string {

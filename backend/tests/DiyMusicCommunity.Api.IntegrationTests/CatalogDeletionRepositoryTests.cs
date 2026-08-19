@@ -134,6 +134,32 @@ public sealed class CatalogDeletionRepositoryTests
         });
     }
 
+    [Fact]
+    public async Task DeleteAllTracks_ExistingRelease_Should_KeepReleaseAndRemoveItsTracks()
+    {
+        var bandId = Guid.NewGuid();
+        var releaseId = Guid.NewGuid();
+        var factory = new CustomWebApplicationFactory();
+        using var _ = factory;
+        factory.CreateClientWithDb(db =>
+        {
+            db.Bands.Add(new Band(bandId, "Track Owner", "UK", GenreId, BandStatus.Active, DateTime.UtcNow));
+            db.Releases.Add(new Release(releaseId, bandId, "Release", ReleaseType.Album));
+            db.Tracks.AddRange(
+                new Track(Guid.NewGuid(), releaseId, "One", 1),
+                new Track(Guid.NewGuid(), releaseId, "Two", 2));
+        });
+
+        var deleted = await Execute(factory, repository => repository.DeleteAllTracksAsync(releaseId));
+
+        deleted.Should().BeTrue();
+        await AssertDatabase(factory, db =>
+        {
+            db.Releases.Should().Contain(item => item.Id == releaseId);
+            db.Tracks.Should().NotContain(item => item.ReleaseId == releaseId);
+        });
+    }
+
     private static async Task<bool> Execute(CustomWebApplicationFactory factory, Func<ICatalogDeletionRepository, Task<bool>> action)
     {
         using var scope = factory.Services.CreateScope();

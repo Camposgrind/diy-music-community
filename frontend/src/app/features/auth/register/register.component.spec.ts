@@ -7,6 +7,7 @@ import { RegisterComponent } from './register.component';
 import { AuthApiService } from '../../../infrastructure/api/auth-api.service';
 import { ToastService } from '../../../core/toast/toast.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../core/auth/auth.service';
 
 import { Component } from '@angular/core';
 
@@ -17,6 +18,8 @@ describe('RegisterComponent', () => {
   let fixture: ComponentFixture<RegisterComponent>;
   let component: RegisterComponent;
   let registerSpy: ReturnType<typeof vi.fn>;
+  let loginSpy: ReturnType<typeof vi.fn>;
+  let setSessionSpy: ReturnType<typeof vi.fn>;
   let successSpy: ReturnType<typeof vi.fn>;
   let errorSpy: ReturnType<typeof vi.fn>;
 
@@ -29,6 +32,8 @@ describe('RegisterComponent', () => {
 
   beforeEach(() => {
     registerSpy = vi.fn();
+    loginSpy = vi.fn().mockReturnValue(of({ token: 'jwt', expiresAt: '' }));
+    setSessionSpy = vi.fn();
     successSpy  = vi.fn();
     errorSpy    = vi.fn();
 
@@ -36,7 +41,8 @@ describe('RegisterComponent', () => {
       imports: [RegisterComponent],
       providers: [
         provideRouter([{ path: 'login', component: DummyComponent }]),
-        { provide: AuthApiService, useValue: { register: registerSpy } },
+        { provide: AuthApiService, useValue: { register: registerSpy, login: loginSpy } },
+        { provide: AuthService, useValue: { setSession: setSessionSpy } },
         { provide: ToastService,   useValue: { success: successSpy, error: errorSpy } },
       ],
     });
@@ -109,14 +115,16 @@ describe('RegisterComponent', () => {
     expect(registerSpy).not.toHaveBeenCalled();
   });
 
-  it('should show success toast and navigate to /login on success', () => {
+  it('should automatically log in and navigate Home after successful registration', () => {
     registerSpy.mockReturnValue(of(undefined));
     const router = TestBed.inject(Router);
     const navSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
     fillValid();
     component.onSubmit();
-    expect(successSpy).toHaveBeenCalledWith('Account created! You can now sign in.');
-    expect(navSpy).toHaveBeenCalledWith(['/login']);
+    expect(loginSpy).toHaveBeenCalledWith({ email: 'campos@test.com', password: 'Password1!' });
+    expect(setSessionSpy).toHaveBeenCalledWith({ token: 'jwt', expiresAt: '' });
+    expect(successSpy).toHaveBeenCalledWith('Account created and signed in.');
+    expect(navSpy).toHaveBeenCalledWith(['/']);
   });
 
   it('should call register with the correct payload', () => {

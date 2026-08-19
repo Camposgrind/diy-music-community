@@ -22,6 +22,10 @@ catalog remains accurate.
   tracks, and its release formats are deleted.
 - [x] Given an Admin deletes a track, when the request succeeds, then the remaining tracks in the
   same release are renumbered consecutively from one, preserving their relative order.
+- [x] Given an Admin deletes all tracks of a release and confirms the action, when the request
+  succeeds, then every track of that release is removed while the release itself remains.
+- [x] Given an Admin deletes a catalog entity from a band or release detail page, when the request
+  succeeds or fails, then a success or red error toast respectively confirms the outcome.
 - [x] Given an Admin deletes an unknown resource, when the request is processed, then it receives
   `404 Not Found` and no data changes.
 - [ ] Given an unauthenticated or non-Admin caller invokes a deletion endpoint, when the request
@@ -35,6 +39,8 @@ All endpoints require the `Admin` role and return `204 No Content` on success:
 - `DELETE /api/bands/{bandId}/members/{memberId}`
 - `DELETE /api/releases/{releaseId}`
 - `DELETE /api/releases/{releaseId}/tracks/{trackId}`
+- `DELETE /api/releases/{releaseId}/tracks` — deletes the track list; an existing release with no
+  tracks still returns `204 No Content`.
 
 Unknown IDs return the existing structured `404` error (`Band.NotFound`, `Member.NotFound`,
 `Release.NotFound`, or `Track.NotFound`).
@@ -59,10 +65,12 @@ Unknown IDs return the existing structured `404` error (`Band.NotFound`, `Member
 
 - Application: deletion returns not found for absent resources and delegates each successful
   deletion to the persistence abstraction.
-- Integration: deleting a band removes all dependent data including restrictive other-band links.
+- Integration: deleting a band removes all dependent data including restrictive other-band links;
+  deleting all tracks retains the release.
 - Integration: deleting a member removes all other-band links; deleting a release removes tracks
   and formats; deleting a track renumbers its release.
 - API: deletion endpoints return 401 without authentication and 403 to a non-Admin.
+- Frontend: successful catalog deletions display success toasts and failed deletions display red error toasts.
 
 ## Out of scope
 

@@ -58,4 +58,27 @@ describe('ReleasesApiService', () => {
     expect(req.request.method).toBe('PUT');
     req.flush({ id: 'release-1' });
   });
+
+  it('should PUT an ordered track list separately from release information', () => {
+    const tracks = [{ title: 'First' }, { title: 'Second' }];
+    service.updateReleaseTracks('band-1', 'release-1', tracks).subscribe();
+    const req = httpMock.expectOne(`${environment.apiBaseUrl}/bands/band-1/releases/release-1/tracks`);
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual({ tracks });
+    req.flush({ id: 'release-1' });
+  });
+
+  it('should DELETE a release', () => {
+    service.deleteRelease('release-1').subscribe();
+    const req = httpMock.expectOne(`${base}/release-1`);
+    expect(req.request.method).toBe('DELETE');
+    req.flush(null);
+  });
+
+  it('should DELETE all tracks from a release', () => {
+    service.deleteAllTracks('release-1').subscribe();
+    const req = httpMock.expectOne(`${base}/release-1/tracks`);
+    expect(req.request.method).toBe('DELETE');
+    req.flush(null);
+  });
 });

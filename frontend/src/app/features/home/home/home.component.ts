@@ -16,6 +16,7 @@ import {
 } from '../../../infrastructure/api';
 import { SearchStateService } from '../search-state.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ToastService } from '../../../core/toast/toast.service';
 
 @Component({
   selector: 'dmc-home',
@@ -32,6 +33,7 @@ export class HomeComponent implements OnInit {
   private readonly searchState = inject(SearchStateService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
 
   readonly countries = signal<string[]>([]);
   readonly genres = signal<GenreModel[]>([]);
@@ -125,12 +127,14 @@ export class HomeComponent implements OnInit {
       next: (band) => {
         this.isCreatingBand.set(false);
         this.isCreateModalOpen.set(false);
-        this.toastMessage.set('Band created successfully.');
+        this.toast.success('Band created successfully.');
         void this.router.navigate(['/bands', band.id]);
       },
       error: (err: HttpErrorResponse) => {
         this.isCreatingBand.set(false);
-        this.createBandError.set(err.error?.message ?? 'Could not create band. Please try again.');
+        const message = err.error?.message ?? 'Could not create band. Please try again.';
+        this.createBandError.set(message);
+        this.toast.error(message);
       },
     });
   }

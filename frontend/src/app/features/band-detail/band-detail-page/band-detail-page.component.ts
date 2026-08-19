@@ -1,5 +1,5 @@
 ﻿import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BandsApiService } from '../../../infrastructure/api/bands-api.service';
 import { BandDetailModel, BandWriteRequest, GenreModel } from '../../../infrastructure/api/models';
 import { CountriesService, GenresApiService } from '../../../infrastructure/api';
@@ -13,10 +13,13 @@ import { BandDiscographyComponent } from '../band-discography/band-discography.c
 import { BandMembersComponent } from '../band-members/band-members.component';
 import { BandEditModalComponent, BandGeneralEditForm } from '../band-edit-modal/band-edit-modal.component';
 import { ReleaseModalComponent, ReleaseModalForm } from '../release-modal/release-modal.component';
+import { ReleaseDeleteConfirmationComponent } from '../release-delete-confirmation/release-delete-confirmation.component';
 import { BandReleaseModel, ReleaseDetailModel, ReleaseWriteRequest } from '../../../infrastructure/api/models';
 import { BandMemberModel, MemberWriteRequest } from '../../../infrastructure/api/models';
 import { MemberModalComponent, MemberModalForm, MemberType } from '../member-modal/member-modal.component';
 import { MemberDeleteConfirmationComponent } from '../member-delete-confirmation/member-delete-confirmation.component';
+import { BandDeleteConfirmationComponent } from '../band-delete-confirmation/band-delete-confirmation.component';
+import { ToastService } from '../../../core/toast/toast.service';
 
 @Component({
   selector: 'dmc-band-detail-page',
@@ -30,20 +33,24 @@ import { MemberDeleteConfirmationComponent } from '../member-delete-confirmation
     BandMembersComponent,
     BandEditModalComponent,
     ReleaseModalComponent,
+    ReleaseDeleteConfirmationComponent,
     MemberModalComponent,
     MemberDeleteConfirmationComponent,
+    BandDeleteConfirmationComponent,
   ],
   templateUrl: './band-detail-page.component.html',
   styleUrl: './band-detail-page.component.scss',
 })
 export class BandDetailPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly bandsApi = inject(BandsApiService);
   private readonly countriesService = inject(CountriesService);
   private readonly genresApi = inject(GenresApiService);
   private readonly auth = inject(AuthService);
   private readonly releasesApi = inject(ReleasesApiService);
   private readonly membersApi = inject(MembersApiService);
+  private readonly toast = inject(ToastService);
 
   readonly band = signal<BandDetailModel | null>(null);
   readonly loading = signal(true);
@@ -56,10 +63,13 @@ export class BandDetailPageComponent implements OnInit {
   readonly editData = signal<BandGeneralEditForm | null>(null);
   readonly releaseModalMode = signal<'create' | 'edit' | null>(null);
   readonly releaseModalData = signal<ReleaseModalForm | null>(null);
-  readonly releaseRequestContext = signal<Omit<ReleaseWriteRequest, 'title' | 'releaseType' | 'year'> | null>(null);
+  readonly releaseRequestContext = signal<Omit<ReleaseWriteRequest, 'title' | 'releaseType' | 'releaseDate' | 'year' | 'labelText' | 'formats'> | null>(null);
   readonly isSavingRelease = signal(false);
   readonly releaseError = signal<string | null>(null);
   readonly editingReleaseId = signal<string | null>(null);
+  readonly deletingRelease = signal<BandReleaseModel | null>(null);
+  readonly isDeletingRelease = signal(false);
+  readonly deleteReleaseError = signal<string | null>(null);
   readonly memberModalMode = signal<'create' | 'edit' | null>(null);
   readonly memberModalType = signal<MemberType>('current');
   readonly memberModalData = signal<MemberModalForm | null>(null);
@@ -69,6 +79,9 @@ export class BandDetailPageComponent implements OnInit {
   readonly deletingMember = signal<BandMemberModel | null>(null);
   readonly isDeletingMember = signal(false);
   readonly deleteMemberError = signal<string | null>(null);
+  readonly isBandDeleteOpen = signal(false);
+  readonly isDeletingBand = signal(false);
+  readonly deleteBandError = signal<string | null>(null);
   readonly isAdmin = this.auth.isAdmin;
   private readonly bandId = signal<string | null>(null);
 
@@ -140,6 +153,44 @@ export class BandDetailPageComponent implements OnInit {
     }
   }
 
+  openBandDeleteConfirmation(): void {
+    if (!this.isDeletingBand()) {
+      this.deleteBandError.set(null);
+      this.isBandDeleteOpen.set(true);
+    }
+  }
+
+  closeBandDeleteConfirmation(): void {
+    if (!this.isDeletingBand()) {
+      this.isBandDeleteOpen.set(false);
+      this.deleteBandError.set(null);
+    }
+  }
+
+  confirmBandDeletion(): void {
+    const band = this.band();
+    if (!band || this.isDeletingBand()) {
+      return;
+    }
+
+    this.isDeletingBand.set(true);
+    this.deleteBandError.set(null);
+    this.bandsApi.deleteBand(band.id).subscribe({
+      next: () => {
+        this.isDeletingBand.set(false);
+        this.isBandDeleteOpen.set(false);
+        this.toast.success('Band deleted successfully.');
+        this.router.navigate(['/']);
+      },
+      error: (err: { error?: { message?: string } }) => {
+        this.isDeletingBand.set(false);
+        const message = err.error?.message ?? 'Could not delete band. Please try again.';
+        this.deleteBandError.set(message);
+        this.toast.error(message);
+      },
+    });
+  }
+
   saveBand(data: BandGeneralEditForm): void {
     const band = this.band();
     const id = this.bandId();
@@ -157,11 +208,14 @@ export class BandDetailPageComponent implements OnInit {
       next: () => {
         this.isUpdatingBand.set(false);
         this.isEditModalOpen.set(false);
+        this.toast.success('Band updated successfully.');
         this.loadBandDetail();
       },
       error: (err: { error?: { message?: string } }) => {
         this.isUpdatingBand.set(false);
-        this.editError.set(err.error?.message ?? 'Could not update band. Please try again.');
+        const message = err.error?.message ?? 'Could not update band. Please try again.';
+        this.editError.set(message);
+        this.toast.error(message);
       },
     });
   }
@@ -170,8 +224,8 @@ export class BandDetailPageComponent implements OnInit {
     if (this.isSavingRelease()) return;
     this.releaseError.set(null);
     this.editingReleaseId.set(null);
-    this.releaseRequestContext.set({ releaseDate: null, labelText: null, coverImageUrl: null, tracks: [] });
-    this.releaseModalData.set({ title: '', releaseType: 'Album', year: null });
+    this.releaseRequestContext.set({ coverImageUrl: null, tracks: [] });
+    this.releaseModalData.set({ title: '', releaseType: 'Album', releaseDate: null, year: null, labelText: null, formats: [] });
     this.releaseModalMode.set('create');
   }
 
@@ -182,7 +236,7 @@ export class BandDetailPageComponent implements OnInit {
       next: (detail) => {
         this.editingReleaseId.set(release.id);
         this.releaseRequestContext.set(this.releaseContextFromDetail(detail));
-        this.releaseModalData.set({ title: detail.title, releaseType: detail.releaseType as ReleaseModalForm['releaseType'], year: detail.year });
+        this.releaseModalData.set({ title: detail.title, releaseType: detail.releaseType as ReleaseModalForm['releaseType'], releaseDate: detail.releaseDate, year: detail.year, labelText: detail.labelText, formats: detail.formats as ReleaseModalForm['formats'] });
         this.releaseModalMode.set('edit');
       },
       error: () => this.releaseError.set('Could not load release details. Please try again.'),
@@ -194,6 +248,41 @@ export class BandDetailPageComponent implements OnInit {
       this.releaseModalMode.set(null);
       this.releaseError.set(null);
     }
+  }
+
+  openDeleteReleaseModal(release: BandReleaseModel): void {
+    if (this.isSavingRelease() || this.isDeletingRelease()) return;
+    this.deleteReleaseError.set(null);
+    this.deletingRelease.set(release);
+  }
+
+  closeDeleteReleaseModal(): void {
+    if (!this.isDeletingRelease()) {
+      this.deletingRelease.set(null);
+      this.deleteReleaseError.set(null);
+    }
+  }
+
+  confirmDeleteRelease(): void {
+    const release = this.deletingRelease();
+    if (!release || this.isDeletingRelease()) return;
+
+    this.isDeletingRelease.set(true);
+    this.deleteReleaseError.set(null);
+    this.releasesApi.deleteRelease(release.id).subscribe({
+      next: () => {
+        this.isDeletingRelease.set(false);
+        this.deletingRelease.set(null);
+        this.toast.success('Release deleted successfully.');
+        this.loadBandDetail();
+      },
+      error: (err: { error?: { message?: string } }) => {
+        this.isDeletingRelease.set(false);
+        const message = err.error?.message ?? 'Could not delete release. Please try again.';
+        this.deleteReleaseError.set(message);
+        this.toast.error(message);
+      },
+    });
   }
 
   saveRelease(data: ReleaseModalForm): void {
@@ -210,14 +299,21 @@ export class BandDetailPageComponent implements OnInit {
       : this.releasesApi.updateRelease(bandId, this.editingReleaseId()!, request);
 
     request$.subscribe({
-      next: () => {
+      next: (result) => {
         this.isSavingRelease.set(false);
         this.releaseModalMode.set(null);
+        this.toast.success(mode === 'create' ? 'Release created successfully.' : 'Release updated successfully.');
+        if (mode === 'create') {
+          this.router.navigate(['/releases', result.id]);
+          return;
+        }
         this.loadBandDetail();
       },
       error: (err: { error?: { message?: string } }) => {
         this.isSavingRelease.set(false);
-        this.releaseError.set(err.error?.message ?? 'Could not save release. Please try again.');
+        const message = err.error?.message ?? 'Could not save release. Please try again.';
+        this.releaseError.set(message);
+        this.toast.error(message);
       },
     });
   }
@@ -272,11 +368,14 @@ export class BandDetailPageComponent implements OnInit {
       next: () => {
         this.isDeletingMember.set(false);
         this.deletingMember.set(null);
+        this.toast.success('Member deleted successfully.');
         this.loadBandDetail();
       },
       error: (err: { error?: { message?: string } }) => {
         this.isDeletingMember.set(false);
-        this.deleteMemberError.set(err.error?.message ?? 'Could not delete member. Please try again.');
+        const message = err.error?.message ?? 'Could not delete member. Please try again.';
+        this.deleteMemberError.set(message);
+        this.toast.error(message);
       },
     });
   }
@@ -301,11 +400,14 @@ export class BandDetailPageComponent implements OnInit {
       next: () => {
         this.isSavingMember.set(false);
         this.memberModalMode.set(null);
+        this.toast.success(mode === 'create' ? 'Member added successfully.' : 'Member updated successfully.');
         this.loadBandDetail();
       },
       error: (err: { error?: { message?: string } }) => {
         this.isSavingMember.set(false);
-        this.memberError.set(err.error?.message ?? 'Could not save member. Please try again.');
+        const message = err.error?.message ?? 'Could not save member. Please try again.';
+        this.memberError.set(message);
+        this.toast.error(message);
       },
     });
   }
@@ -331,10 +433,8 @@ export class BandDetailPageComponent implements OnInit {
     });
   }
 
-  private releaseContextFromDetail(detail: ReleaseDetailModel): Omit<ReleaseWriteRequest, 'title' | 'releaseType' | 'year'> {
+  private releaseContextFromDetail(detail: ReleaseDetailModel): Omit<ReleaseWriteRequest, 'title' | 'releaseType' | 'releaseDate' | 'year' | 'labelText' | 'formats'> {
     return {
-      releaseDate: detail.releaseDate,
-      labelText: detail.labelText,
       coverImageUrl: detail.coverImageUrl,
       tracks: detail.tracks.map((track) => ({ title: track.title })),
     };

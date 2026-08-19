@@ -85,6 +85,23 @@ public sealed class BandMember : Entity
         IsCurrent = false;
     }
 
+    public void MoveToPastMembers()
+    {
+        IsCurrent = false;
+        IsLastKnownLineup = false;
+    }
+
+    public void MarkAsLastKnownLineup()
+    {
+        if (!EndYear.HasValue)
+        {
+            throw new ArgumentException("Last known lineup members require an end year.", nameof(EndYear));
+        }
+
+        IsCurrent = false;
+        IsLastKnownLineup = true;
+    }
+
     // --- Other bands ---
 
     public void AddOtherBand(Guid otherBandId)

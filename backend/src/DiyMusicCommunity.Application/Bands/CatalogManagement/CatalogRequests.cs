@@ -36,12 +36,18 @@ public sealed class ReleaseWriteRequest
     public int? Year { get; init; }
     public string? LabelText { get; init; }
     public string? CoverImageUrl { get; init; }
+    public IReadOnlyList<Format> Formats { get; init; } = [];
     public IReadOnlyList<TrackWriteRequest> Tracks { get; init; } = [];
 }
 
 public sealed class TrackWriteRequest
 {
     public string Title { get; init; } = string.Empty;
+}
+
+public sealed class TrackListWriteRequest
+{
+    public IReadOnlyList<TrackWriteRequest> Tracks { get; init; } = [];
 }
 
 public sealed class CatalogResourceModel

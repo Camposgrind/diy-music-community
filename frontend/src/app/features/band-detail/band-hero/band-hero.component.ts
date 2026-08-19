@@ -13,6 +13,7 @@ export class BandHeroComponent {
   readonly band = input.required<BandDetailModel>();
   readonly isAdmin = input(false);
   readonly edit = output<void>();
+  readonly deleteBand = output<void>();
 
   readonly fallback = 'images/grindLogo.jpg';
 

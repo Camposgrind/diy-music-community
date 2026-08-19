@@ -89,6 +89,15 @@ describe('HeaderComponent', () => {
     expect(navSpy).toHaveBeenCalledWith(['/']);
   });
 
+  it('should include the current page as the login return URL', () => {
+    setup(false);
+    const component = fixture.componentInstance;
+    const router = TestBed.inject(Router);
+    Object.defineProperty(router, 'url', { configurable: true, get: () => '/bands/band-42?tab=members' });
+
+    expect(component.loginReturnUrl()).toBe('/bands/band-42?tab=members');
+  });
+
   it('logout() should call auth.logout()', () => {
     const { fakeAuth } = setup(true, mockUser);
     fixture.componentInstance.logout();

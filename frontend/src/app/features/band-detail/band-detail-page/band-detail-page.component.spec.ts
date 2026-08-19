@@ -1,12 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { provideRouter } from '@angular/router';
-import { signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { vi } from 'vitest';
 import { BandDetailPageComponent } from './band-detail-page.component';
 import { BandDetailModel, BandWriteRequest, MemberWriteRequest, ReleaseWriteRequest } from '../../../infrastructure/api/models';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ToastService } from '../../../core/toast/toast.service';
 
 const mockBand: BandDetailModel = {
   id: 'b1',
@@ -30,21 +32,29 @@ const mockBand: BandDetailModel = {
   ],
 };
 
+@Component({ template: '' })
+class ReleaseRouteStubComponent {}
+
 describe('BandDetailPageComponent', () => {
   let fixture: ComponentFixture<BandDetailPageComponent>;
   let component: BandDetailPageComponent;
   let httpMock: HttpTestingController;
   const isAdmin = signal(false);
+  let toastSuccess: ReturnType<typeof vi.fn>;
+  let toastError: ReturnType<typeof vi.fn>;
 
   const setup = async (paramId: string | null) => {
     TestBed.resetTestingModule();
+    toastSuccess = vi.fn();
+    toastError = vi.fn();
     await TestBed.configureTestingModule({
       imports: [BandDetailPageComponent],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
-        provideRouter([]),
+        provideRouter([{ path: 'releases/:id', component: ReleaseRouteStubComponent }]),
         { provide: AuthService, useValue: { isAdmin } },
+        { provide: ToastService, useValue: { success: toastSuccess, error: toastError } },
         {
           provide: ActivatedRoute,
           useValue: {
@@ -218,6 +228,37 @@ describe('BandDetailPageComponent', () => {
 
     expect(component.isEditModalOpen()).toBe(false);
     expect(component.band()?.status).toBe('OnHold');
+    expect(toastSuccess).toHaveBeenCalledWith('Band updated successfully.');
+  });
+
+  it('should delete a confirmed band and redirect to Home', async () => {
+    await setup('b1');
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
+    const router = TestBed.inject(Router);
+    const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    component.openBandDeleteConfirmation();
+    component.confirmBandDeletion();
+
+    httpMock.expectOne((r) => r.method === 'DELETE' && r.url.endsWith('/bands/b1')).flush(null);
+    expect(navigate).toHaveBeenCalledWith(['/']);
+    expect(toastSuccess).toHaveBeenCalledWith('Band deleted successfully.');
+  });
+
+  it('shows the API error in a toast when updating a band fails', async () => {
+    await setup('b1');
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
+
+    component.saveBand({ name: mockBand.name, country: mockBand.country, genreId: 'genre-1', status: 'Active' });
+    httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'PUT').flush(
+      { message: 'The band cannot be updated.' },
+      { status: 422, statusText: 'Unprocessable Entity' },
+    );
+
+    expect(component.editError()).toBe('The band cannot be updated.');
+    expect(toastError).toHaveBeenCalledWith('The band cannot be updated.');
   });
 
   it('should open the release modal in create mode for an Admin', async () => {
@@ -249,7 +290,7 @@ describe('BandDetailPageComponent', () => {
     fixture.detectChanges();
 
     expect(component.releaseModalMode()).toBe('edit');
-    expect(component.releaseModalData()).toEqual({ title: 'Scum', releaseType: 'Album', year: 1987 });
+    expect(component.releaseModalData()).toEqual({ title: 'Scum', releaseType: 'Album', releaseDate: null, year: 1987, labelText: null, formats: [] });
   });
 
   it('should create a release and reload the full band detail', async () => {
@@ -257,15 +298,14 @@ describe('BandDetailPageComponent', () => {
     fixture.detectChanges();
     httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
     component.openCreateReleaseModal();
-    component.saveRelease({ title: 'Harmony Corruption', releaseType: 'Album', year: 1990 });
+    component.saveRelease({ title: 'Harmony Corruption', releaseType: 'Album', releaseDate: null, year: 1990, labelText: null, formats: [] });
 
     const create = httpMock.expectOne((r) => r.url.endsWith('/bands/b1/releases') && r.method === 'POST');
     expect(create.request.body).toMatchObject({ title: 'Harmony Corruption', releaseType: 'Album', year: 1990, tracks: [] } satisfies Partial<ReleaseWriteRequest>);
     create.flush({ id: 'r2' });
-    httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'GET').flush({ ...mockBand, releases: [...mockBand.releases, { id: 'r2', title: 'Harmony Corruption', releaseType: 'Album', year: 1990 }] });
-
     expect(component.releaseModalMode()).toBeNull();
-    expect(component.band()?.releases).toHaveLength(2);
+    expect(component.band()?.releases).toHaveLength(1);
+    expect(toastSuccess).toHaveBeenCalledWith('Release created successfully.');
   });
 
   it('should update a release and reload the full band detail', async () => {
@@ -277,7 +317,7 @@ describe('BandDetailPageComponent', () => {
       id: 'r1', title: 'Scum', releaseType: 'Album', releaseDate: null, year: 1987, labelText: 'Earache',
       coverImageUrl: 'https://example.com/scum.jpg', band: null, formats: [], tracks: [{ id: 't1', title: 'Multinational Corporations', trackNumber: 1 }],
     });
-    component.saveRelease({ title: 'Scum', releaseType: 'Album', year: 1988 });
+    component.saveRelease({ title: 'Scum', releaseType: 'Album', releaseDate: null, year: 1988, labelText: 'Earache', formats: [] });
 
     const update = httpMock.expectOne((r) => r.url.endsWith('/bands/b1/releases/r1') && r.method === 'PUT');
     expect(update.request.body).toMatchObject({ year: 1988, labelText: 'Earache', coverImageUrl: 'https://example.com/scum.jpg', tracks: [{ title: 'Multinational Corporations' }] });
@@ -285,6 +325,36 @@ describe('BandDetailPageComponent', () => {
     httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'GET').flush({ ...mockBand, releases: [{ ...mockBand.releases[0], year: 1988 }] });
 
     expect(component.band()?.releases[0].year).toBe(1988);
+    expect(toastSuccess).toHaveBeenCalledWith('Release updated successfully.');
+  });
+
+  it('should delete a confirmed release and reload the band detail without it', async () => {
+    await setup('b1');
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
+    component.openDeleteReleaseModal(mockBand.releases[0]);
+
+    expect(component.deletingRelease()).toEqual(mockBand.releases[0]);
+
+    component.confirmDeleteRelease();
+    httpMock.expectOne((r) => r.url.endsWith('/releases/r1') && r.method === 'DELETE').flush(null);
+    httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'GET').flush({ ...mockBand, releases: [] });
+
+    expect(component.deletingRelease()).toBeNull();
+    expect(component.band()?.releases).toEqual([]);
+    expect(toastSuccess).toHaveBeenCalledWith('Release deleted successfully.');
+  });
+
+  it('should close release deletion confirmation without calling the API', async () => {
+    await setup('b1');
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
+    component.openDeleteReleaseModal(mockBand.releases[0]);
+
+    component.closeDeleteReleaseModal();
+
+    expect(component.deletingRelease()).toBeNull();
+    httpMock.expectNone((r) => r.method === 'DELETE');
   });
 
   it('should open a current-member modal for an Admin', async () => {
@@ -315,6 +385,7 @@ describe('BandDetailPageComponent', () => {
     update.flush({ id: 'm2' });
     httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'GET').flush({ ...mockBand, members: [...mockBand.members.slice(0, 1), { ...pastMember, endYear: 1990 }] });
     expect(component.band()?.members[1].endYear).toBe(1990);
+    expect(toastSuccess).toHaveBeenCalledWith('Member updated successfully.');
   });
 
   it('should delete a confirmed member and reload the band detail without it', async () => {
@@ -332,6 +403,7 @@ describe('BandDetailPageComponent', () => {
 
     expect(component.deletingMember()).toBeNull();
     expect(component.band()?.members).toEqual([mockBand.members[1]]);
+    expect(toastSuccess).toHaveBeenCalledWith('Member deleted successfully.');
   });
 
   it('should close member deletion confirmation without calling the API', async () => {

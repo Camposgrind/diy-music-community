@@ -125,6 +125,23 @@ public sealed class CatalogDeletionRepository : ICatalogDeletionRepository
         return true;
     }
 
+    public async Task<bool> DeleteAllTracksAsync(Guid releaseId, CancellationToken cancellationToken = default)
+    {
+        var releaseExists = await _context.Releases.AnyAsync(item => item.Id == releaseId, cancellationToken);
+        if (!releaseExists)
+        {
+            return false;
+        }
+
+        var tracks = await _context.Tracks
+            .Where(item => item.ReleaseId == releaseId)
+            .ToListAsync(cancellationToken);
+
+        _context.Tracks.RemoveRange(tracks);
+        await _context.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
     private async Task RenumberTracksAsync(Guid releaseId, CancellationToken cancellationToken)
     {
         if (_context.Database.IsRelational())

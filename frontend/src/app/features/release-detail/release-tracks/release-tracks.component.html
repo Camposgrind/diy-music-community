@@ -1,18 +1,29 @@
 <section class="tracks">
-  <h2 class="tracks__title">Track List</h2>
-
-  <!-- Column headers -->
-  <div class="tracks__header">
-    <span class="tracks__header-num">#</span>
-    <span class="tracks__header-title">Title</span>
-  </div>
-
-  <div class="tracks__list">
-    @for (track of sortedTracks(); track track.trackNumber) {
-      <div class="tracks__item">
-        <span class="tracks__item-num">{{ track.trackNumber }}</span>
-        <span class="tracks__item-title">{{ track.title }}</span>
+  <div class="tracks__title-row">
+    <h2 class="tracks__title">Track List</h2>
+    @if (isAdmin()) {
+      <div class="tracks__actions">
+        <button type="button" class="tracks__action" data-testid="edit-release-tracks" (click)="editTracks.emit()">Edit tracks</button>
+        <button type="button" class="tracks__action tracks__action--delete" data-testid="delete-all-tracks" (click)="deleteAllTracks.emit()" [disabled]="sortedTracks().length === 0">Delete all</button>
       </div>
     }
   </div>
+
+  @if (sortedTracks().length > 0) {
+    <div class="tracks__header">
+      <span class="tracks__header-num">#</span>
+      <span class="tracks__header-title">Title</span>
+    </div>
+
+    <div class="tracks__list">
+      @for (track of sortedTracks(); track track.trackNumber) {
+        <div class="tracks__item">
+          <span class="tracks__item-num">{{ track.trackNumber }}</span>
+          <span class="tracks__item-title">{{ track.title }}</span>
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="tracks__empty">No tracks have been added yet.</p>
+  }
 </section>

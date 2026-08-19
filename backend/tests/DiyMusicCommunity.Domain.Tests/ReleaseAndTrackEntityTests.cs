@@ -49,6 +49,18 @@ public class ReleaseFormatTests
         Assert.Contains(Format.Digital, formats);
     }
 
+    [Fact]
+    public void ReplaceFormats_Should_RemoveMissingFormatsAndApplyTheNewList()
+    {
+        var release = CreateRelease();
+        release.AddFormat(Format.CD);
+        release.AddFormat(Format.Cassette);
+
+        release.ReplaceFormats([Format.Vinyl12, Format.Digital]);
+
+        Assert.Equal([Format.Vinyl12, Format.Digital], release.GetFormats());
+    }
+
     // --- RemoveFormat ---
 
     [Fact]

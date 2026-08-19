@@ -35,7 +35,10 @@
     <div class="band-hero__title-row">
       <h1 class="band-hero__name">{{ band().name }}</h1>
       @if (isAdmin()) {
-        <button type="button" class="band-hero__edit" data-testid="edit-band" (click)="edit.emit()">Edit</button>
+        <div class="band-hero__edit-actions">
+          <button type="button" class="band-hero__edit" data-testid="edit-band" (click)="edit.emit()">Edit</button>
+          <button type="button" class="band-hero__edit band-hero__edit--delete" data-testid="delete-band" (click)="deleteBand.emit()">Delete band</button>
+        </div>
       }
     </div>
 

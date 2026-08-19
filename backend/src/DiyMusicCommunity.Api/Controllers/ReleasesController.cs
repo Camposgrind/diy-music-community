@@ -75,4 +75,19 @@ public sealed class ReleasesController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpDelete("{releaseId:guid}/tracks")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteAllTracks(Guid releaseId, CancellationToken cancellationToken)
+    {
+        var result = await _catalogDeletionUseCase.DeleteAllTracks(releaseId, cancellationToken);
+        if (result.IsFailure)
+        {
+            return NotFound(result.Error);
+        }
+
+        return NoContent();
+    }
 }

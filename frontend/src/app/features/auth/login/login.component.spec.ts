@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { vi } from 'vitest';
 import { of, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -15,11 +15,13 @@ describe('LoginComponent', () => {
   let loginSpy: ReturnType<typeof vi.fn>;
   let setSessionSpy: ReturnType<typeof vi.fn>;
   let toastErrorSpy: ReturnType<typeof vi.fn>;
+  let returnUrl: string | null;
 
   beforeEach(() => {
     loginSpy      = vi.fn();
     setSessionSpy = vi.fn();
     toastErrorSpy = vi.fn();
+    returnUrl = null;
 
     TestBed.configureTestingModule({
       imports: [LoginComponent],
@@ -28,6 +30,7 @@ describe('LoginComponent', () => {
         { provide: AuthApiService,  useValue: { login: loginSpy } },
         { provide: AuthService,     useValue: { setSession: setSessionSpy } },
         { provide: ToastService,    useValue: { error: toastErrorSpy } },
+        { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: { get: (key: string) => key === 'returnUrl' ? returnUrl : null } } } },
       ],
     });
 
@@ -77,7 +80,7 @@ describe('LoginComponent', () => {
     );
   });
 
-  it('should call setSession and navigate to / on successful login', () => {
+  it('should call setSession and navigate to Home on successful login without a return URL', () => {
     const res = { token: 'jwt', expiresAt: '' };
     loginSpy.mockReturnValue(of(res));
     const router = TestBed.inject(Router);
@@ -86,6 +89,45 @@ describe('LoginComponent', () => {
     component.password.setValue('Password1!');
     component.onSubmit();
     expect(setSessionSpy).toHaveBeenCalledWith(res);
+    expect(navSpy).toHaveBeenCalledWith(['/']);
+  });
+
+  it('should return to the originating band page after successful login', () => {
+    returnUrl = '/bands/band-42?tab=members';
+    loginSpy.mockReturnValue(of({ token: 'jwt', expiresAt: '' }));
+    const router = TestBed.inject(Router);
+    const navSpy = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+    component.emailOrUsername.setValue('a@a.com');
+    component.password.setValue('Password1!');
+
+    component.onSubmit();
+
+    expect(navSpy).toHaveBeenCalledWith('/bands/band-42?tab=members');
+  });
+
+  it('should return to the originating release page after successful login', () => {
+    returnUrl = '/releases/release-42';
+    loginSpy.mockReturnValue(of({ token: 'jwt', expiresAt: '' }));
+    const router = TestBed.inject(Router);
+    const navSpy = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+    component.emailOrUsername.setValue('a@a.com');
+    component.password.setValue('Password1!');
+
+    component.onSubmit();
+
+    expect(navSpy).toHaveBeenCalledWith('/releases/release-42');
+  });
+
+  it('should ignore an unsafe external return URL after successful login', () => {
+    returnUrl = '//external.example';
+    loginSpy.mockReturnValue(of({ token: 'jwt', expiresAt: '' }));
+    const router = TestBed.inject(Router);
+    const navSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    component.emailOrUsername.setValue('a@a.com');
+    component.password.setValue('Password1!');
+
+    component.onSubmit();
+
     expect(navSpy).toHaveBeenCalledWith(['/']);
   });
 

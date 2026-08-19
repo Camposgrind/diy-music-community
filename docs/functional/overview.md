@@ -18,9 +18,13 @@ can also edit its general information from the band detail page. These flows del
 logo and photo management, which belongs to a later edit flow. The successful creation flow opens
 the new band detail page. Registered non-admin users have no band catalog write access.
 
-Administrators can also add a release or edit its title, type, and year from a band's
-discography. Editing preserves the release's existing tracks and other stored release metadata;
-track and cover management remain separate future flows.
+Administrators can add a release from a band's discography and are taken to its detail after a
+successful creation. They can edit a release's main information (title, type, date, year, label,
+and formats) from either band or release detail, without changing its tracks or cover. Multiple
+labels are entered as a comma-separated value and formats use a multi-select control. Release
+detail has a separate track editor where administrators add names, remove incorrect entries, and
+move entries up or down before saving. The visual list order is submitted to the API, which assigns
+track numbers. Release cover management remains a separate future flow.
 
 When creating or editing a split-up band, administrators must record its split-up year. Its detail
 page shows the years it was active when both formation and split-up years are known.

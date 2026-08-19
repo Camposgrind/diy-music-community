@@ -17,14 +17,15 @@
       </div>
     </div>
   } @else if (band(); as b) {
-    <dmc-band-hero [band]="b" [isAdmin]="isAdmin()" (edit)="openEditModal()" />
+    <dmc-band-hero [band]="b" [isAdmin]="isAdmin()" (edit)="openEditModal()" (deleteBand)="openBandDeleteConfirmation()" />
 
     <dmc-band-discography
       [releases]="b.releases"
       [bandId]="b.id"
       [isAdmin]="isAdmin()"
       (addRelease)="openCreateReleaseModal()"
-      (editRelease)="openEditReleaseModal($event)" />
+      (editRelease)="openEditReleaseModal($event)"
+      (deleteRelease)="openDeleteReleaseModal($event)" />
 
     <dmc-band-members [members]="isSplitUp() ? lastKnownMembers() : currentMembers()" [title]="isSplitUp() ? 'Last Known Lineup' : 'Current Members'" [memberType]="isSplitUp() ? 'lastKnown' : 'current'" [isAdmin]="isAdmin()" (addMember)="openCreateMemberModal($event)" (editMember)="openEditMemberModal($event)" (deleteMember)="openDeleteMemberModal($event)" />
     <dmc-band-members [members]="pastMembers()" title="Past Members" memberType="past" [isAdmin]="isAdmin()" (addMember)="openCreateMemberModal($event)" (editMember)="openEditMemberModal($event)" (deleteMember)="openDeleteMemberModal($event)" />
@@ -42,6 +43,10 @@
     (close)="closeEditModal()" />
 }
 
+@if (isBandDeleteOpen() && band(); as band) {
+  <dmc-band-delete-confirmation [band]="band" [deleting]="isDeletingBand()" [error]="deleteBandError()" (confirm)="confirmBandDeletion()" (close)="closeBandDeleteConfirmation()" />
+}
+
 @if (releaseModalMode(); as mode) {
   <dmc-release-modal
     [mode]="mode"
@@ -50,6 +55,15 @@
     [error]="releaseError()"
     (save)="saveRelease($event)"
     (close)="closeReleaseModal()" />
+}
+
+@if (deletingRelease(); as release) {
+  <dmc-release-delete-confirmation
+    [release]="release"
+    [deleting]="isDeletingRelease()"
+    [error]="deleteReleaseError()"
+    (confirm)="confirmDeleteRelease()"
+    (close)="closeDeleteReleaseModal()" />
 }
 
 @if (memberModalMode(); as mode) {

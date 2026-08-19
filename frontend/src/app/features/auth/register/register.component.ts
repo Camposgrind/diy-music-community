@@ -6,6 +6,8 @@ import { AuthApiService } from '../../../infrastructure/api/auth-api.service';
 import { ToastService } from '../../../core/toast/toast.service';
 import { ApiError } from '../../../infrastructure/api/models';
 import { passwordMatchValidator } from './password-match.validator';
+import { AuthService } from '../../../core/auth/auth.service';
+import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'dmc-register',
@@ -16,6 +18,7 @@ import { passwordMatchValidator } from './password-match.validator';
 })
 export class RegisterComponent {
   private readonly authApi = inject(AuthApiService);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
 
@@ -63,16 +66,18 @@ export class RegisterComponent {
     const raw = this.form.getRawValue();
     this.loading.set(true);
 
-    this.authApi
-      .register({
-        email: raw.email!,
+    const credentials = { email: raw.email!, password: raw.password! };
+
+    this.authApi.register({
+        ...credentials,
         username: raw.username!,
-        password: raw.password!,
       })
+      .pipe(switchMap(() => this.authApi.login(credentials)))
       .subscribe({
-        next: () => {
-          this.toast.success('Account created! You can now sign in.');
-          this.router.navigate(['/login']);
+        next: (response) => {
+          this.authService.setSession(response);
+          this.toast.success('Account created and signed in.');
+          this.router.navigate(['/']);
         },
         error: (err: HttpErrorResponse) => {
           this.loading.set(false);

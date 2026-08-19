@@ -17,10 +17,29 @@
       </div>
     </div>
   } @else if (release(); as r) {
-    <dmc-release-hero [release]="r" />
-
-    @if (hasTracks()) {
-      <dmc-release-tracks [tracks]="r.tracks" />
-    }
+    <dmc-release-hero [release]="r" [isAdmin]="isAdmin()" (editDetails)="openEditDetailsModal()" (deleteRelease)="openReleaseDeleteConfirmation()" />
+    <dmc-release-tracks [tracks]="r.tracks" [isAdmin]="isAdmin()" (editTracks)="openEditReleaseModal()" (deleteAllTracks)="openDeleteAllTracksConfirmation()" />
   }
 </div>
+
+@if (isEditModalOpen()) {
+  <dmc-release-detail-edit-modal
+    [initialData]="editData()"
+    [tracksOnly]="true"
+    [saving]="isUpdatingRelease()"
+    [error]="editError()"
+    (save)="saveReleaseEdit($event)"
+    (close)="closeEditReleaseModal()" />
+}
+
+@if (isDetailsModalOpen()) {
+  <dmc-release-modal [mode]="'edit'" [initialData]="detailsData()" [saving]="isUpdatingRelease()" [error]="editError()" (save)="saveReleaseDetails($event)" (close)="closeEditDetailsModal()" />
+}
+
+@if (isReleaseDeleteOpen() && release(); as release) {
+  <dmc-release-delete-confirmation [release]="{ id: release.id, title: release.title, releaseType: release.releaseType, year: release.year }" [deleting]="isDeletingRelease()" [error]="releaseDeleteError()" (confirm)="confirmReleaseDeletion()" (close)="closeReleaseDeleteConfirmation()" />
+}
+
+@if (isDeleteAllTracksOpen() && release(); as release) {
+  <dmc-track-list-delete-confirmation [releaseTitle]="release.title" [deleting]="isDeletingAllTracks()" [error]="deleteAllTracksError()" (confirm)="confirmDeleteAllTracks()" (close)="closeDeleteAllTracksConfirmation()" />
+}

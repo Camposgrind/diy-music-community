@@ -1,4 +1,4 @@
-import { Component, input, signal } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { ReleaseDetailModel } from '../../../infrastructure/api/models';
 
 @Component({
@@ -10,6 +10,9 @@ import { ReleaseDetailModel } from '../../../infrastructure/api/models';
 })
 export class ReleaseHeroComponent {
   readonly release = input.required<ReleaseDetailModel>();
+  readonly isAdmin = input(false);
+  readonly editDetails = output<void>();
+  readonly deleteRelease = output<void>();
 
   readonly fallback = 'images/grindLogo.jpg';
   readonly lightboxUrl = signal<string | null>(null);

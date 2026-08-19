@@ -113,6 +113,38 @@
     text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
   }
 
+  &__title-row {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    justify-content: space-between;
+  }
+
+  &__edit {
+    background: transparent;
+    border: 1px solid #333;
+    border-radius: 4px;
+    color: #aaa;
+    cursor: pointer;
+    font-family: 'Oswald', sans-serif;
+    font-size: .75rem;
+    letter-spacing: 1px;
+    padding: .4rem .85rem;
+    text-transform: uppercase;
+
+    &:hover { border-color: #8b0000; color: #fff; }
+  }
+
+  &__edit-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+  &__edit--delete {
+    border-color: rgba(224, 96, 96, .7);
+    color: #ff8080;
+
+    &:hover { border-color: #e06060; color: #fff; background: rgba(181, 29, 29, .24); }
+  }
+
   // ── Type badge ───────────────────────────────────────────────
   &__meta {
     display: flex;

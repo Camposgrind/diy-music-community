@@ -6,4 +6,5 @@ public interface ICatalogDeletionRepository
     Task<bool> DeleteMemberAsync(Guid bandId, Guid memberId, CancellationToken cancellationToken = default);
     Task<bool> DeleteReleaseAsync(Guid releaseId, CancellationToken cancellationToken = default);
     Task<bool> DeleteTrackAsync(Guid releaseId, Guid trackId, CancellationToken cancellationToken = default);
+    Task<bool> DeleteAllTracksAsync(Guid releaseId, CancellationToken cancellationToken = default);
 }

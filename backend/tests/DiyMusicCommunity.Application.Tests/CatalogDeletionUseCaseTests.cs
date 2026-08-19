@@ -58,4 +58,17 @@ public sealed class CatalogDeletionUseCaseTests
         Assert.True(result.IsSuccess);
         repository.Verify(item => item.DeleteTrackAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Once);
     }
+
+    [Fact]
+    public async Task DeleteAllTracks_ExistingRelease_Should_DeleteAllTracks()
+    {
+        var repository = new Mock<ICatalogDeletionRepository>();
+        repository.Setup(item => item.DeleteAllTracksAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        var useCase = new CatalogDeletionUseCase(repository.Object);
+
+        var result = await useCase.DeleteAllTracks(Guid.NewGuid());
+
+        Assert.True(result.IsSuccess);
+        repository.Verify(item => item.DeleteAllTracksAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
 }
