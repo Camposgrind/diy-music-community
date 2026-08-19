@@ -7,12 +7,12 @@ namespace DiyMusicCommunity.Application.Bands.GetBandDetail;
 public sealed class GetBandDetailUseCase
 {
     private readonly IBandRepository _bandRepository;
-    private readonly IBlobStorageService _blobStorageService;
+    private readonly IImageUrlResolver _imageUrlResolver;
 
-    public GetBandDetailUseCase(IBandRepository bandRepository, IBlobStorageService blobStorageService)
+    public GetBandDetailUseCase(IBandRepository bandRepository, IImageUrlResolver imageUrlResolver)
     {
         _bandRepository = bandRepository;
-        _blobStorageService = blobStorageService;
+        _imageUrlResolver = imageUrlResolver;
     }
 
     public async Task<Result<BandDetailModel>> Handle(
@@ -37,8 +37,8 @@ public sealed class GetBandDetailUseCase
             FormationYear = band.FormationYear,
             SplitUpYear = band.SplitUpYear,
             Description = band.Description,
-            LogoImageUrl = await GetReadUrlAsync(band.LogoImageBlobPath, cancellationToken),
-            BandImageUrl = await GetReadUrlAsync(band.BandPhotoBlobPath, cancellationToken),
+            LogoImageUrl = await _imageUrlResolver.ResolveAsync(band.LogoImageBlobPath, cancellationToken),
+            BandImageUrl = await _imageUrlResolver.ResolveAsync(band.BandPhotoBlobPath, cancellationToken),
             MusicUrlPortal = band.MusicUrlPortal,
             BandContact = band.BandContact,
             Releases = band.Releases
@@ -75,16 +75,5 @@ public sealed class GetBandDetailUseCase
         };
 
         return Result<BandDetailModel>.Success(model);
-    }
-
-    private async Task<string?> GetReadUrlAsync(string? blobPath, CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrWhiteSpace(blobPath))
-        {
-            return null;
-        }
-
-        var uri = await _blobStorageService.GenerateReadUriAsync(blobPath, cancellationToken);
-        return uri.ToString();
     }
 }

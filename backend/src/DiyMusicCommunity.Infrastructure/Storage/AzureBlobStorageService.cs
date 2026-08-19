@@ -41,6 +41,12 @@ public sealed class AzureBlobStorageService : IBlobStorageService
         return Task.FromResult(blob.GenerateSasUri(builder));
     }
 
+    public async Task<bool> ExistsAsync(string blobPath, CancellationToken cancellationToken = default)
+    {
+        var response = await GetContainerClient().GetBlobClient(blobPath).ExistsAsync(cancellationToken);
+        return response.Value;
+    }
+
     public async Task DeleteIfExistsAsync(string blobPath, CancellationToken cancellationToken = default)
     {
         await GetContainerClient().DeleteBlobIfExistsAsync(blobPath, cancellationToken: cancellationToken);

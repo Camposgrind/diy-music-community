@@ -17,6 +17,8 @@ Como administrador, quiero reemplazar la foto o el logo de una banda para manten
 - [x] Given a non-administrator or an unknown band, when they call either image endpoint, then the API rejects the request using the existing authorization and not-found conventions.
 - [x] Given a persisted image path, when a band is returned, then any read URL is generated on demand and the database never stores a SAS URL.
 - [x] Given expired or confirmed temporary files, when cleanup runs, then only temporary local files are deleted.
+- [x] Given a band detail with a persisted image blob path, when its blob no longer exists or storage cannot resolve it, then the public image URL is null and the incident is logged without failing the band-detail response.
+- [x] Given a textual band update containing legacy image fields, when it is saved, then existing image blob paths remain unchanged.
 
 ## API contract
 
@@ -74,6 +76,10 @@ Returns `200 OK` with the band identifier, image type, stable blob path, and a r
 The intended production storage abstraction is `IBlobStorageService`, with an Azure Blob implementation that generates read-only SAS URLs for a configured lifetime. The database persists stable `BandPhotoBlobPath` and `BandLogoBlobPath`, not SAS URLs.
 
 Azure Blob Storage is the approved definitive-media storage for this project. Short-lived local files are retained only until successful confirmation and are deleted immediately after the database update succeeds. Expired temporary files are also removed opportunistically on every upload or confirmation.
+
+## Compatibility decision
+
+The existing public fields `bandImageUrl` and `logoImageUrl` remain the response contract and now contain short-lived read-only SAS URLs. Blob paths are never exposed. No null-path fallback search is implemented: the feature did not precede the definitive `bands/{bandId}/photo|logo/{fileId}` convention, and choosing an arbitrary blob would be unsafe when duplicate candidates exist.
 
 ## Test scenarios
 

@@ -47,6 +47,7 @@ public static class DependencyInjection
             options.TemporaryDirectory = configuration["FileUpload:TemporaryDirectory"];
         });
         services.AddScoped<IBlobStorageService, AzureBlobStorageService>();
+        services.AddScoped<IImageUrlResolver, BandImageUrlResolver>();
         services.AddScoped<IImageFileValidator, ImageFileValidator>();
         services.AddScoped<IImageUploadSettings, ImageUploadSettings>();
         services.AddScoped<ITemporaryImageStorage, LocalTemporaryImageStorage>();

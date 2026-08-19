@@ -36,7 +36,7 @@ public class GetBandDetailUseCaseTests
     private static (GetBandDetailUseCase UseCase, Mock<IBandRepository> Repo) BuildSut()
     {
         var repo = new Mock<IBandRepository>();
-        var useCase = new GetBandDetailUseCase(repo.Object, Mock.Of<IBlobStorageService>());
+        var useCase = new GetBandDetailUseCase(repo.Object, Mock.Of<IImageUrlResolver>());
         return (useCase, repo);
     }
 
@@ -150,5 +150,23 @@ public class GetBandDetailUseCaseTests
 
         Assert.True(result.IsSuccess);
         Assert.Equal(1991, result.Value!.SplitUpYear);
+    }
+
+    [Fact]
+    public async Task Handle_BandWithPhotoBlobPath_ShouldReturnResolvedReadUrl()
+    {
+        var repo = new Mock<IBandRepository>();
+        var resolver = new Mock<IImageUrlResolver>();
+        var band = MakeBand();
+        band.SetImageBlobPath(BandImageType.BandPhoto, "bands/photo.png");
+        repo.Setup(item => item.GetDetailAsync(band.Id, It.IsAny<CancellationToken>())).ReturnsAsync(band);
+        resolver.Setup(item => item.ResolveAsync("bands/photo.png", It.IsAny<CancellationToken>())).ReturnsAsync("https://storage.example/photo?read-only-sas");
+        var useCase = new GetBandDetailUseCase(repo.Object, resolver.Object);
+
+        var result = await useCase.Handle(band.Id);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("https://storage.example/photo?read-only-sas", result.Value!.BandImageUrl);
+        Assert.Null(result.Value.LogoImageUrl);
     }
 }
