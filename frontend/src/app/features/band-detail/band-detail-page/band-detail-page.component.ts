@@ -16,6 +16,7 @@ import { ReleaseModalComponent, ReleaseModalForm } from '../release-modal/releas
 import { BandReleaseModel, ReleaseDetailModel, ReleaseWriteRequest } from '../../../infrastructure/api/models';
 import { BandMemberModel, MemberWriteRequest } from '../../../infrastructure/api/models';
 import { MemberModalComponent, MemberModalForm, MemberType } from '../member-modal/member-modal.component';
+import { MemberDeleteConfirmationComponent } from '../member-delete-confirmation/member-delete-confirmation.component';
 
 @Component({
   selector: 'dmc-band-detail-page',
@@ -30,6 +31,7 @@ import { MemberModalComponent, MemberModalForm, MemberType } from '../member-mod
     BandEditModalComponent,
     ReleaseModalComponent,
     MemberModalComponent,
+    MemberDeleteConfirmationComponent,
   ],
   templateUrl: './band-detail-page.component.html',
   styleUrl: './band-detail-page.component.scss',
@@ -64,6 +66,9 @@ export class BandDetailPageComponent implements OnInit {
   readonly editingMemberId = signal<string | null>(null);
   readonly isSavingMember = signal(false);
   readonly memberError = signal<string | null>(null);
+  readonly deletingMember = signal<BandMemberModel | null>(null);
+  readonly isDeletingMember = signal(false);
+  readonly deleteMemberError = signal<string | null>(null);
   readonly isAdmin = this.auth.isAdmin;
   private readonly bandId = signal<string | null>(null);
 
@@ -240,6 +245,39 @@ export class BandDetailPageComponent implements OnInit {
       this.memberModalMode.set(null);
       this.memberError.set(null);
     }
+  }
+
+  openDeleteMemberModal(member: BandMemberModel): void {
+    if (this.isSavingMember() || this.isDeletingMember()) return;
+    this.deleteMemberError.set(null);
+    this.deletingMember.set(member);
+  }
+
+  closeDeleteMemberModal(): void {
+    if (!this.isDeletingMember()) {
+      this.deletingMember.set(null);
+      this.deleteMemberError.set(null);
+    }
+  }
+
+  confirmDeleteMember(): void {
+    const bandId = this.bandId();
+    const member = this.deletingMember();
+    if (!bandId || !member || this.isDeletingMember()) return;
+
+    this.isDeletingMember.set(true);
+    this.deleteMemberError.set(null);
+    this.membersApi.deleteMember(bandId, member.id).subscribe({
+      next: () => {
+        this.isDeletingMember.set(false);
+        this.deletingMember.set(null);
+        this.loadBandDetail();
+      },
+      error: (err: { error?: { message?: string } }) => {
+        this.isDeletingMember.set(false);
+        this.deleteMemberError.set(err.error?.message ?? 'Could not delete member. Please try again.');
+      },
+    });
   }
 
   saveMember(data: MemberModalForm): void {

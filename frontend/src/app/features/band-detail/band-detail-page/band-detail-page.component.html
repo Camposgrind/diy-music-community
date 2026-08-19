@@ -26,8 +26,8 @@
       (addRelease)="openCreateReleaseModal()"
       (editRelease)="openEditReleaseModal($event)" />
 
-    <dmc-band-members [members]="isSplitUp() ? lastKnownMembers() : currentMembers()" [title]="isSplitUp() ? 'Last Known Lineup' : 'Current Members'" [memberType]="isSplitUp() ? 'lastKnown' : 'current'" [isAdmin]="isAdmin()" (addMember)="openCreateMemberModal($event)" (editMember)="openEditMemberModal($event)" />
-    <dmc-band-members [members]="pastMembers()" title="Past Members" memberType="past" [isAdmin]="isAdmin()" (addMember)="openCreateMemberModal($event)" (editMember)="openEditMemberModal($event)" />
+    <dmc-band-members [members]="isSplitUp() ? lastKnownMembers() : currentMembers()" [title]="isSplitUp() ? 'Last Known Lineup' : 'Current Members'" [memberType]="isSplitUp() ? 'lastKnown' : 'current'" [isAdmin]="isAdmin()" (addMember)="openCreateMemberModal($event)" (editMember)="openEditMemberModal($event)" (deleteMember)="openDeleteMemberModal($event)" />
+    <dmc-band-members [members]="pastMembers()" title="Past Members" memberType="past" [isAdmin]="isAdmin()" (addMember)="openCreateMemberModal($event)" (editMember)="openEditMemberModal($event)" (deleteMember)="openDeleteMemberModal($event)" />
   }
 </div>
 
@@ -62,4 +62,13 @@
     [error]="memberError()"
     (save)="saveMember($event)"
     (close)="closeMemberModal()" />
+}
+
+@if (deletingMember(); as member) {
+  <dmc-member-delete-confirmation
+    [member]="member"
+    [deleting]="isDeletingMember()"
+    [error]="deleteMemberError()"
+    (confirm)="confirmDeleteMember()"
+    (close)="closeDeleteMemberModal()" />
 }

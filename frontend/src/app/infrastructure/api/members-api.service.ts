@@ -16,4 +16,8 @@ export class MembersApiService {
   updateMember(bandId: string, memberId: string, request: MemberWriteRequest): Observable<BandMemberModel> {
     return this.http.put<BandMemberModel>(`${this.bandsBaseUrl}/${bandId}/members/${memberId}`, request);
   }
+
+  deleteMember(bandId: string, memberId: string): Observable<void> {
+    return this.http.delete<void>(`${this.bandsBaseUrl}/${bandId}/members/${memberId}`);
+  }
 }

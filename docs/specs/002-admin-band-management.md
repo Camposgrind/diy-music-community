@@ -25,6 +25,9 @@ accurate and curated.
 - [x] Given I am not an Admin, when I view current or past members, then member-management controls are not available.
 - [x] Given a band is SplitUp, when I view its detail, then its persisted last known lineup is shown separately from past members.
 - [x] Given an Admin adds a member to a SplitUp band's last known lineup, when they submit the form, then an end year is required and the member is persisted as part of that lineup.
+- [x] Given I am authenticated as an Admin, when I choose to delete a current, past, or last-known-lineup member and confirm the action, then the member is deleted and the band detail reloads without it.
+- [x] Given I am an Admin, when I initiate member deletion, then I can cancel in a confirmation modal without changing the catalog.
+- [x] Given I edit a current member as a past member, when the refreshed detail loads, then the member appears in Past Members; when I change the band to SplitUp, then Current Members becomes Last Known Lineup.
 - [ ] Given I submit a duplicate band, release, member, or track identity, when the request is processed, then I receive 409 and no data is changed.
 - [ ] Given I am unauthenticated, when I call a band create or update endpoint, then I receive 401.
 - [ ] Given I am authenticated without the Admin role, when I call a band create or update endpoint, then I receive 403.
@@ -38,6 +41,7 @@ The catalog-management endpoints are pending implementation:
 - `PUT /api/bands/{id}` — Admin only.
 - `POST /api/bands/{bandId}/members` — Admin only.
 - `PUT /api/bands/{bandId}/members/{memberId}` — Admin only.
+- `DELETE /api/bands/{bandId}/members/{memberId}` — Admin only; returns `204 No Content`.
 - `POST /api/bands/{bandId}/releases` — Admin only. The request includes the release and all of its tracks.
 - `PUT /api/bands/{bandId}/releases/{releaseId}` — Admin only. The request replaces the release's complete track list.
 

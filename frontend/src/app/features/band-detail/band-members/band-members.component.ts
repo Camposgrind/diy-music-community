@@ -15,4 +15,5 @@ export class BandMembersComponent {
   readonly isAdmin = input(false);
   readonly addMember = output<'current' | 'past' | 'lastKnown'>();
   readonly editMember = output<BandMemberModel>();
+  readonly deleteMember = output<BandMemberModel>();
 }

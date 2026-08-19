@@ -31,4 +31,11 @@ describe('MembersApiService', () => {
     expect(req.request.method).toBe('PUT');
     req.flush({ id: 'member-1' });
   });
+
+  it('should DELETE a member from its parent band', () => {
+    service.deleteMember('band-1', 'member-1').subscribe();
+    const req = httpMock.expectOne(`${environment.apiBaseUrl}/bands/band-1/members/member-1`);
+    expect(req.request.method).toBe('DELETE');
+    req.flush(null);
+  });
 });

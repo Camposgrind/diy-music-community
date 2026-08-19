@@ -58,5 +58,17 @@ describe('BandMembersComponent', () => {
     fixture.detectChanges();
     expect(el.querySelector('[data-testid="add-member"]')).toBeTruthy();
     expect(el.querySelector('[data-testid="edit-member-m1"]')).toBeTruthy();
+    expect(el.querySelector('[data-testid="delete-member-m1"]')).toBeTruthy();
+  });
+
+  it('should emit the selected member when an Admin requests deletion', () => {
+    componentRef.setInput('isAdmin', true);
+    const deleteMember = vi.fn();
+    fixture.componentInstance.deleteMember.subscribe(deleteMember);
+    fixture.detectChanges();
+
+    (el.querySelector('[data-testid="delete-member-m1"]') as HTMLButtonElement).click();
+
+    expect(deleteMember).toHaveBeenCalledWith(mockMembers[0]);
   });
 });

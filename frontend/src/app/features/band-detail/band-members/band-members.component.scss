@@ -27,9 +27,10 @@
   }
 
   &__title-row { align-items: flex-start; display: flex; gap: 1rem; justify-content: space-between; }
-  &__add, &__edit { background: transparent; border: 1px solid #333; border-radius: 4px; color: #aaa; cursor: pointer; font-family: 'Oswald', sans-serif; font-size: .72rem; letter-spacing: 1px; padding: .35rem .75rem; text-transform: uppercase; &:hover { border-color: #8b0000; color: #fff; } }
+  &__add, &__edit, &__delete { background: transparent; border: 1px solid #333; border-radius: 4px; color: #aaa; cursor: pointer; font-family: 'Oswald', sans-serif; font-size: .72rem; letter-spacing: 1px; padding: .35rem .75rem; text-transform: uppercase; &:hover { border-color: #8b0000; color: #fff; } }
   &__add { flex-shrink: 0; }
   &__edit { font-size: .65rem; padding: .2rem .45rem; }
+  &__delete { background: rgba(181, 29, 29, .18); border-color: #b51d1d; color: #ff8080; font-size: .65rem; padding: .2rem .45rem; &:hover { background: #b51d1d; border-color: #ff8080; color: #fff; } }
   &__empty { color: #666; font-size: .875rem; margin: 0; padding: 1rem 0; }
 
   &__grid {

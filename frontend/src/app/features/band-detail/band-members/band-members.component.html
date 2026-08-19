@@ -17,6 +17,7 @@
             }
             @if (isAdmin()) {
               <button type="button" class="members__edit" [attr.data-testid]="'edit-member-' + member.id" (click)="editMember.emit(member)">Edit</button>
+              <button type="button" class="members__delete" [attr.data-testid]="'delete-member-' + member.id" (click)="deleteMember.emit(member)">Delete</button>
             }
             </div>
           </div>

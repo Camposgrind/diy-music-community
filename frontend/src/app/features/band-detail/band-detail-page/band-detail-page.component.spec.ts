@@ -317,6 +317,69 @@ describe('BandDetailPageComponent', () => {
     expect(component.band()?.members[1].endYear).toBe(1990);
   });
 
+  it('should delete a confirmed member and reload the band detail without it', async () => {
+    await setup('b1');
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
+    component.openDeleteMemberModal(mockBand.members[0]);
+
+    expect(component.deletingMember()).toEqual(mockBand.members[0]);
+
+    component.confirmDeleteMember();
+    const deletion = httpMock.expectOne((r) => r.url.endsWith('/bands/b1/members/m1') && r.method === 'DELETE');
+    deletion.flush(null);
+    httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'GET').flush({ ...mockBand, members: [mockBand.members[1]] });
+
+    expect(component.deletingMember()).toBeNull();
+    expect(component.band()?.members).toEqual([mockBand.members[1]]);
+  });
+
+  it('should close member deletion confirmation without calling the API', async () => {
+    await setup('b1');
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
+    component.openDeleteMemberModal(mockBand.members[0]);
+
+    component.closeDeleteMemberModal();
+
+    expect(component.deletingMember()).toBeNull();
+    httpMock.expectNone((r) => r.method === 'DELETE');
+  });
+
+  it('should show a member edited as past in Past Members after reload', async () => {
+    await setup('b1');
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
+    component.openEditMemberModal(mockBand.members[0]);
+
+    component.saveMember({ name: 'Barney Greenway', instrument: 'Vocals', startYear: 1989, endYear: 2020, memberType: 'past' });
+    httpMock.expectOne((r) => r.url.endsWith('/bands/b1/members/m1') && r.method === 'PUT').flush({ id: 'm1' });
+    httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'GET').flush({
+      ...mockBand,
+      members: [{ ...mockBand.members[0], endYear: 2020, isCurrent: false }, mockBand.members[1]],
+    });
+
+    expect(component.currentMembers()).toEqual([]);
+    expect(component.pastMembers().map((member) => member.id)).toEqual(['m1', 'm2']);
+  });
+
+  it('should replace Current Members with Last Known Lineup after changing the band to SplitUp', async () => {
+    await setup('b1');
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
+    component.saveBand({ name: mockBand.name, country: mockBand.country, genreId: 'genre-1', status: 'SplitUp' });
+    httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'PUT').flush({ id: 'b1' });
+    httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'GET').flush({
+      ...mockBand,
+      status: 'SplitUp',
+      members: [{ ...mockBand.members[0], isCurrent: false, isLastKnownLineup: true }],
+    });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Last Known Lineup');
+    expect(fixture.nativeElement.textContent).not.toContain('Current Members');
+  });
+
   it('should show a split-up band\'s last known lineup and use that member type', async () => {
     await setup('b1');
     fixture.detectChanges();
