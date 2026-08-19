@@ -1,6 +1,8 @@
 using DiyMusicCommunity.Application.Common;
 using DiyMusicCommunity.Application.Releases;
 using DiyMusicCommunity.Application.Releases.GetReleaseDetail;
+using DiyMusicCommunity.Application.Bands.CatalogDeletion;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiyMusicCommunity.Api.Controllers;
@@ -15,11 +17,13 @@ namespace DiyMusicCommunity.Api.Controllers;
 public sealed class ReleasesController : ControllerBase
 {
     private readonly GetReleaseDetailUseCase _getReleaseDetailUseCase;
+    private readonly CatalogDeletionUseCase _catalogDeletionUseCase;
 
     /// <summary>Initialises a new instance of <see cref="ReleasesController"/>.</summary>
-    public ReleasesController(GetReleaseDetailUseCase getReleaseDetailUseCase)
+    public ReleasesController(GetReleaseDetailUseCase getReleaseDetailUseCase, CatalogDeletionUseCase catalogDeletionUseCase)
     {
         _getReleaseDetailUseCase = getReleaseDetailUseCase;
+        _catalogDeletionUseCase = catalogDeletionUseCase;
     }
 
     /// <summary>Get the full detail of a single release, including its tracks and formats.</summary>
@@ -40,5 +44,35 @@ public sealed class ReleasesController : ControllerBase
         }
 
         return Ok(result.Value);
+    }
+
+    [HttpDelete("{releaseId:guid}")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteRelease(Guid releaseId, CancellationToken cancellationToken)
+    {
+        var result = await _catalogDeletionUseCase.DeleteRelease(releaseId, cancellationToken);
+        if (result.IsFailure)
+        {
+            return NotFound(result.Error);
+        }
+
+        return NoContent();
+    }
+
+    [HttpDelete("{releaseId:guid}/tracks/{trackId:guid}")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteTrack(Guid releaseId, Guid trackId, CancellationToken cancellationToken)
+    {
+        var result = await _catalogDeletionUseCase.DeleteTrack(releaseId, trackId, cancellationToken);
+        if (result.IsFailure)
+        {
+            return NotFound(result.Error);
+        }
+
+        return NoContent();
     }
 }

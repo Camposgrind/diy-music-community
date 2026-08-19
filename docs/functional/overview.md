@@ -22,6 +22,10 @@ Administrators can also add a release or edit its title, type, and year from a b
 discography. Editing preserves the release's existing tracks and other stored release metadata;
 track and cover management remain separate future flows.
 
+Administrators can remove an incorrect band, member, release, or track. Removing a band removes
+its dependent catalog data and member-to-other-band links; removing a track keeps the remaining
+track list consecutively numbered.
+
 From band detail, administrators can also manage current and past members. A shared form supports
 both types, including a change of type when a member joins or leaves the band; member images and
 other-band links remain separate future flows.

@@ -2,6 +2,7 @@ using DiyMusicCommunity.Application.Bands;
 using DiyMusicCommunity.Application.Bands.GetBandDetail;
 using DiyMusicCommunity.Application.Bands.GetBands;
 using DiyMusicCommunity.Application.Bands.CatalogManagement;
+using DiyMusicCommunity.Application.Bands.CatalogDeletion;
 using DiyMusicCommunity.Application.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -20,13 +21,15 @@ public sealed class BandsController : ControllerBase
     private readonly GetBandsUseCase _getBandsUseCase;
     private readonly GetBandDetailUseCase _getBandDetailUseCase;
     private readonly CatalogManagementUseCase _catalogManagementUseCase;
+    private readonly CatalogDeletionUseCase _catalogDeletionUseCase;
 
     /// <summary>Initialises a new instance of <see cref="BandsController"/>.</summary>
-    public BandsController(GetBandsUseCase getBandsUseCase, GetBandDetailUseCase getBandDetailUseCase, CatalogManagementUseCase catalogManagementUseCase)
+    public BandsController(GetBandsUseCase getBandsUseCase, GetBandDetailUseCase getBandDetailUseCase, CatalogManagementUseCase catalogManagementUseCase, CatalogDeletionUseCase catalogDeletionUseCase)
     {
         _getBandsUseCase = getBandsUseCase;
         _getBandDetailUseCase = getBandDetailUseCase;
         _catalogManagementUseCase = catalogManagementUseCase;
+        _catalogDeletionUseCase = catalogDeletionUseCase;
     }
 
     /// <summary>Search and filter the public band catalog.</summary>
@@ -126,6 +129,26 @@ public sealed class BandsController : ControllerBase
         return WriteResult(result, Ok);
     }
 
+    [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteBand(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _catalogDeletionUseCase.DeleteBand(id, cancellationToken);
+        return DeleteResult(result);
+    }
+
+    [HttpDelete("{bandId:guid}/members/{memberId:guid}")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteMember(Guid bandId, Guid memberId, CancellationToken cancellationToken)
+    {
+        var result = await _catalogDeletionUseCase.DeleteMember(bandId, memberId, cancellationToken);
+        return DeleteResult(result);
+    }
+
     private IActionResult WriteResult<T>(Result<T> result, Func<T, IActionResult> onSuccess)
     {
         if (result.IsSuccess)
@@ -139,5 +162,15 @@ public sealed class BandsController : ControllerBase
             BandErrors.Codes.NotFound or "Member.NotFound" or "Release.NotFound" => NotFound(result.Error),
             _ => BadRequest(result.Error)
         };
+    }
+
+    private IActionResult DeleteResult(Result<bool> result)
+    {
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return NotFound(result.Error);
     }
 }

@@ -3,6 +3,7 @@ using DiyMusicCommunity.Application.Auth.Register;
 using DiyMusicCommunity.Application.Bands.GetBandDetail;
 using DiyMusicCommunity.Application.Bands.GetBands;
 using DiyMusicCommunity.Application.Bands.CatalogManagement;
+using DiyMusicCommunity.Application.Bands.CatalogDeletion;
 using DiyMusicCommunity.Application.Genres.GetGenres;
 using DiyMusicCommunity.Application.Releases.GetReleaseDetail;
 using FluentValidation;
@@ -18,6 +19,7 @@ public static class DependencyInjection
         services.AddScoped<GetBandsUseCase>();
         services.AddScoped<GetBandDetailUseCase>();
         services.AddScoped<CatalogManagementUseCase>();
+        services.AddScoped<CatalogDeletionUseCase>();
         services.AddScoped<GetReleaseDetailUseCase>();
         services.AddScoped<GetGenresUseCase>();
         services.AddScoped<RegisterUseCase>();

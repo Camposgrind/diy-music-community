@@ -160,6 +160,10 @@ requests receive `401`; authenticated non-admin requests receive `403`.
 | `PUT /api/bands/{bandId}/members/{memberId}` | Update a member | `200` with `BandMemberModel` |
 | `POST /api/bands/{bandId}/releases` | Create a release with its complete track list | `201` with `ReleaseDetailModel` |
 | `PUT /api/bands/{bandId}/releases/{releaseId}` | Update a release and replace its complete track list | `200` with `ReleaseDetailModel` |
+| `DELETE /api/bands/{id}` | Delete a band and its catalog dependents | `204` |
+| `DELETE /api/bands/{bandId}/members/{memberId}` | Delete a member and its other-band links | `204` |
+| `DELETE /api/releases/{releaseId}` | Delete a release, its tracks, and formats | `204` |
+| `DELETE /api/releases/{releaseId}/tracks/{trackId}` | Delete a track and renumber later tracks | `204` |
 
 Band request fields are `name`, `country`, `genreId`, `status`, `location`, `formationYear`,
 `description`, `logoImageUrl`, `bandImageUrl`, `musicUrlPortal`, and `bandContact`. `name`,
@@ -179,6 +183,11 @@ identity. `PUT` returns `404` for an unknown resource and `409` when the change 
 different existing resource. Invalid request data returns `400` with `Catalog.InvalidRequest`.
 Write responses contain the current persisted DTO, so the frontend can update local state without a
 follow-up detail request.
+
+Deletion endpoints return no response body. An unknown resource returns `404` with the matching
+resource error code. Deleting a band also removes its releases, release formats, tracks, members,
+and all `BandMemberOtherBand` links that reference the deleted band. All deletion endpoints are
+Admin-only.
 
 ---
 
