@@ -434,3 +434,7 @@ appsettings.*.Local.json
 
 # Visual Studio launch profiles
 *.slnLaunch
+
+# Keep the Application release feature source tracked. The Visual Studio rule above is for build output folders, not this Clean Architecture folder.
+!backend/src/DiyMusicCommunity.Application/Releases/
+!backend/src/DiyMusicCommunity.Application/Releases/**
