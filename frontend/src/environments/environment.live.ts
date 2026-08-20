@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://SET_YOUR_BACKEND_APP_URL/api',
+  apiBaseUrl: 'https://diymusiccommunity-api-frdxhnewe7bvaybk.spaincentral-01.azurewebsites.net/api',
 };

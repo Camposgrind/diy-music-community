@@ -1,5 +1,6 @@
 using DiyMusicCommunity.Application.Releases;
 using DiyMusicCommunity.Application.Releases.GetReleaseDetail;
+using DiyMusicCommunity.Application.Abstractions;
 using DiyMusicCommunity.Domain.Abstractions;
 using DiyMusicCommunity.Domain.Entities;
 using DiyMusicCommunity.Domain.Enums;
@@ -29,10 +30,14 @@ public class GetReleaseDetailUseCaseTests
     private static Band MakeBand(string name = "Convulsions", string country = "Spain")
         => new(Guid.NewGuid(), name, country, Guid.NewGuid(), BandStatus.Active, DateTime.UtcNow);
 
-    private static (GetReleaseDetailUseCase UseCase, Mock<IReleaseRepository> Repo) BuildSut()
+    private static (GetReleaseDetailUseCase UseCase, Mock<IReleaseRepository> Repo) BuildSut(string? resolvedImageUrl = null)
     {
         var repo = new Mock<IReleaseRepository>();
-        var useCase = new GetReleaseDetailUseCase(repo.Object);
+        var imageUrlResolver = new Mock<IImageUrlResolver>();
+        imageUrlResolver
+            .Setup(resolver => resolver.ResolveAsync(It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(resolvedImageUrl);
+        var useCase = new GetReleaseDetailUseCase(repo.Object, imageUrlResolver.Object);
         return (useCase, repo);
     }
 
@@ -122,10 +127,11 @@ public class GetReleaseDetailUseCaseTests
     [Fact]
     public async Task Handle_ReleaseWithAllOptionalFields_Should_MapCorrectly()
     {
-        var (sut, repo) = BuildSut();
+        var (sut, repo) = BuildSut("https://example.com/cover.jpg");
         var release = MakeRelease(title: "World Downfall");
         release.SetReleaseDate(new DateOnly(1989, 10, 1));
         release.SetDetails("Earache Records", "https://example.com/cover.jpg");
+        release.SetCoverBlobPath("releases/world-downfall/cover.png");
         repo.Setup(r => r.GetDetailAsync(release.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(release);
 
@@ -159,7 +165,7 @@ public class GetReleaseDetailUseCaseTests
         repo.Setup(r => r.GetDetailAsync(releaseId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(release);
 
-        var sut = new GetReleaseDetailUseCase(repo.Object);
+        var sut = new GetReleaseDetailUseCase(repo.Object, Mock.Of<IImageUrlResolver>());
         var result = await sut.Handle(releaseId);
 
         Assert.True(result.IsSuccess);

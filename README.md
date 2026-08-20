@@ -23,6 +23,20 @@ Powerviolence, D-Beat). Public browsing with an administrator-maintained band ca
 | 2026-08-14 | Documented the admin-only catalog model; proposals, claims, and moderation are out of scope. |
 
 ## Tech stack
-- Backend: .NET 10 / ASP.NET Core Web API, EF Core, SQLite (dev) / Postgres (prod)
+- Backend: .NET 10 / ASP.NET Core Web API, EF Core, SQL Server
 - Frontend: Angular 22, TypeScript, standalone components
 - Architecture: Clean Architecture, SOLID, TDD, SDD
+
+## Deployment
+
+Pushes to `master` deploy only the changed application after its tests and
+production build complete successfully. Pull requests run the same validation
+without deploying.
+
+- `frontend/` deploys to Azure Static Web Apps.
+- `backend/` deploys to Azure App Service using GitHub OpenID Connect.
+
+Production secrets are held in Azure Key Vault and read by the App Service
+managed identity. GitHub repository secrets contain only the Static Web Apps
+deployment token and Azure OpenID Connect identifiers; they must never contain
+Key Vault values, connection strings, or application keys.

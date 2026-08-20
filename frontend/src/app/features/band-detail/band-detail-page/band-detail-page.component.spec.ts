@@ -6,7 +6,8 @@ import { provideRouter } from '@angular/router';
 import { Component, signal } from '@angular/core';
 import { vi } from 'vitest';
 import { BandDetailPageComponent } from './band-detail-page.component';
-import { BandDetailModel, BandWriteRequest, MemberWriteRequest, ReleaseWriteRequest } from '../../../infrastructure/api/models';
+import { BandDetailModel, MemberWriteRequest, ReleaseWriteRequest } from '../../../infrastructure/api/models';
+import { BandGeneralEditForm } from '../band-edit-modal/band-edit-modal.component';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/toast/toast.service';
 
@@ -34,6 +35,21 @@ const mockBand: BandDetailModel = {
 
 @Component({ template: '' })
 class ReleaseRouteStubComponent {}
+
+function createBandEditForm(overrides: Partial<BandGeneralEditForm> = {}): BandGeneralEditForm {
+  return {
+    name: mockBand.name,
+    country: mockBand.country,
+    location: mockBand.location,
+    formationYear: mockBand.formationYear,
+    splitUpYear: null,
+    genreId: 'genre-1',
+    status: 'Active',
+    musicUrlPortal: mockBand.musicUrlPortal,
+    bandContact: mockBand.bandContact,
+    ...overrides,
+  };
+}
 
 describe('BandDetailPageComponent', () => {
   let fixture: ComponentFixture<BandDetailPageComponent>;
@@ -219,7 +235,7 @@ describe('BandDetailPageComponent', () => {
     await setup('b1');
     fixture.detectChanges();
     httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
-    const update: BandWriteRequest = { name: 'Napalm Death', country: 'United Kingdom', genreId: 'genre-1', status: 'OnHold' };
+    const update = createBandEditForm({ name: 'Napalm Death', country: 'United Kingdom', status: 'OnHold' });
 
     component.saveBand(update);
     const updateRequest = httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'PUT');
@@ -251,7 +267,7 @@ describe('BandDetailPageComponent', () => {
     fixture.detectChanges();
     httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
 
-    component.saveBand({ name: mockBand.name, country: mockBand.country, genreId: 'genre-1', status: 'Active' });
+    component.saveBand(createBandEditForm());
     httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'PUT').flush(
       { message: 'The band cannot be updated.' },
       { status: 422, statusText: 'Unprocessable Entity' },
@@ -439,7 +455,7 @@ describe('BandDetailPageComponent', () => {
     await setup('b1');
     fixture.detectChanges();
     httpMock.expectOne((r) => r.url.includes('/bands/b1')).flush(mockBand);
-    component.saveBand({ name: mockBand.name, country: mockBand.country, genreId: 'genre-1', status: 'SplitUp' });
+    component.saveBand(createBandEditForm({ status: 'SplitUp', splitUpYear: 1990 }));
     httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'PUT').flush({ id: 'b1' });
     httpMock.expectOne((r) => r.url.endsWith('/bands/b1') && r.method === 'GET').flush({
       ...mockBand,

@@ -10,7 +10,7 @@ describe('BandEditModalComponent', () => {
 
   const initialData: BandGeneralEditForm = {
     name: 'Napalm Death', country: 'United Kingdom', location: 'Birmingham', formationYear: 1981,
-    genreId: 'genre-1', status: 'Active', musicUrlPortal: 'https://example.com', bandContact: 'contact@example.com',
+    splitUpYear: null, genreId: 'genre-1', status: 'Active', musicUrlPortal: 'https://example.com', bandContact: 'contact@example.com',
   };
 
   beforeEach(async () => {
@@ -25,7 +25,7 @@ describe('BandEditModalComponent', () => {
   });
 
   it('should preload the current general band data', () => {
-    expect(component.form.getRawValue()).toMatchObject({ ...initialData, formationYear: '1981' });
+    expect(component.form.getRawValue()).toMatchObject({ ...initialData, formationYear: '1981', splitUpYear: '' });
   });
 
   it('should disable saving while a required field is invalid', () => {

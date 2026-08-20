@@ -21,7 +21,7 @@ public sealed class BandImagesUseCaseTests
             .ReturnsAsync(new TemporaryImageFile(
                 "temporary-file",
                 band.Id,
-                BandImageType.BandPhoto,
+                BandImageType.BandPhoto.ToString(),
                 "photo.png",
                 "image/png",
                 "png",
@@ -56,7 +56,7 @@ public sealed class BandImagesUseCaseTests
             .ReturnsAsync(new TemporaryImageFile(
                 "temporary-file",
                 Guid.NewGuid(),
-                BandImageType.BandPhoto,
+                BandImageType.BandPhoto.ToString(),
                 "photo.png",
                 "image/png",
                 "png",

@@ -50,6 +50,7 @@ public sealed class ReleasesControllerTests
             var release = new Release(releaseId, bandId, "World Downfall", ReleaseType.Album);
             release.SetReleaseDate(new DateOnly(1989, 10, 1));
             release.SetDetails("Earache Records", "https://example.com/cover.jpg");
+            release.SetCoverBlobPath("releases/world-downfall/cover.png");
             db.Releases.Add(release);
         });
         using var _ = factory;
@@ -65,7 +66,7 @@ public sealed class ReleasesControllerTests
         body.ReleaseDate.Should().Be(new DateOnly(1989, 10, 1));
         body.Year.Should().Be(1989);
         body.LabelText.Should().Be("Earache Records");
-        body.CoverImageUrl.Should().Be("https://example.com/cover.jpg");
+        body.CoverImageUrl.Should().Be("https://example.test/releases/world-downfall/cover.png");
         body.Band.Should().NotBeNull();
         body.Band!.BandId.Should().Be(bandId);
         body.Band.Name.Should().Be("Terrorizer");
