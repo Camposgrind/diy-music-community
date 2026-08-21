@@ -14,8 +14,9 @@ and balanced across image dimensions and screen sizes.
 ## Acceptance criteria
 
 - [x] Given a band photo has a portrait, landscape, or square ratio, when it is
-  rendered on a band detail page, then it is fully visible inside a bounded
-  responsive portrait frame without cropping.
+  rendered on a band detail page, then its frame adopts the image's native
+  ratio, is bounded by responsive maximum dimensions, and does not crop or show
+  artificial empty bands.
 - [x] Given a band logo has an unusual ratio, when it is rendered, then it is
   contained in a bounded header area and does not exceed the page width.
 - [x] Given a release cover has an unusual ratio, when it is rendered on a
