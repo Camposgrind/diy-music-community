@@ -36,6 +36,9 @@ only by validated code and secrets remain outside GitHub and source control.
   only the Static Web App production hostname is allowed.
 - [ ] Given Azure SQL, Blob Storage, and Key Vault are provisioned, when the API
   accesses them, then least-privilege network and identity controls are used.
+- [x] Given a visitor refreshes a valid Angular client-side route in the Static
+  Web App, when Azure cannot find a physical file at that path, then it returns
+  the frontend `index.html` so that Angular resolves the route.
 
 ## API contract
 
@@ -67,6 +70,8 @@ None.
 - Frontend CI runs `npm ci`, `npm run test:run`, and `npm run build -- --configuration live`.
 - Backend CI runs `dotnet restore`, `dotnet test`, and `dotnet publish`.
 - Workflow triggers are limited to their respective folder plus their workflow file.
+- The published frontend artifact contains the Static Web Apps navigation-fallback
+  configuration.
 
 ## Out of scope
 
