@@ -42,6 +42,11 @@ public sealed class GetBandDetailUseCase
             MusicUrlPortal = band.MusicUrlPortal,
             BandContact = band.BandContact,
             Releases = band.Releases
+                .OrderBy(release => release.Year.HasValue ? 0 : 1)
+                .ThenBy(release => release.Year)
+                .ThenBy(release => release.ReleaseDate.HasValue ? 0 : 1)
+                .ThenBy(release => release.ReleaseDate)
+                .ThenBy(release => release.Title, StringComparer.OrdinalIgnoreCase)
                 .Select(r => new BandReleaseModel
                 {
                     Id = r.Id,

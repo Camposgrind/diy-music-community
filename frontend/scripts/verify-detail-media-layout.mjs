@@ -11,6 +11,7 @@ const releaseStyles = await readFile(
 
 const requiredRules = [
   ['band photo frame adapts to the image ratio', /&__photo-wrap\s*\{[\s\S]*?width:\s*fit-content/],
+  ['band photo frame is not stretched by the detail layout', /&__photo-wrap\s*\{[\s\S]*?align-self:\s*flex-start/],
   ['band photo has bounded responsive dimensions', /&__photo\s*\{[\s\S]*?max-width:\s*clamp\([\s\S]*?max-height:\s*clamp\(/],
   ['band photo preserves the whole uploaded image', /&__photo\s*\{[\s\S]*?object-fit:\s*contain/],
   ['band logo uses a bounded responsive height', /&-img\s*\{[\s\S]*?height:\s*clamp\(/],

@@ -91,6 +91,32 @@ public class GetBandDetailUseCaseTests
     }
 
     [Fact]
+    public async Task Handle_ReleasesAreUnsorted_Should_ReturnChronologicalDiscography()
+    {
+        var (sut, repo) = BuildSut();
+        var band = MakeBand();
+        var newest = new Release(Guid.NewGuid(), band.Id, "Newest", ReleaseType.Album);
+        newest.SetReleaseDate(new DateOnly(2025, 9, 1));
+        var sameYearLater = new Release(Guid.NewGuid(), band.Id, "Later", ReleaseType.Demo);
+        sameYearLater.SetReleaseDate(new DateOnly(2023, 8, 1));
+        var oldest = new Release(Guid.NewGuid(), band.Id, "Oldest", ReleaseType.Demo);
+        oldest.SetReleaseDate(new DateOnly(2023, 1, 1));
+        var unknownYear = new Release(Guid.NewGuid(), band.Id, "Unknown", ReleaseType.EP);
+
+        band.AddRelease(newest);
+        band.AddRelease(unknownYear);
+        band.AddRelease(sameYearLater);
+        band.AddRelease(oldest);
+        repo.Setup(r => r.GetDetailAsync(band.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(band);
+
+        var result = await sut.Handle(band.Id);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(["Oldest", "Later", "Newest", "Unknown"], result.Value!.Releases.Select(release => release.Title));
+    }
+
+    [Fact]
     public async Task Handle_BandWithNoMembers_Should_ReturnEmptyMembersList()
     {
         var (sut, repo) = BuildSut();

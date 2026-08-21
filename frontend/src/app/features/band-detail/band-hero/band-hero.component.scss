@@ -36,6 +36,7 @@
   // ── Left: large band photo ──────────────────────────
   &__photo-wrap {
     flex-shrink: 0;
+    align-self: flex-start;
     display: inline-block;
     width: fit-content;
     background: #161616;

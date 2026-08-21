@@ -23,7 +23,15 @@ internal static class CatalogDetailMapper
             BandImageUrl = null,
             MusicUrlPortal = band.MusicUrlPortal,
             BandContact = band.BandContact,
-            Releases = band.Releases.Select(ToBandRelease).ToList().AsReadOnly(),
+            Releases = band.Releases
+                .OrderBy(release => release.Year.HasValue ? 0 : 1)
+                .ThenBy(release => release.Year)
+                .ThenBy(release => release.ReleaseDate.HasValue ? 0 : 1)
+                .ThenBy(release => release.ReleaseDate)
+                .ThenBy(release => release.Title, StringComparer.OrdinalIgnoreCase)
+                .Select(ToBandRelease)
+                .ToList()
+                .AsReadOnly(),
             Members = band.Members.Select(ToMember).ToList().AsReadOnly()
         };
     }
