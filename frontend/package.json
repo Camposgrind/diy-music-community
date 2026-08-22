@@ -9,7 +9,8 @@
     "test": "ng test",
     "test:run": "ng test --watch=false",
     "verify:static-web-app-config": "node scripts/verify-static-web-app-config.mjs",
-    "verify:detail-media-layout": "node scripts/verify-detail-media-layout.mjs"
+    "verify:detail-media-layout": "node scripts/verify-detail-media-layout.mjs",
+    "verify:back-navigation-alignment": "node scripts/verify-back-navigation-alignment.mjs"
   },
   "private": true,
   "packageManager": "npm@10.9.8",
