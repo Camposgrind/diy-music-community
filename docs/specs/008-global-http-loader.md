@@ -1,12 +1,12 @@
-# Feature: Cargador global de solicitudes HTTP
+# Feature: Global HTTP request loader
 
 ## Functional goal
 
-Mostrar una animación de carga centrada mientras la aplicación espera una o más solicitudes HTTP, sin que cada pantalla tenga que implementar su propio estado de espera.
+Show a centered loading animation while the application waits for one or more HTTP requests, without requiring each screen to implement its own pending state.
 
 ## User story
 
-Como visitante o administrador, quiero recibir una indicación visual consistente mientras se cargan búsquedas, inicios de sesión y páginas de detalle, para saber que la aplicación está procesando mi acción.
+As a visitor or administrator, I want a consistent visual indication while searches, sign-ins, and detail pages are loading so I know that the application is processing my action.
 
 ## Acceptance criteria
 
@@ -26,4 +26,4 @@ Como visitante o administrador, quiero recibir una indicación visual consistent
 ## Test scenarios
 
 - The service never returns a negative pending count and supports concurrent operations.
-- The interceptor activates the loader for pending requests and always clears it on both success and error.
+- The interceptor activates the loader for pending requests and always clears it after both success and error.

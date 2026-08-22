@@ -1,21 +1,21 @@
-# Azure Blob Storage: configuración de imágenes de banda
+# Azure Blob Storage: band-image configuration
 
-## Qué se guarda
+## Stored data
 
-La base de datos guarda solo rutas estables de blob (`BandPhotoBlobPath` y `LogoImageBlobPath`), nunca una URL SAS. El backend crea una URL SAS de solo lectura cuando debe mostrar una imagen.
+The database stores only stable blob paths (`BandPhotoBlobPath` and `LogoImageBlobPath`), never SAS URLs. The backend generates a read-only SAS URL when an image must be displayed.
 
-Los blobs usan rutas como `bands/{bandId}/photo/{fileId}.png` y `bands/{bandId}/logo/{fileId}.jpg`.
+Blobs use paths such as `bands/{bandId}/photo/{fileId}.png` and `bands/{bandId}/logo/{fileId}.jpg`.
 
-## Recursos de Azure
+## Azure resources
 
-1. Crea un Storage Account y un contenedor privado, por ejemplo `diy-music-community`.
-2. No habilites acceso público anónimo al contenedor.
-3. Para la aplicación desplegada, crea una Managed Identity y asígnale el rol **Storage Blob Data Contributor** únicamente sobre ese Storage Account o contenedor.
-4. Conserva una conexión de desarrollo local solo en User Secrets; en producción usa Azure Key Vault.
+1. Create a Storage Account and a private container, for example `diy-music-community`.
+2. Do not enable anonymous public access to the container.
+3. For the deployed application, create a Managed Identity and assign the **Storage Blob Data Contributor** role only on that Storage Account or container.
+4. Keep a development connection only in User Secrets; use Azure Key Vault in production.
 
-## Desarrollo local
+## Local development
 
-Desde `backend/src/DiyMusicCommunity.Api` ejecuta:
+From `backend/src/DiyMusicCommunity.Api`, run:
 
 ```powershell
 dotnet user-secrets set "AzureStorage:ConnectionString" "DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=core.windows.net"
@@ -25,26 +25,26 @@ dotnet user-secrets set "FileUpload:MaxImageSizeMb" "5"
 dotnet user-secrets set "FileUpload:TemporaryFileLifetimeMinutes" "30"
 ```
 
-Los archivos temporales se almacenan bajo `FileUpload:TemporaryDirectory`; si no se indica, el backend usa `App_Data/temporary-images`. Se eliminan inmediatamente después de una confirmación satisfactoria y también cuando han expirado.
+Temporary files are stored under `FileUpload:TemporaryDirectory`. When it is not configured, the backend uses `App_Data/temporary-images`. Files are removed immediately after successful confirmation and when they expire.
 
-## Producción con Azure Key Vault
+## Production with Azure Key Vault
 
-1. Guarda `AzureStorage--ConnectionString`, `AzureStorage--ContainerName`, `AzureStorage--SasLifetimeDays`, `FileUpload--MaxImageSizeMb` y `FileUpload--TemporaryFileLifetimeMinutes` como secretos de Key Vault.
-2. Habilita la Managed Identity de la aplicación y concede a esa identidad el rol **Key Vault Secrets User** sobre el vault.
-3. Configura `AzureKeyVaultEndpoint` (por ejemplo `https://<vault>.vault.azure.net/`). La API detecta este valor al arrancar y carga los secretos mediante `DefaultAzureCredential`: Azure CLI/Visual Studio en local y Managed Identity en Azure.
-4. No incluyas secretos en `appsettings*.json`, variables de CI visibles, repositorios ni logs.
+1. Store `AzureStorage--ConnectionString`, `AzureStorage--ContainerName`, `AzureStorage--SasLifetimeDays`, `FileUpload--MaxImageSizeMb`, and `FileUpload--TemporaryFileLifetimeMinutes` as Key Vault secrets.
+2. Enable the application's Managed Identity and assign it the **Key Vault Secrets User** role on the vault.
+3. Configure `AzureKeyVaultEndpoint`, for example `https://<vault>.vault.azure.net/`. At startup, the API detects this value and loads secrets through `DefaultAzureCredential`: Azure CLI or Visual Studio locally, and Managed Identity in Azure.
+4. Do not include secrets in `appsettings*.json`, visible CI variables, repositories, or logs.
 
-## Configuración Live preparada
+## Prepared Live configuration
 
-- Backend: `backend/src/DiyMusicCommunity.Api/appsettings.Live.json`. Sustituye únicamente el endpoint del vault, el hostname del backend y el origen público del frontend. No añadas secretos a este archivo.
-- Frontend: `frontend/src/environments/environment.live.ts`. Sustituye `SET_YOUR_BACKEND_APP_URL` por el hostname HTTPS público del backend.
+- Backend: `backend/src/DiyMusicCommunity.Api/appsettings.Live.json`. Replace only the public frontend origin and backend hostname. Do not add secrets to this file.
+- Frontend: `frontend/src/environments/environment.live.ts`. It contains the production HTTPS API URL.
 
-El backend se debe ejecutar con `ASPNETCORE_ENVIRONMENT=Live`. En Key Vault usa nombres con doble guion para la jerarquía de .NET, por ejemplo: `ConnectionStrings--DefaultConnection`, `Jwt--Key`, `Jwt--Issuer`, `Jwt--Audience`, `AzureStorage--ConnectionString`, `AzureStorage--ContainerName`, `AzureStorage--SasLifetimeDays`, `FileUpload--MaxImageSizeMb` y `FileUpload--TemporaryFileLifetimeMinutes`.
+Run the backend with `ASPNETCORE_ENVIRONMENT=Live`. In Key Vault, use double hyphens for .NET configuration hierarchy; for example: `ConnectionStrings--DefaultConnection`, `Jwt--Key`, `Jwt--Issuer`, `Jwt--Audience`, `AzureStorage--ConnectionString`, `AzureStorage--ContainerName`, `AzureStorage--SasLifetimeDays`, `FileUpload--MaxImageSizeMb`, and `FileUpload--TemporaryFileLifetimeMinutes`.
 
-El build del frontend Live se ejecutará con `npm run build -- --configuration live`. La futura canalización YAML será responsable de sustituir o proporcionar las URLs públicas correspondientes; no se ha creado ninguna canalización todavía.
+Build the Live frontend configuration with `npm run build -- --configuration live`. The GitHub Actions workflows in `.github/workflows/` run the relevant test and build steps before deploying the frontend and API.
 
-## Seguridad operativa
+## Operational security
 
-- SAS exclusivamente de lectura, con duración configurable y sin permisos de escritura, borrado o listado.
-- La validación comprueba tamaño, vacío y magic bytes para PNG/JPEG; la extensión y MIME proporcionados por el cliente no son fuente de verdad.
-- Usa una cuenta/contenedor distinto por entorno y rota las claves si se usa una cadena de conexión local.
+- SAS tokens are read-only, have a configurable lifetime, and do not grant write, delete, or list permissions.
+- Validation checks file size, empty content, and PNG/JPEG magic bytes; client-provided extensions and MIME types are not trusted.
+- Use a separate Storage Account or container for each environment, and rotate keys if a local connection string is used.

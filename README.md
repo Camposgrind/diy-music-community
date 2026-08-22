@@ -11,8 +11,10 @@ Developed as a master's degree project, the application uses Clean Architecture 
 - [Architecture and project structure](#architecture-and-project-structure)
 - [Requirements](#requirements)
 - [Local installation and execution](#local-installation-and-execution)
+- [Administrator access](#administrator-access)
 - [Testing and quality](#testing-and-quality)
 - [API and technical documentation](#api-and-technical-documentation)
+- [Delivery resources](#delivery-resources)
 
 ## Features
 
@@ -32,6 +34,27 @@ Developed as a master's degree project, the application uses Clean Architecture 
 - Temporary upload and confirmation flow for band and release images. Permanent files are stored in Azure Blob Storage and the application generates read-only URLs on demand.
 
 Visitors can browse the catalogue without authentication. All data-changing operations are protected by the `Admin` role.
+
+## Administrator access
+
+The catalogue is curated by administrators. The public header intentionally does not display sign-in or registration links; administrators access the dedicated login page directly:
+
+```text
+/admin/login
+```
+
+For a local instance, open `http://localhost:4200/admin/login`. After authentication with an `Admin` account, the initial band-creation form is available on the home page. Administrators can then edit a band's general information from its detail page, manage its members and releases, and upload a main image or logo through the temporary-upload and confirmation flow.
+
+### Demo account
+
+Create a dedicated administrator account for the project assessment and replace the two values below immediately before publishing the submission. This account must contain only demonstration data and must not be reused for personal or Azure accounts.
+
+| Field | Value for the submitted project |
+|---|---|
+| Login route | [Admin Login path](https://gentle-coast-0a136d110.7.azurestaticapps.net/admin/login) |
+| Admin Email | Provided in the project submission form |
+| Admin Password | Provided in the project submission form |
+
 
 ## Technology stack
 
@@ -175,6 +198,15 @@ The backend includes domain, use-case, and API integration tests. The frontend t
 - User stories and acceptance criteria are in [docs/specs](docs/specs).
 - Key design decisions are recorded in [docs/adr](docs/adr).
 - Azure Blob Storage and Application Insights operations are explained in [docs/operations](docs/operations).
+
+## Delivery resources
+
+| Resource | Link |
+|---|---|
+| Source code repository | [github.com/Camposgrind/diy-music-community](https://github.com/Camposgrind/diy-music-community) |
+| Live application | [DIY Music Community](https://gentle-coast-0a136d110.7.azurestaticapps.net/) |
+| Project presentation | `REPLACE_WITH_PUBLIC_SLIDES_URL` |
+| Project walkthrough video | `REPLACE_WITH_PUBLIC_VIDEO_URL` |
 
 ## License
 

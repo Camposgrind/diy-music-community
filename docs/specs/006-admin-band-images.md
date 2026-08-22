@@ -1,12 +1,12 @@
-# Feature: Administración de imágenes de banda
+# Feature: Band image administration
 
 ## Functional goal
 
-Permitir que un administrador suba temporalmente y confirme una foto principal o un logo de una banda existente, persistiendo un identificador estable del archivo y devolviendo una URL de lectura temporal.
+Allow an administrator to upload temporarily and confirm a main photo or logo for an existing band, persist a stable file identifier, and return a temporary read URL.
 
 ## User story
 
-Como administrador, quiero reemplazar la foto o el logo de una banda para mantener actualizado su perfil sin guardar URLs temporales o credenciales de almacenamiento en la base de datos.
+As an administrator, I want to replace a band's photo or logo so I can keep its profile up to date without storing temporary URLs or storage credentials in the database.
 
 ## Acceptance criteria
 
@@ -56,7 +56,7 @@ Returns `200 OK` with the band identifier, image type, stable blob path, and a r
 ## Domain rules
 
 - A band has independent paths for its main photo and logo.
-- Supported image content is PNG, JPEG, and JPG only; the detected magic bytes determine the saved extension and content type.
+- Supported image content is PNG, JPEG, and JPG only; detected magic bytes determine the saved extension and content type.
 - Definitive paths follow `bands/{bandId}/{photo|logo}/{fileId}.{detectedExtension}`.
 - A temporary file belongs to exactly one band and one image type and cannot be confirmed after expiration.
 
@@ -73,7 +73,7 @@ Returns `200 OK` with the band identifier, image type, stable blob path, and a r
 
 ## Architecture decision
 
-The intended production storage abstraction is `IBlobStorageService`, with an Azure Blob implementation that generates read-only SAS URLs for a configured lifetime. The database persists stable `BandPhotoBlobPath` and `BandLogoBlobPath`, not SAS URLs.
+The production storage abstraction is `IBlobStorageService`, implemented with Azure Blob Storage to generate read-only SAS URLs for a configured lifetime. The database persists stable `BandPhotoBlobPath` and `BandLogoBlobPath`, not SAS URLs.
 
 Azure Blob Storage is the approved definitive-media storage for this project. Short-lived local files are retained only until successful confirmation and are deleted immediately after the database update succeeds. Expired temporary files are also removed opportunistically on every upload or confirmation.
 
@@ -86,7 +86,7 @@ The existing public fields `bandImageUrl` and `logoImageUrl` remain the response
 - Unit: image validator accepts PNG and JPEG signatures and rejects malformed, unsupported, empty, and oversized content.
 - Unit: temporary-file service enforces ownership, image type, and expiry.
 - Application: confirmation persists only a stable path and attempts prior-file deletion after persistence.
-- Integration: administrator upload and confirmation succeed; non-admin, invalid file, wrong band/type, and expired temporary file receive the appropriate responses.
+- Integration: administrator upload and confirmation succeed; non-admin, invalid file, wrong band or type, and expired temporary file receive the appropriate responses.
 
 ## Out of scope
 

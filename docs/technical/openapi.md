@@ -1,8 +1,8 @@
 # OpenAPI Contract — DIY Music Community API
 
 > **Version:** v1  
-> **Base URL (local dev):** `http://localhost:5071/api`  
-> **Swagger UI (local dev):** `http://localhost:5071/swagger`  
+> **Base URL (local development):** `https://localhost:7294/api`
+> **Swagger UI (local development):** `https://localhost:7294/swagger`
 > **Content-Type:** `application/json`  
 > **Authentication:** None required for public endpoints.
 
