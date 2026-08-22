@@ -9,6 +9,8 @@ using DiyMusicCommunity.Infrastructure.Persistence.Seed;
 using DiyMusicCommunity.Api.Services;
 using DiyMusicCommunity.Api.Swagger;
 using DiyMusicCommunity.Api.Converters;
+using DiyMusicCommunity.Api.Telemetry;
+using DiyMusicCommunity.Api.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +24,21 @@ var keyVaultEndpoint = builder.Configuration["AzureKeyVaultEndpoint"];
 if (Uri.TryCreate(keyVaultEndpoint, UriKind.Absolute, out var keyVaultUri))
 {
     builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
+}
+
+var applicationInsightsConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"];
+if (!string.IsNullOrWhiteSpace(applicationInsightsConnectionString) &&
+    !string.Equals(applicationInsightsConnectionString, "SET_VIA_KEYVAULT_OR_USER_SECRETS", StringComparison.Ordinal))
+{
+    builder.Services.AddApplicationInsightsTelemetry(options =>
+    {
+        options.ConnectionString = applicationInsightsConnectionString;
+    });
+    builder.Services.AddSingleton<IApplicationTelemetry, ApplicationInsightsTelemetry>();
+}
+else
+{
+    builder.Services.AddSingleton<IApplicationTelemetry, NullApplicationTelemetry>();
 }
 
 builder.Services.AddHttpContextAccessor();
@@ -120,6 +137,7 @@ await RoleSeeder.SeedRolesAsync(app.Services);
 await AdminSeeder.SeedAdminAsync(app.Services);
 
 app.UseSwaggerDocumentation();
+app.UseMiddleware<ExceptionLoggingMiddleware>();
 app.UseCors();
 app.UseHttpsRedirection();
 app.UseAuthentication();

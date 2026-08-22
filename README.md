@@ -40,3 +40,7 @@ Production secrets are held in Azure Key Vault and read by the App Service
 managed identity. GitHub repository secrets contain only the Static Web Apps
 deployment token and Azure OpenID Connect identifiers; they must never contain
 Key Vault values, connection strings, or application keys.
+
+Application Insights is enabled for the API when its connection string is
+available from configuration. The Live setup and operational queries are in
+[`docs/operations/application-insights-live.md`](./docs/operations/application-insights-live.md).

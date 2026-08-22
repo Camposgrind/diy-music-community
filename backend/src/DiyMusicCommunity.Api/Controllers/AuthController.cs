@@ -2,6 +2,7 @@ using DiyMusicCommunity.Application.Auth;
 using DiyMusicCommunity.Application.Auth.Login;
 using DiyMusicCommunity.Application.Auth.Register;
 using DiyMusicCommunity.Application.Common;
+using DiyMusicCommunity.Api.Telemetry;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiyMusicCommunity.Api.Controllers;
@@ -17,12 +18,14 @@ public sealed class AuthController : ControllerBase
 {
     private readonly RegisterUseCase _registerUseCase;
     private readonly LoginUseCase _loginUseCase;
+    private readonly IApplicationTelemetry _telemetry;
 
     /// <summary>Initialises a new instance of <see cref="AuthController"/>.</summary>
-    public AuthController(RegisterUseCase registerUseCase, LoginUseCase loginUseCase)
+    public AuthController(RegisterUseCase registerUseCase, LoginUseCase loginUseCase, IApplicationTelemetry telemetry)
     {
         _registerUseCase = registerUseCase;
         _loginUseCase = loginUseCase;
+        _telemetry = telemetry;
     }
 
     /// <summary>Register a new user account.</summary>
@@ -49,6 +52,7 @@ public sealed class AuthController : ControllerBase
             };
         }
 
+        _telemetry.TrackBusinessOperation(BusinessOperation.UserRegistered);
         return StatusCode(StatusCodes.Status201Created);
     }
 
@@ -69,6 +73,7 @@ public sealed class AuthController : ControllerBase
             return BadRequest(result.Error);
         }
 
+        _telemetry.TrackBusinessOperation(BusinessOperation.UserLoginSucceeded);
         return Ok(result.Value);
     }
 }

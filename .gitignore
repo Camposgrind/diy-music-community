@@ -438,3 +438,8 @@ appsettings.*.Local.json
 # Keep the Application release feature source tracked. The Visual Studio rule above is for build output folders, not this Clean Architecture folder.
 !backend/src/DiyMusicCommunity.Application/Releases/
 !backend/src/DiyMusicCommunity.Application/Releases/**
+
+# Local secret files
+.env.*
+secrets.json
+local.settings.json

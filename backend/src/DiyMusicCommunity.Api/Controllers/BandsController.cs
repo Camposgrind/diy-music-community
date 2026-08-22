@@ -8,6 +8,7 @@ using DiyMusicCommunity.Application.Common;
 using DiyMusicCommunity.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using DiyMusicCommunity.Api.Telemetry;
 
 namespace DiyMusicCommunity.Api.Controllers;
 
@@ -25,15 +26,17 @@ public sealed class BandsController : ControllerBase
     private readonly CatalogManagementUseCase _catalogManagementUseCase;
     private readonly CatalogDeletionUseCase _catalogDeletionUseCase;
     private readonly BandImagesUseCase _bandImagesUseCase;
+    private readonly IApplicationTelemetry _telemetry;
 
     /// <summary>Initialises a new instance of <see cref="BandsController"/>.</summary>
-    public BandsController(GetBandsUseCase getBandsUseCase, GetBandDetailUseCase getBandDetailUseCase, CatalogManagementUseCase catalogManagementUseCase, CatalogDeletionUseCase catalogDeletionUseCase, BandImagesUseCase bandImagesUseCase)
+    public BandsController(GetBandsUseCase getBandsUseCase, GetBandDetailUseCase getBandDetailUseCase, CatalogManagementUseCase catalogManagementUseCase, CatalogDeletionUseCase catalogDeletionUseCase, BandImagesUseCase bandImagesUseCase, IApplicationTelemetry telemetry)
     {
         _getBandsUseCase = getBandsUseCase;
         _getBandDetailUseCase = getBandDetailUseCase;
         _catalogManagementUseCase = catalogManagementUseCase;
         _catalogDeletionUseCase = catalogDeletionUseCase;
         _bandImagesUseCase = bandImagesUseCase;
+        _telemetry = telemetry;
     }
 
     /// <summary>Search and filter the public band catalog.</summary>
@@ -90,7 +93,7 @@ public sealed class BandsController : ControllerBase
     public async Task<IActionResult> CreateBand([FromBody] BandWriteRequest request, CancellationToken cancellationToken)
     {
         var result = await _catalogManagementUseCase.CreateBand(request, cancellationToken);
-        return WriteResult(result, model => CreatedAtAction(nameof(GetBandDetail), new { id = model.Id }, model));
+        return WriteResult(result, model => CreatedAtAction(nameof(GetBandDetail), new { id = model.Id }, model), BusinessOperation.BandCreated);
     }
 
     [HttpPut("{id:guid}")]
@@ -98,7 +101,7 @@ public sealed class BandsController : ControllerBase
     public async Task<IActionResult> UpdateBand(Guid id, [FromBody] BandWriteRequest request, CancellationToken cancellationToken)
     {
         var result = await _catalogManagementUseCase.UpdateBand(id, request, cancellationToken);
-        return WriteResult(result, Ok);
+        return WriteResult(result, Ok, BusinessOperation.BandUpdated);
     }
 
     [HttpPost("{bandId:guid}/members")]
@@ -106,7 +109,7 @@ public sealed class BandsController : ControllerBase
     public async Task<IActionResult> CreateMember(Guid bandId, [FromBody] MemberWriteRequest request, CancellationToken cancellationToken)
     {
         var result = await _catalogManagementUseCase.CreateMember(bandId, request, cancellationToken);
-        return WriteResult(result, model => Created($"/api/bands/{bandId}/members/{model.Id}", model));
+        return WriteResult(result, model => Created($"/api/bands/{bandId}/members/{model.Id}", model), BusinessOperation.MemberCreated);
     }
 
     [HttpPut("{bandId:guid}/members/{memberId:guid}")]
@@ -114,7 +117,7 @@ public sealed class BandsController : ControllerBase
     public async Task<IActionResult> UpdateMember(Guid bandId, Guid memberId, [FromBody] MemberWriteRequest request, CancellationToken cancellationToken)
     {
         var result = await _catalogManagementUseCase.UpdateMember(bandId, memberId, request, cancellationToken);
-        return WriteResult(result, Ok);
+        return WriteResult(result, Ok, BusinessOperation.MemberUpdated);
     }
 
     [HttpPost("{bandId:guid}/releases")]
@@ -122,7 +125,7 @@ public sealed class BandsController : ControllerBase
     public async Task<IActionResult> CreateRelease(Guid bandId, [FromBody] ReleaseWriteRequest request, CancellationToken cancellationToken)
     {
         var result = await _catalogManagementUseCase.CreateRelease(bandId, request, cancellationToken);
-        return WriteResult(result, model => Created($"/api/releases/{model.Id}", model));
+        return WriteResult(result, model => Created($"/api/releases/{model.Id}", model), BusinessOperation.ReleaseCreated);
     }
 
     [HttpPut("{bandId:guid}/releases/{releaseId:guid}")]
@@ -130,7 +133,7 @@ public sealed class BandsController : ControllerBase
     public async Task<IActionResult> UpdateRelease(Guid bandId, Guid releaseId, [FromBody] ReleaseWriteRequest request, CancellationToken cancellationToken)
     {
         var result = await _catalogManagementUseCase.UpdateRelease(bandId, releaseId, request, cancellationToken);
-        return WriteResult(result, Ok);
+        return WriteResult(result, Ok, BusinessOperation.ReleaseUpdated);
     }
 
     [HttpPut("{bandId:guid}/releases/{releaseId:guid}/tracks")]
@@ -138,7 +141,7 @@ public sealed class BandsController : ControllerBase
     public async Task<IActionResult> UpdateReleaseTracks(Guid bandId, Guid releaseId, [FromBody] TrackListWriteRequest request, CancellationToken cancellationToken)
     {
         var result = await _catalogManagementUseCase.UpdateReleaseTracks(bandId, releaseId, request, cancellationToken);
-        return WriteResult(result, Ok);
+        return WriteResult(result, Ok, BusinessOperation.ReleaseTracksUpdated);
     }
 
     [HttpPost("{bandId:guid}/images/temporary")]
@@ -161,7 +164,7 @@ public sealed class BandsController : ControllerBase
             DeclaredContentType = request.File.ContentType,
             Content = contentStream.ToArray()
         }, cancellationToken);
-        return WriteResult(result, Ok);
+        return WriteResult(result, Ok, BusinessOperation.BandImageConfirmed);
     }
 
     [HttpPost("{bandId:guid}/images/confirm")]
@@ -179,7 +182,7 @@ public sealed class BandsController : ControllerBase
     public async Task<IActionResult> DeleteBand(Guid id, CancellationToken cancellationToken)
     {
         var result = await _catalogDeletionUseCase.DeleteBand(id, cancellationToken);
-        return DeleteResult(result);
+        return DeleteResult(result, BusinessOperation.BandDeleted);
     }
 
     [HttpDelete("{bandId:guid}/members/{memberId:guid}")]
@@ -189,13 +192,17 @@ public sealed class BandsController : ControllerBase
     public async Task<IActionResult> DeleteMember(Guid bandId, Guid memberId, CancellationToken cancellationToken)
     {
         var result = await _catalogDeletionUseCase.DeleteMember(bandId, memberId, cancellationToken);
-        return DeleteResult(result);
+        return DeleteResult(result, BusinessOperation.MemberDeleted);
     }
 
-    private IActionResult WriteResult<T>(Result<T> result, Func<T, IActionResult> onSuccess)
+    private IActionResult WriteResult<T>(Result<T> result, Func<T, IActionResult> onSuccess, BusinessOperation? successfulOperation = null)
     {
         if (result.IsSuccess)
         {
+            if (successfulOperation is not null)
+            {
+                _telemetry.TrackBusinessOperation(successfulOperation.Value);
+            }
             return onSuccess(result.Value!);
         }
 
@@ -207,10 +214,11 @@ public sealed class BandsController : ControllerBase
         };
     }
 
-    private IActionResult DeleteResult(Result<bool> result)
+    private IActionResult DeleteResult(Result<bool> result, BusinessOperation successfulOperation)
     {
         if (result.IsSuccess)
         {
+            _telemetry.TrackBusinessOperation(successfulOperation);
             return NoContent();
         }
 
