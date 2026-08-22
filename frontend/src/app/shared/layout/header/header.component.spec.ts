@@ -42,11 +42,14 @@ describe('HeaderComponent', () => {
   };
 
   describe('when not authenticated', () => {
-    it('should show the Login link', () => {
+    it('should expose only the Home navigation link', () => {
       setup(false);
       const links: HTMLAnchorElement[] = Array.from(fixture.nativeElement.querySelectorAll('a'));
-      const loginLink = links.find(l => l.textContent?.trim().toLowerCase() === 'login');
-      expect(loginLink).toBeTruthy();
+      const navigationLabels = links
+        .map(link => link.textContent?.trim())
+        .filter(label => label && label !== 'DIY Music Community');
+
+      expect(navigationLabels).toEqual(['Home']);
     });
 
     it('should NOT show the logout button', () => {
@@ -67,7 +70,7 @@ describe('HeaderComponent', () => {
       expect(userEl.textContent).toContain('camposgrind');
     });
 
-    it('should NOT show the Login link', () => {
+    it('should NOT show a Login link', () => {
       setup(true, mockUser);
       const links: HTMLAnchorElement[] = Array.from(fixture.nativeElement.querySelectorAll('a'));
       const loginLink = links.find(l => l.textContent?.trim().toLowerCase() === 'login');
@@ -87,15 +90,6 @@ describe('HeaderComponent', () => {
     fixture.componentInstance.clearAndGoHome();
     expect(fakeSearch.clear).toHaveBeenCalled();
     expect(navSpy).toHaveBeenCalledWith(['/']);
-  });
-
-  it('should include the current page as the login return URL', () => {
-    setup(false);
-    const component = fixture.componentInstance;
-    const router = TestBed.inject(Router);
-    Object.defineProperty(router, 'url', { configurable: true, get: () => '/bands/band-42?tab=members' });
-
-    expect(component.loginReturnUrl()).toBe('/bands/band-42?tab=members');
   });
 
   it('logout() should call auth.logout()', () => {

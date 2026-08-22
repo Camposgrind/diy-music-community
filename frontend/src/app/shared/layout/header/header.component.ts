@@ -24,7 +24,4 @@ export class HeaderComponent {
     this.auth.logout();
   }
 
-  loginReturnUrl(): string {
-    return this.router.url;
-  }
 }

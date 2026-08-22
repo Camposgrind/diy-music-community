@@ -1,16 +1,22 @@
 # Feature: Login return navigation
 
+## Status
+
+Partially superseded by `014-admin-only-login.md`. Login remains available only from the dedicated
+administrator entry route, rather than from public navigation.
+
 ## Functional goal
 
 Keep a visitor on the page they were viewing when they sign in.
 
 ## User story
 
-As a visitor viewing a band or release, I want to return to that same page after logging in.
+As an administrator using the dedicated sign-in route, I want to return to a safe internal URL
+when one is supplied.
 
 ## Acceptance criteria (Given/When/Then checkboxes)
 
-- [x] Given I am on a public page, when I choose Login and authenticate successfully, then I return to the same internal URL, including its route parameters and query string.
+- [x] Given I open the administrator login route with a valid internal return URL and authenticate successfully, then I return to the same internal URL, including its route parameters and query string.
 - [x] Given Login has no valid internal return URL, when I authenticate successfully, then I am sent to Home.
 
 ## Security rules

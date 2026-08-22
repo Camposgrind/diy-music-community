@@ -17,7 +17,9 @@ the `Admin` role can open the initial band-creation form and create a general ba
 can also edit its general information from the band detail page. They can upload a main photo or
 logo through a temporary upload and confirmation flow. Definitive media is stored in Azure Blob
 Storage, while the database stores stable blob paths and read-only URLs are generated on demand. The successful creation flow opens
-the new band detail page. Registered non-admin users have no band catalog write access.
+the new band detail page. Only administrators can create an authenticated session in this MVP. The
+public header does not advertise sign-in or registration; administrators use the dedicated
+`/admin/login` route.
 
 Administrators can add a release from a band's discography and are taken to its detail after a
 successful creation. They can edit a release's main information (title, type, date, year, label,

@@ -40,6 +40,11 @@ public sealed class LoginUseCase
             return Result<LoginResponse>.Failure(AuthErrors.InvalidCredentials());
         }
 
+        if (!roles.Contains("Admin", StringComparer.Ordinal))
+        {
+            return Result<LoginResponse>.Failure(AuthErrors.InvalidCredentials());
+        }
+
         var (token, expiresAt) = _jwtTokenService.GenerateToken(userId, username, email, roles);
 
         return Result<LoginResponse>.Success(new LoginResponse

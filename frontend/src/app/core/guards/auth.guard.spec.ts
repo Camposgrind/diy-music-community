@@ -11,7 +11,7 @@ describe('authGuard', () => {
 
   const setup = (authenticated: boolean) => {
     const isAuthSpy = vi.fn().mockReturnValue(authenticated);
-    const createUrlTreeSpy = vi.fn().mockReturnValue({ toString: () => '/login' } as unknown as UrlTree);
+    const createUrlTreeSpy = vi.fn().mockReturnValue({ toString: () => '/admin/login' } as unknown as UrlTree);
 
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
@@ -31,10 +31,10 @@ describe('authGuard', () => {
     expect(runGuard()).toBe(true);
   });
 
-  it('should redirect to /login when the user is not authenticated', () => {
+  it('should redirect to /admin/login when the user is not authenticated', () => {
     const { createUrlTreeSpy } = setup(false);
     const result = runGuard();
-    expect(createUrlTreeSpy).toHaveBeenCalledWith(['/login']);
+    expect(createUrlTreeSpy).toHaveBeenCalledWith(['/admin/login']);
     expect(result).toBeTruthy();
   });
 });

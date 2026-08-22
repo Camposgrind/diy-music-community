@@ -1,5 +1,10 @@
 # Feature: Registration automatic login
 
+## Status
+
+Superseded by `014-admin-only-login.md` for the MVP. Public registration is no longer routed or
+advertised, because only administrators may create an authenticated session.
+
 ## Functional goal
 
 Authenticate a user immediately after a successful account registration.
