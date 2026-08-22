@@ -22,6 +22,7 @@ public sealed class LoginUseCase
     public async Task<Result<LoginResponse>> Handle(LoginRequest request, CancellationToken cancellationToken = default)
     {
         var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+
         if (!validationResult.IsValid)
         {
             var message = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));

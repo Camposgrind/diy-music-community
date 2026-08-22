@@ -21,7 +21,9 @@ public sealed class LocalTemporaryImageStorage : ITemporaryImageStorage
     public async Task SaveAsync(TemporaryImageFile file, CancellationToken cancellationToken = default)
     {
         var paths = GetPaths(file.Id);
+
         await File.WriteAllBytesAsync(paths.ContentPath, file.Content, cancellationToken);
+
         var metadata = new TemporaryImageMetadata
         {
             Id = file.Id,
@@ -32,7 +34,9 @@ public sealed class LocalTemporaryImageStorage : ITemporaryImageStorage
             Extension = file.Extension,
             ExpiresAtUtc = file.ExpiresAtUtc
         };
+
         await using var stream = File.Create(paths.MetadataPath);
+
         await JsonSerializer.SerializeAsync(stream, metadata, cancellationToken: cancellationToken);
     }
 
@@ -50,13 +54,16 @@ public sealed class LocalTemporaryImageStorage : ITemporaryImageStorage
         }
 
         await using var stream = File.OpenRead(paths.MetadataPath);
+
         var metadata = await JsonSerializer.DeserializeAsync<TemporaryImageMetadata>(stream, cancellationToken: cancellationToken);
+
         if (metadata is null || metadata.Id != temporaryFileId)
         {
             return null;
         }
 
         var content = await File.ReadAllBytesAsync(paths.ContentPath, cancellationToken);
+
         return new TemporaryImageFile(metadata.Id, metadata.OwnerId, metadata.ImageType, metadata.OriginalFileName, metadata.ContentType, metadata.Extension, content, metadata.ExpiresAtUtc);
     }
 
@@ -68,8 +75,10 @@ public sealed class LocalTemporaryImageStorage : ITemporaryImageStorage
         }
 
         var paths = GetPaths(temporaryFileId);
+
         DeleteIfExists(paths.ContentPath);
         DeleteIfExists(paths.MetadataPath);
+
         return Task.CompletedTask;
     }
 
@@ -81,10 +90,13 @@ public sealed class LocalTemporaryImageStorage : ITemporaryImageStorage
             try
             {
                 await using var stream = File.OpenRead(metadataPath);
+
                 var metadata = await JsonSerializer.DeserializeAsync<TemporaryImageMetadata>(stream, cancellationToken: cancellationToken);
+
                 if (metadata is null || metadata.ExpiresAtUtc <= DateTime.UtcNow)
                 {
                     var temporaryFileId = Path.GetFileNameWithoutExtension(metadataPath);
+
                     await DeleteAsync(temporaryFileId, cancellationToken);
                 }
             }
@@ -92,6 +104,7 @@ public sealed class LocalTemporaryImageStorage : ITemporaryImageStorage
             {
                 // Metadata is unreadable/incompatible — treat as expired and delete
                 var temporaryFileId = Path.GetFileNameWithoutExtension(metadataPath);
+
                 await DeleteAsync(temporaryFileId, cancellationToken);
             }
         }
@@ -100,6 +113,7 @@ public sealed class LocalTemporaryImageStorage : ITemporaryImageStorage
     private (string ContentPath, string MetadataPath) GetPaths(string temporaryFileId)
     {
         var safeId = Path.GetFileName(temporaryFileId);
+
         return (Path.Combine(_rootDirectory, $"{safeId}.bin"), Path.Combine(_rootDirectory, $"{safeId}.json"));
     }
 

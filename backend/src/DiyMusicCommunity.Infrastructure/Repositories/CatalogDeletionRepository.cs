@@ -25,22 +25,28 @@ public sealed class CatalogDeletionRepository : ICatalogDeletionRepository
             .Where(item => item.BandId == bandId)
             .Select(item => item.Id)
             .ToListAsync(cancellationToken);
+
         var otherBandLinks = await _context.BandMemberOtherBands
             .Where(item => item.OtherBandId == bandId || memberIds.Contains(item.BandMemberId))
             .ToListAsync(cancellationToken);
+
         var releaseIds = await _context.Releases
             .Where(item => item.BandId == bandId)
             .Select(item => item.Id)
             .ToListAsync(cancellationToken);
+
         var tracks = await _context.Tracks
             .Where(item => releaseIds.Contains(item.ReleaseId))
             .ToListAsync(cancellationToken);
+
         var formats = await _context.ReleaseFormats
             .Where(item => releaseIds.Contains(item.ReleaseId))
             .ToListAsync(cancellationToken);
+
         var releases = await _context.Releases
             .Where(item => item.BandId == bandId)
             .ToListAsync(cancellationToken);
+
         var members = await _context.BandMembers
             .Where(item => item.BandId == bandId)
             .ToListAsync(cancellationToken);
@@ -51,7 +57,9 @@ public sealed class CatalogDeletionRepository : ICatalogDeletionRepository
         _context.Releases.RemoveRange(releases);
         _context.BandMembers.RemoveRange(members);
         _context.Bands.Remove(band);
+
         await _context.SaveChangesAsync(cancellationToken);
+
         return true;
     }
 
@@ -60,6 +68,7 @@ public sealed class CatalogDeletionRepository : ICatalogDeletionRepository
         var member = await _context.BandMembers.SingleOrDefaultAsync(
             item => item.Id == memberId && item.BandId == bandId,
             cancellationToken);
+
         if (member is null)
         {
             return false;
@@ -71,7 +80,9 @@ public sealed class CatalogDeletionRepository : ICatalogDeletionRepository
 
         _context.BandMemberOtherBands.RemoveRange(otherBandLinks);
         _context.BandMembers.Remove(member);
+
         await _context.SaveChangesAsync(cancellationToken);
+
         return true;
     }
 
@@ -86,6 +97,7 @@ public sealed class CatalogDeletionRepository : ICatalogDeletionRepository
         var tracks = await _context.Tracks
             .Where(item => item.ReleaseId == releaseId)
             .ToListAsync(cancellationToken);
+
         var formats = await _context.ReleaseFormats
             .Where(item => item.ReleaseId == releaseId)
             .ToListAsync(cancellationToken);
@@ -93,6 +105,7 @@ public sealed class CatalogDeletionRepository : ICatalogDeletionRepository
         _context.Tracks.RemoveRange(tracks);
         _context.ReleaseFormats.RemoveRange(formats);
         _context.Releases.Remove(release);
+
         await _context.SaveChangesAsync(cancellationToken);
         return true;
     }
@@ -102,6 +115,7 @@ public sealed class CatalogDeletionRepository : ICatalogDeletionRepository
         var track = await _context.Tracks.SingleOrDefaultAsync(
             item => item.Id == trackId && item.ReleaseId == releaseId,
             cancellationToken);
+
         if (track is null)
         {
             return false;
@@ -110,15 +124,21 @@ public sealed class CatalogDeletionRepository : ICatalogDeletionRepository
         if (_context.Database.IsRelational())
         {
             await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+
             _context.Tracks.Remove(track);
+
             await _context.SaveChangesAsync(cancellationToken);
+
             await RenumberTracksAsync(releaseId, cancellationToken);
+
             await transaction.CommitAsync(cancellationToken);
         }
         else
         {
             _context.Tracks.Remove(track);
+
             await _context.SaveChangesAsync(cancellationToken);
+
             await RenumberTracksAsync(releaseId, cancellationToken);
         }
 
@@ -138,7 +158,9 @@ public sealed class CatalogDeletionRepository : ICatalogDeletionRepository
             .ToListAsync(cancellationToken);
 
         _context.Tracks.RemoveRange(tracks);
+
         await _context.SaveChangesAsync(cancellationToken);
+
         return true;
     }
 

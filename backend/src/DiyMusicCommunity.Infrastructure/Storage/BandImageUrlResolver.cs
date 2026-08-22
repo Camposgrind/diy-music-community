@@ -26,10 +26,12 @@ public sealed class BandImageUrlResolver : IImageUrlResolver
             if (!await _blobStorageService.ExistsAsync(blobPath, cancellationToken))
             {
                 _logger.LogWarning("Band image blob {BlobPath} does not exist.", blobPath);
+
                 return null;
             }
 
             var uri = await _blobStorageService.GenerateReadUriAsync(blobPath, cancellationToken);
+
             return uri.ToString();
         }
         catch (Exception exception)

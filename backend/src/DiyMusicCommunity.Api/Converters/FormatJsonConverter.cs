@@ -19,6 +19,7 @@ public sealed class FormatJsonConverter : JsonConverter<Format>
     public override Format Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var value = reader.GetString();
+
         if (value is not null && FromString.TryGetValue(value, out var format))
         {
             return format;
